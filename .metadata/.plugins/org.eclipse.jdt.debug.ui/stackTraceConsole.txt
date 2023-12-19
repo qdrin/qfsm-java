@@ -1,5 +1,0 @@
-                <dependency>
-                                <groupId>org.springframework.statemachine</groupId>
-                                <artifactId>spring-statemachine-core</artifactId>
-                                <version>${spring-statemachine.version}</version>
-                </dependency>
