@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="org.springframework.boot.CommandLineRunner"/>
+    <fullyQualifiedTypeName name="jdk.internal.org.jline.utils.Log"/>
+    <fullyQualifiedTypeName name="lombok.extern.slf4j.Slf4j"/>
+    <fullyQualifiedTypeName name="org.qdrin.qfsm.machine.events.Events"/>
+    <fullyQualifiedTypeName name="org.qdrin.qfsm.machine.states.States"/>
+    <fullyQualifiedTypeName name="org.springframework.statemachine.state.State"/>
+</qualifiedTypeNameHistroy>
