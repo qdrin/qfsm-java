@@ -7,15 +7,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.statemachine.StateMachine;
-import org.qdrin.qfsm.machine.Events;
-import org.qdrin.qfsm.machine.States;
 
 @Slf4j
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
 	@Autowired
-	private StateMachine<States, Events> stateMachine;
+	private StateMachine<String, String> stateMachine;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
@@ -25,19 +23,27 @@ public class Application implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		Scanner in = new Scanner(System.in);
 		String input = "disconnect";
+		stateMachine.start();
+		log.info("state: {}, initialState: {}", stateMachine.getState().getId(), stateMachine.getInitialState().getId());
 		while(! input.equals("exit")) {
 			System.out.print("input event name(exit to exit):");
 			input = in.nextLine();
 			try {
-				Events event = Events.valueOf(input);
-				log.info("Sending event: {}", input);
-				stateMachine.sendEvent(event);
+				var state0 = stateMachine.getState();
+				String sname0 = (state0 == null) ? "null" : state0.getId();
+				log.info("state: {}, sending event: {}", sname0, input);
+
+				stateMachine.sendEvent(input);
+				var state = stateMachine.getState();
+				String sname = (state == null) ? "null" : state.getId();
+				log.info("currentState: {}", sname);
 			} catch(IllegalArgumentException e) {
 				log.info("'{}' is not valid event name. Try more", input);
 				continue;
 			}
 		}
 		log.info("exiting...");
+		stateMachine.stop();
 		in.close();
 	}
 }
