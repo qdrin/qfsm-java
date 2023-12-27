@@ -38,8 +38,6 @@
               </subvertex>
             </region>
           </subvertex>
-          <subvertex xmi:type="uml:State" xmi:id="_T069MKSFEe6rvq_AkA4_SQ" name="Payment"/>
-          <subvertex xmi:type="uml:State" xmi:id="_aHJwQKSFEe6rvq_AkA4_SQ" name="Price"/>
         </region>
       </subvertex>
     </region>
