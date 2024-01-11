@@ -5,49 +5,56 @@
   </packageImport>
   <packagedElement xmi:type="uml:StateMachine" xmi:id="_B2NPAJ5dEe6bEMWh5jDIIQ" name="StateMachine1" isActive="true">
     <region xmi:type="uml:Region" xmi:id="_B2814J5dEe6bEMWh5jDIIQ" name="Region1">
-      <transition xmi:type="uml:Transition" xmi:id="_PjExQKAWEe6Sh616vaZpZA" source="_omt5EKAPEe6Sh616vaZpZA" target="_Gay-IKAWEe6Sh616vaZpZA"/>
-      <transition xmi:type="uml:Transition" xmi:id="_GVeVgKSFEe6rvq_AkA4_SQ" source="_NQCOAJ5dEe6bEMWh5jDIIQ" target="_FAXpQKMQEe6O1Jiq5C6Z5w"/>
-      <subvertex xmi:type="uml:State" xmi:id="_NQCOAJ5dEe6bEMWh5jDIIQ" name="Disconnected"/>
+      <transition xmi:type="uml:Transition" xmi:id="_PjExQKAWEe6Sh616vaZpZA" source="_omt5EKAPEe6Sh616vaZpZA" target="_Gay-IKAWEe6Sh616vaZpZA">
+        <trigger xmi:type="uml:Trigger" xmi:id="_6GxzkLCDEe6zeo6uvgVLWA" event="_HGxUkLCDEe6zeo6uvgVLWA"/>
+      </transition>
+      <transition xmi:type="uml:Transition" xmi:id="_njLqoLCFEe6zeo6uvgVLWA" source="_PR87YLCFEe6zeo6uvgVLWA" target="_bn-c4LCFEe6zeo6uvgVLWA">
+        <trigger xmi:type="uml:Trigger" xmi:id="_GQTfQLCGEe6zeo6uvgVLWA" event="_VSTmMLCDEe6zeo6uvgVLWA"/>
+      </transition>
+      <transition xmi:type="uml:Transition" xmi:id="_4EikILCFEe6zeo6uvgVLWA" source="_Gay-IKAWEe6Sh616vaZpZA" target="_PR87YLCFEe6zeo6uvgVLWA">
+        <trigger xmi:type="uml:Trigger" xmi:id="_9Tf8ULCFEe6zeo6uvgVLWA" event="_RYkUgLCDEe6zeo6uvgVLWA"/>
+      </transition>
+      <transition xmi:type="uml:Transition" xmi:id="_WT8FgLCHEe6zeo6uvgVLWA" source="_bn-c4LCFEe6zeo6uvgVLWA" target="_GOcooLCHEe6zeo6uvgVLWA">
+        <trigger xmi:type="uml:Trigger" xmi:id="_YHAloLCHEe6zeo6uvgVLWA" event="_ZOkncLCDEe6zeo6uvgVLWA"/>
+      </transition>
+      <transition xmi:type="uml:Transition" xmi:id="_2aPTkLCHEe6zeo6uvgVLWA" source="_Gay-IKAWEe6Sh616vaZpZA" target="_rfbL0LCHEe6zeo6uvgVLWA">
+        <trigger xmi:type="uml:Trigger" xmi:id="_4i_IwLCHEe6zeo6uvgVLWA" event="_yjXIoLCHEe6zeo6uvgVLWA"/>
+      </transition>
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_omt5EKAPEe6Sh616vaZpZA"/>
       <subvertex xmi:type="uml:State" xmi:id="_Gay-IKAWEe6Sh616vaZpZA" name="PendingActivate"/>
-      <subvertex xmi:type="uml:FinalState" xmi:id="_FAXpQKMQEe6O1Jiq5C6Z5w" name=""/>
-      <subvertex xmi:type="uml:State" xmi:id="_v0o_IKR_Ee6rvq_AkA4_SQ" name="ProductProvision">
-        <region xmi:type="uml:Region" xmi:id="_y-WiEKR_Ee6rvq_AkA4_SQ" name="Region1">
-          <subvertex xmi:type="uml:State" xmi:id="_y-ZlYKR_Ee6rvq_AkA4_SQ" name="Usage">
-            <region xmi:type="uml:Region" xmi:id="_uHlxAKSLEe6rvq_AkA4_SQ" name="Region1">
-              <subvertex xmi:type="uml:State" xmi:id="_uHpbYKSLEe6rvq_AkA4_SQ" name="UsageOn">
-                <region xmi:type="uml:Region" xmi:id="_2akFEqSREe6rvq_AkA4_SQ" name="Region1">
-                  <subvertex xmi:type="uml:State" xmi:id="_2alTNKSREe6rvq_AkA4_SQ" name="Activated">
-                    <region xmi:type="uml:Region" xmi:id="_6raPMqSREe6rvq_AkA4_SQ" name="Region1">
-                      <subvertex xmi:type="uml:State" xmi:id="_6rbdUqSREe6rvq_AkA4_SQ" name="Active"/>
-                      <subvertex xmi:type="uml:State" xmi:id="_-RbToKSREe6rvq_AkA4_SQ" name="ActiveTrial"/>
-                    </region>
-                  </subvertex>
-                  <subvertex xmi:type="uml:State" xmi:id="_ZAun0KSSEe6rvq_AkA4_SQ" name="Prolongation"/>
-                  <subvertex xmi:type="uml:State" xmi:id="_b9abYKSSEe6rvq_AkA4_SQ" name="Suspending"/>
-                  <subvertex xmi:type="uml:State" xmi:id="_hR-FQKSSEe6rvq_AkA4_SQ" name="Resuming"/>
-                  <subvertex xmi:type="uml:State" xmi:id="_kQrSEKSSEe6rvq_AkA4_SQ" name="Suspended"/>
-                </region>
-              </subvertex>
-              <subvertex xmi:type="uml:State" xmi:id="_8E3kMKSLEe6rvq_AkA4_SQ" name="UsageOff">
-                <region xmi:type="uml:Region" xmi:id="_2IyjIqSSEe6rvq_AkA4_SQ" name="Region1">
-                  <subvertex xmi:type="uml:State" xmi:id="_2IzxQKSSEe6rvq_AkA4_SQ" name="PendingDisconnect"/>
-                  <subvertex xmi:type="uml:State" xmi:id="_6rJ7EKSSEe6rvq_AkA4_SQ" name="Disconnection"/>
-                  <subvertex xmi:type="uml:State" xmi:id="_9l7DEKSSEe6rvq_AkA4_SQ" name="Disconnected"/>
-                </region>
-              </subvertex>
-            </region>
-          </subvertex>
+      <subvertex xmi:type="uml:State" xmi:id="_PR87YLCFEe6zeo6uvgVLWA" name="UsageOn">
+        <region xmi:type="uml:Region" xmi:id="_XDBrALCFEe6zeo6uvgVLWA" name="Region1">
+          <transition xmi:type="uml:Transition" xmi:id="_lmfUcLCFEe6zeo6uvgVLWA" source="_iFhIELCFEe6zeo6uvgVLWA" target="_XDC5ILCFEe6zeo6uvgVLWA"/>
+          <transition xmi:type="uml:Transition" xmi:id="_tDji8LCFEe6zeo6uvgVLWA" source="_ZHVFELCFEe6zeo6uvgVLWA" target="_XDC5ILCFEe6zeo6uvgVLWA">
+            <trigger xmi:type="uml:Trigger" xmi:id="_CAP_ULCGEe6zeo6uvgVLWA" event="_667zIKAWEe6Sh616vaZpZA"/>
+          </transition>
+          <transition xmi:type="uml:Transition" xmi:id="_u3eXoLCFEe6zeo6uvgVLWA" source="_XDC5ILCFEe6zeo6uvgVLWA" target="_ZHVFELCFEe6zeo6uvgVLWA">
+            <trigger xmi:type="uml:Trigger" xmi:id="__yGswLCFEe6zeo6uvgVLWA" event="_1PsuoKAWEe6Sh616vaZpZA"/>
+          </transition>
+          <subvertex xmi:type="uml:State" xmi:id="_XDC5ILCFEe6zeo6uvgVLWA" name="Active"/>
+          <subvertex xmi:type="uml:State" xmi:id="_ZHVFELCFEe6zeo6uvgVLWA" name="Suspended"/>
+          <subvertex xmi:type="uml:Pseudostate" xmi:id="_iFhIELCFEe6zeo6uvgVLWA"/>
         </region>
       </subvertex>
+      <subvertex xmi:type="uml:State" xmi:id="_bn-c4LCFEe6zeo6uvgVLWA" name="PendingDisconnect"/>
+      <subvertex xmi:type="uml:State" xmi:id="_GOcooLCHEe6zeo6uvgVLWA" name="Disconnect"/>
+      <subvertex xmi:type="uml:State" xmi:id="_rfbL0LCHEe6zeo6uvgVLWA" name="Aborted"/>
     </region>
   </packagedElement>
-  <packagedElement xmi:type="uml:Signal" xmi:id="_sl_u4KALEe6Sh616vaZpZA" name="activate"/>
-  <packagedElement xmi:type="uml:Signal" xmi:id="_wtLmsKALEe6Sh616vaZpZA" name="deactivate"/>
   <packagedElement xmi:type="uml:Signal" xmi:id="_1mdCwKALEe6Sh616vaZpZA" name="suspend"/>
   <packagedElement xmi:type="uml:Signal" xmi:id="_4XV2AKALEe6Sh616vaZpZA" name="resume"/>
-  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_9oTVIKASEe6Sh616vaZpZA" name="SignalEventActivate" signal="_sl_u4KALEe6Sh616vaZpZA"/>
-  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_cUWrYKAWEe6Sh616vaZpZA" name="SignalEventDeactivate" signal="_wtLmsKALEe6Sh616vaZpZA"/>
-  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_1PsuoKAWEe6Sh616vaZpZA" name="SignalEventSuspend" signal="_1mdCwKALEe6Sh616vaZpZA"/>
-  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_667zIKAWEe6Sh616vaZpZA" name="SignalEventResume" signal="_4XV2AKALEe6Sh616vaZpZA"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_1PsuoKAWEe6Sh616vaZpZA" name="SESuspend" signal="_1mdCwKALEe6Sh616vaZpZA"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_667zIKAWEe6Sh616vaZpZA" name="SEResume" signal="_4XV2AKALEe6Sh616vaZpZA"/>
+  <packagedElement xmi:type="uml:Signal" xmi:id="_rhFyALCCEe6zeo6uvgVLWA" name="activation_started"/>
+  <packagedElement xmi:type="uml:Signal" xmi:id="_0D_AILCCEe6zeo6uvgVLWA" name="activation_completed"/>
+  <packagedElement xmi:type="uml:Signal" xmi:id="_6w-ckLCCEe6zeo6uvgVLWA" name="deactivation_started"/>
+  <packagedElement xmi:type="uml:Signal" xmi:id="_90oa0LCCEe6zeo6uvgVLWA" name="deactivation_completed"/>
+  <packagedElement xmi:type="uml:Signal" xmi:id="_AtznYLCDEe6zeo6uvgVLWA" name="disconnect"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_HGxUkLCDEe6zeo6uvgVLWA" name="SEActivationStarted" signal="_rhFyALCCEe6zeo6uvgVLWA"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_RYkUgLCDEe6zeo6uvgVLWA" name="SEActivationCompleted" signal="_0D_AILCCEe6zeo6uvgVLWA"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_VSTmMLCDEe6zeo6uvgVLWA" name="SEDeactivationStarted" signal="_6w-ckLCCEe6zeo6uvgVLWA"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_ZOkncLCDEe6zeo6uvgVLWA" name="SEDeactivationCompleted" signal="_90oa0LCCEe6zeo6uvgVLWA"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_caph4LCDEe6zeo6uvgVLWA" name="SEDisconnect" signal="_AtznYLCDEe6zeo6uvgVLWA"/>
+  <packagedElement xmi:type="uml:Signal" xmi:id="_vRdTALCHEe6zeo6uvgVLWA" name="activation_aborted"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_yjXIoLCHEe6zeo6uvgVLWA" name="SEActivationAborted" signal="_vRdTALCHEe6zeo6uvgVLWA"/>
 </uml:Model>

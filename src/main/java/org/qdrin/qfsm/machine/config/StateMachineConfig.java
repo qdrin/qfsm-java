@@ -7,12 +7,11 @@ import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
-import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableStateMachine
 public class StateMachineConfig extends StateMachineConfigurerAdapter<String, String>{
-
+  
   @Override
   public void configure(StateMachineModelConfigurer<String, String> model) throws Exception {
     model.withModel().factory(modelFactory());
