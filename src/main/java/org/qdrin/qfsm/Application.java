@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.state.AbstractState;
 
 @Slf4j
 @SpringBootApplication
@@ -31,9 +32,7 @@ public class Application implements CommandLineRunner {
 		runsm.block();
 		var state = stateMachine.getState();
 		String sname = (state == null) ? "null" : state.getId();
-		var extstate = stateMachine.getExtendedState();
-		var customvar = extstate.getVariables();  // .getOrDefault("customvar", "Null").toString();
-		log.info("state: {}, customvar: {}", sname, customvar);
+		log.info("state: {}, isSubmachineState: {}", sname, state.isSubmachineState());
 		System.out.println("checking System.out.println. OK");
 		while(! input.equals("exit")) {
 			log.info("input event name(exit to exit):");
@@ -47,11 +46,14 @@ public class Application implements CommandLineRunner {
 					.withPayload(input).build());
 				var evResult = stateMachine.sendEvent(msg).collectList();
 				evResult.block();
-				var id = stateMachine.getId();
 				state = stateMachine.getState();
 				sname = (state == null) ? "null" : state.getId();
-				log.info("new state: {}, id: {}", sname, id);
-				states = state0.getStates();
+				String subId = "Null";
+				if(state.isSubmachineState()) {
+					var submachine = ((AbstractState<String, String>) state).getSubmachine();
+					sname = String.format("%s->%s", sname, submachine.getState().getId());
+				}
+				log.info("new state: {}", sname);
 			} catch(IllegalArgumentException e) {
 				log.info("'{}' is not valid event name. Try more", input);
 				continue;
