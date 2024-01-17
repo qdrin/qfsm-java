@@ -12,6 +12,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.state.AbstractState;
+import org.springframework.statemachine.state.State;
 
 @Slf4j
 @SpringBootApplication
@@ -20,6 +21,16 @@ public class Application implements CommandLineRunner {
 	@Autowired
 	private StateMachine<String, String> stateMachine;
 
+	private String getMachineState() {
+		State<String, String> state = stateMachine.getState();
+		String mstate = state.getId();
+		while(state.isSubmachineState()) {
+			StateMachine<String, String> submachine = ((AbstractState<String, String>) state).getSubmachine();
+			state = submachine.getState();
+			mstate = mstate + "->" + state.getId();
+		}
+		return mstate;
+	}
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
@@ -33,7 +44,6 @@ public class Application implements CommandLineRunner {
 		var state = stateMachine.getState();
 		String sname = (state == null) ? "null" : state.getId();
 		log.info("state: {}, isSubmachineState: {}", sname, state.isSubmachineState());
-		System.out.println("checking System.out.println. OK");
 		while(! input.equals("exit")) {
 			log.info("input event name(exit to exit):");
 			input = in.nextLine();
@@ -41,18 +51,12 @@ public class Application implements CommandLineRunner {
 				var state0 = stateMachine.getState();
 				String sname0 = (state0 == null) ? "null" : state0.getId();
 				log.info("current state: {}, sending event: {}", sname0, input);
-				var states = state0.getStates();
 				Mono<Message<String>> msg = Mono.just(MessageBuilder
 					.withPayload(input).build());
 				var evResult = stateMachine.sendEvent(msg).collectList();
 				evResult.block();
 				state = stateMachine.getState();
-				sname = (state == null) ? "null" : state.getId();
-				String subId = "Null";
-				if(state.isSubmachineState()) {
-					var submachine = ((AbstractState<String, String>) state).getSubmachine();
-					sname = String.format("%s->%s", sname, submachine.getState().getId());
-				}
+				sname = getMachineState();
 				log.info("new state: {}", sname);
 			} catch(IllegalArgumentException e) {
 				log.info("'{}' is not valid event name. Try more", input);
