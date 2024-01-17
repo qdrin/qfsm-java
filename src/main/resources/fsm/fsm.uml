@@ -21,9 +21,15 @@
         <trigger xmi:type="uml:Trigger" xmi:id="_4i_IwLCHEe6zeo6uvgVLWA" event="_yjXIoLCHEe6zeo6uvgVLWA"/>
       </transition>
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_omt5EKAPEe6Sh616vaZpZA"/>
-      <subvertex xmi:type="uml:State" xmi:id="_Gay-IKAWEe6Sh616vaZpZA" name="PendingActivate"/>
+      <subvertex xmi:type="uml:State" xmi:id="_Gay-IKAWEe6Sh616vaZpZA" name="PendingActivate">
+        <entry xmi:type="uml:OpaqueBehavior" xmi:id="_NsvyYLUKEe6GmqK4b9jh0A" name="stateLogAction">
+          <language>bean</language>
+          <body>stateLogAction</body>
+        </entry>
+      </subvertex>
       <subvertex xmi:type="uml:State" xmi:id="_PR87YLCFEe6zeo6uvgVLWA" name="UsageOn">
-        <region xmi:type="uml:Region" xmi:id="_XDBrALCFEe6zeo6uvgVLWA" name="Region1">
+        <region xmi:type="uml:Region" xmi:id="_XDBrALCFEe6zeo6uvgVLWA" name="Region1"/>
+        <region xmi:type="uml:Region" xmi:id="_lWGhELEfEe65QITknCn82A" name="Region2">
           <transition xmi:type="uml:Transition" xmi:id="_lmfUcLCFEe6zeo6uvgVLWA" source="_iFhIELCFEe6zeo6uvgVLWA" target="_XDC5ILCFEe6zeo6uvgVLWA"/>
           <transition xmi:type="uml:Transition" xmi:id="_tDji8LCFEe6zeo6uvgVLWA" source="_ZHVFELCFEe6zeo6uvgVLWA" target="_XDC5ILCFEe6zeo6uvgVLWA">
             <trigger xmi:type="uml:Trigger" xmi:id="_CAP_ULCGEe6zeo6uvgVLWA" event="_667zIKAWEe6Sh616vaZpZA"/>
@@ -31,7 +37,12 @@
           <transition xmi:type="uml:Transition" xmi:id="_u3eXoLCFEe6zeo6uvgVLWA" source="_XDC5ILCFEe6zeo6uvgVLWA" target="_ZHVFELCFEe6zeo6uvgVLWA">
             <trigger xmi:type="uml:Trigger" xmi:id="__yGswLCFEe6zeo6uvgVLWA" event="_1PsuoKAWEe6Sh616vaZpZA"/>
           </transition>
-          <subvertex xmi:type="uml:State" xmi:id="_XDC5ILCFEe6zeo6uvgVLWA" name="Active"/>
+          <subvertex xmi:type="uml:State" xmi:id="_XDC5ILCFEe6zeo6uvgVLWA" name="Active">
+            <entry xmi:type="uml:OpaqueBehavior" xmi:id="_mwRPULUMEe6GmqK4b9jh0A" name="stateLogAction">
+              <language>bean</language>
+              <body>stateLogAction</body>
+            </entry>
+          </subvertex>
           <subvertex xmi:type="uml:State" xmi:id="_ZHVFELCFEe6zeo6uvgVLWA" name="Suspended"/>
           <subvertex xmi:type="uml:Pseudostate" xmi:id="_iFhIELCFEe6zeo6uvgVLWA"/>
         </region>

@@ -18,7 +18,7 @@
               <layoutConstraint xmi:type="notation:Location" xmi:id="_om5fQ6APEe6Sh616vaZpZA" x="25" y="-10"/>
             </children>
             <element xmi:type="uml:Pseudostate" href="fsm.uml#_omt5EKAPEe6Sh616vaZpZA"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_om44MaAPEe6Sh616vaZpZA" x="139" y="161"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_om44MaAPEe6Sh616vaZpZA" x="59" y="161"/>
           </children>
           <children xmi:type="notation:Shape" xmi:id="_GbOb8KAWEe6Sh616vaZpZA" type="State_Shape">
             <children xmi:type="notation:DecorationNode" xmi:id="_GbOb8qAWEe6Sh616vaZpZA" type="State_NameLabel"/>
@@ -28,10 +28,21 @@
             <children xmi:type="notation:BasicCompartment" xmi:id="_GbOb9aAWEe6Sh616vaZpZA" type="State_RegionCompartment">
               <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GbOb9qAWEe6Sh616vaZpZA"/>
             </children>
+            <children xmi:type="notation:BasicCompartment" xmi:id="_10mbMLEcEe65QITknCn82A" type="compartment_shape_display">
+              <styles xmi:type="notation:TitleStyle" xmi:id="_10mbMbEcEe65QITknCn82A"/>
+              <layoutConstraint xmi:type="notation:Bounds" xmi:id="_10mbMrEcEe65QITknCn82A"/>
+            </children>
+            <children xmi:type="notation:Shape" xmi:id="_Ns0q4LUKEe6GmqK4b9jh0A" type="Behavior_EntryBehaviorLabel">
+              <element xmi:type="uml:OpaqueBehavior" href="fsm.uml#_NsvyYLUKEe6GmqK4b9jh0A"/>
+              <layoutConstraint xmi:type="notation:Location" xmi:id="_Ns0q4bUKEe6GmqK4b9jh0A" x="-10" y="-10"/>
+            </children>
             <element xmi:type="uml:State" href="fsm.uml#_Gay-IKAWEe6Sh616vaZpZA"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GbOb8aAWEe6Sh616vaZpZA" x="279" y="161"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GbOb8aAWEe6Sh616vaZpZA" x="119" y="161"/>
           </children>
           <children xmi:type="notation:Shape" xmi:id="_PSIhkLCFEe6zeo6uvgVLWA" type="State_Shape">
+            <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pERncLRKEe6LZYMK2f09yQ" source="PapyrusCSSForceValue">
+              <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pERncbRKEe6LZYMK2f09yQ" key="mutable" value="true"/>
+            </eAnnotations>
             <children xmi:type="notation:DecorationNode" xmi:id="_PSIhkrCFEe6zeo6uvgVLWA" type="State_NameLabel">
               <layoutConstraint xmi:type="notation:Bounds" xmi:id="_QDSRsLCFEe6zeo6uvgVLWA" width="461" height="19"/>
             </children>
@@ -41,10 +52,11 @@
             <children xmi:type="notation:BasicCompartment" xmi:id="_PSJIoLCFEe6zeo6uvgVLWA" type="State_RegionCompartment">
               <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XDAc4LCFEe6zeo6uvgVLWA" source="PapyrusCSSForceValue">
                 <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XDAc4bCFEe6zeo6uvgVLWA" key="visible" value="true"/>
+                <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lbCrcLEfEe65QITknCn82A" key="mutable" value="true"/>
               </eAnnotations>
               <children xmi:type="notation:Shape" xmi:id="_XDCSELCFEe6zeo6uvgVLWA" type="Region_Shape">
                 <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XDCSFLCFEe6zeo6uvgVLWA" source="RegionAnnotationKey">
-                  <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XDCSFbCFEe6zeo6uvgVLWA" key="RegionZoneKey" value=""/>
+                  <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XDCSFbCFEe6zeo6uvgVLWA" key="RegionZoneKey" value="L"/>
                 </eAnnotations>
                 <children xmi:type="notation:BasicCompartment" xmi:id="_XDCSErCFEe6zeo6uvgVLWA" type="Region_SubvertexCompartment">
                   <children xmi:type="notation:Shape" xmi:id="_XDEHQLCFEe6zeo6uvgVLWA" type="State_Shape">
@@ -56,6 +68,14 @@
                     </children>
                     <children xmi:type="notation:BasicCompartment" xmi:id="_XDEHRbCFEe6zeo6uvgVLWA" type="State_RegionCompartment">
                       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XDEHRrCFEe6zeo6uvgVLWA" y="-1" width="101"/>
+                    </children>
+                    <children xmi:type="notation:BasicCompartment" xmi:id="_11LC8LEcEe65QITknCn82A" type="compartment_shape_display">
+                      <styles xmi:type="notation:TitleStyle" xmi:id="_11LC8bEcEe65QITknCn82A"/>
+                      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_11LC8rEcEe65QITknCn82A"/>
+                    </children>
+                    <children xmi:type="notation:Shape" xmi:id="_mwUSoLUMEe6GmqK4b9jh0A" type="Behavior_EntryBehaviorLabel">
+                      <element xmi:type="uml:OpaqueBehavior" href="fsm.uml#_mwRPULUMEe6GmqK4b9jh0A"/>
+                      <layoutConstraint xmi:type="notation:Location" xmi:id="_mwUSobUMEe6GmqK4b9jh0A" x="-10" y="-10"/>
                     </children>
                     <element xmi:type="uml:State" href="fsm.uml#_XDC5ILCFEe6zeo6uvgVLWA"/>
                     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XDEHQbCFEe6zeo6uvgVLWA" x="119" y="101" width="101"/>
@@ -86,9 +106,43 @@
                   <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XDCSE7CFEe6zeo6uvgVLWA"/>
                 </children>
                 <element xmi:type="uml:Region" href="fsm.uml#_XDBrALCFEe6zeo6uvgVLWA"/>
-                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XDCSEbCFEe6zeo6uvgVLWA" width="461" height="328"/>
+                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_XDCSEbCFEe6zeo6uvgVLWA" width="455" height="328"/>
+              </children>
+              <children xmi:type="notation:Shape" xmi:id="_lXRlwLEfEe65QITknCn82A" type="Region_Shape">
+                <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_lXSz4rEfEe65QITknCn82A" source="RegionAnnotationKey">
+                  <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lXTa8LEfEe65QITknCn82A" key="RegionZoneKey" value="R"/>
+                </eAnnotations>
+                <children xmi:type="notation:BasicCompartment" xmi:id="_lXSz4LEfEe65QITknCn82A" type="Region_SubvertexCompartment">
+                  <layoutConstraint xmi:type="notation:Bounds" xmi:id="_lXSz4bEfEe65QITknCn82A"/>
+                </children>
+                <element xmi:type="uml:Region" href="fsm.uml#_lWGhELEfEe65QITknCn82A"/>
+                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_lXRlwbEfEe65QITknCn82A" x="455" width="5" height="328"/>
               </children>
               <layoutConstraint xmi:type="notation:Bounds" xmi:id="_PSJIobCFEe6zeo6uvgVLWA" y="19" width="461" height="328"/>
+            </children>
+            <children xmi:type="notation:BasicCompartment" xmi:id="_oqKeULRKEe6LZYMK2f09yQ" type="compartment_shape_display">
+              <styles xmi:type="notation:TitleStyle" xmi:id="_oqKeUbRKEe6LZYMK2f09yQ"/>
+              <layoutConstraint xmi:type="notation:Bounds" xmi:id="_oqKeUrRKEe6LZYMK2f09yQ"/>
+            </children>
+            <children xmi:type="notation:Shape" xmi:id="_oqSaILRKEe6LZYMK2f09yQ" type="Region_Shape">
+              <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pERncrRKEe6LZYMK2f09yQ" source="PapyrusCSSForceValue">
+                <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pERnc7RKEe6LZYMK2f09yQ" key="mutable" value="true"/>
+              </eAnnotations>
+              <children xmi:type="notation:BasicCompartment" xmi:id="_oqTBMLRKEe6LZYMK2f09yQ" type="Region_SubvertexCompartment">
+                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_oqTBMbRKEe6LZYMK2f09yQ"/>
+              </children>
+              <element xmi:type="uml:Region" href="fsm.uml#_XDBrALCFEe6zeo6uvgVLWA"/>
+              <layoutConstraint xmi:type="notation:Bounds" xmi:id="_oqSaIbRKEe6LZYMK2f09yQ" x="-10" y="-10"/>
+            </children>
+            <children xmi:type="notation:Shape" xmi:id="_oqToQLRKEe6LZYMK2f09yQ" type="Region_Shape">
+              <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pERndLRKEe6LZYMK2f09yQ" source="PapyrusCSSForceValue">
+                <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pERndbRKEe6LZYMK2f09yQ" key="mutable" value="true"/>
+              </eAnnotations>
+              <children xmi:type="notation:BasicCompartment" xmi:id="_oqToQrRKEe6LZYMK2f09yQ" type="Region_SubvertexCompartment">
+                <layoutConstraint xmi:type="notation:Bounds" xmi:id="_oqToQ7RKEe6LZYMK2f09yQ"/>
+              </children>
+              <element xmi:type="uml:Region" href="fsm.uml#_lWGhELEfEe65QITknCn82A"/>
+              <layoutConstraint xmi:type="notation:Bounds" xmi:id="_oqToQbRKEe6LZYMK2f09yQ" x="-10" y="-10"/>
             </children>
             <element xmi:type="uml:State" href="fsm.uml#_PR87YLCFEe6zeo6uvgVLWA"/>
             <layoutConstraint xmi:type="notation:Bounds" xmi:id="_PSIhkbCFEe6zeo6uvgVLWA" x="479" y="21" width="461" height="347"/>
@@ -232,12 +286,15 @@
   </edges>
   <edges xmi:type="notation:Connector" xmi:id="_4EzC0LCFEe6zeo6uvgVLWA" type="Transition_Edge" source="_GbOb8KAWEe6Sh616vaZpZA" target="_PSIhkLCFEe6zeo6uvgVLWA">
     <children xmi:type="notation:DecorationNode" xmi:id="_4Ezp4LCFEe6zeo6uvgVLWA" type="Transition_NameLabel">
+      <styles xmi:type="notation:BooleanValueStyle" xmi:id="_oL4VALOIEe65QITknCn82A" name="IS_UPDATED_POSITION" booleanValue="true"/>
       <layoutConstraint xmi:type="notation:Location" xmi:id="_4Ezp4bCFEe6zeo6uvgVLWA" y="20"/>
     </children>
     <children xmi:type="notation:DecorationNode" xmi:id="_4Ezp4rCFEe6zeo6uvgVLWA" type="Transition_GuardLabel">
+      <styles xmi:type="notation:BooleanValueStyle" xmi:id="_oMQvgLOIEe65QITknCn82A" name="IS_UPDATED_POSITION" booleanValue="true"/>
       <layoutConstraint xmi:type="notation:Location" xmi:id="_4Ezp47CFEe6zeo6uvgVLWA" y="-20"/>
     </children>
     <children xmi:type="notation:DecorationNode" xmi:id="_4Ezp5LCFEe6zeo6uvgVLWA" type="Transition_StereotypeLabel">
+      <styles xmi:type="notation:BooleanValueStyle" xmi:id="_oMmGsLOIEe65QITknCn82A" name="IS_UPDATED_POSITION" booleanValue="true"/>
       <layoutConstraint xmi:type="notation:Location" xmi:id="_4Ezp5bCFEe6zeo6uvgVLWA" y="60"/>
     </children>
     <styles xmi:type="notation:FontStyle" xmi:id="_4EzC0bCFEe6zeo6uvgVLWA"/>
@@ -264,13 +321,16 @@
   </edges>
   <edges xmi:type="notation:Connector" xmi:id="_2aiOgLCHEe6zeo6uvgVLWA" type="Transition_Edge" source="_GbOb8KAWEe6Sh616vaZpZA" target="_rfp1ULCHEe6zeo6uvgVLWA">
     <children xmi:type="notation:DecorationNode" xmi:id="_2aiOg7CHEe6zeo6uvgVLWA" type="Transition_NameLabel">
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_2aiOhLCHEe6zeo6uvgVLWA" y="20"/>
+      <styles xmi:type="notation:BooleanValueStyle" xmi:id="_oM8sALOIEe65QITknCn82A" name="IS_UPDATED_POSITION" booleanValue="true"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_2aiOhLCHEe6zeo6uvgVLWA" x="-1" y="18"/>
     </children>
     <children xmi:type="notation:DecorationNode" xmi:id="_2aiOhbCHEe6zeo6uvgVLWA" type="Transition_GuardLabel">
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_2aiOhrCHEe6zeo6uvgVLWA" y="-20"/>
+      <styles xmi:type="notation:BooleanValueStyle" xmi:id="_oNQ1ELOIEe65QITknCn82A" name="IS_UPDATED_POSITION" booleanValue="true"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_2aiOhrCHEe6zeo6uvgVLWA" y="-19"/>
     </children>
     <children xmi:type="notation:DecorationNode" xmi:id="_2aiOh7CHEe6zeo6uvgVLWA" type="Transition_StereotypeLabel">
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_2aiOiLCHEe6zeo6uvgVLWA" y="60"/>
+      <styles xmi:type="notation:BooleanValueStyle" xmi:id="_oNmzULOIEe65QITknCn82A" name="IS_UPDATED_POSITION" booleanValue="true"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_2aiOiLCHEe6zeo6uvgVLWA" x="1" y="58"/>
     </children>
     <styles xmi:type="notation:FontStyle" xmi:id="_2aiOgbCHEe6zeo6uvgVLWA"/>
     <element xmi:type="uml:Transition" href="fsm.uml#_2aPTkLCHEe6zeo6uvgVLWA"/>

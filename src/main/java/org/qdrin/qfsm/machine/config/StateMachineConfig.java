@@ -1,5 +1,6 @@
 package org.qdrin.qfsm.machine.config;
 
+import org.qdrin.qfsm.machine.StateLogAction;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.config.EnableStateMachine;
@@ -20,5 +21,10 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   @Bean
   public StateMachineModelFactory<String, String> modelFactory() {
     return new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
+  }
+
+  @Bean
+  public StateLogAction stateLogAction() {
+    return new StateLogAction();
   }
 }
