@@ -21,6 +21,7 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   @Bean
   public StateMachineModelFactory<String, String> modelFactory() {
     return new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
+    // return new UmlStateMachineModelFactory("classpath:uml_sample/simple-forkjoin.uml");
   }
 
   @Bean

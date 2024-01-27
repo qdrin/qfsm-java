@@ -13,8 +13,8 @@
         <trigger xmi:type="uml:Trigger" xmi:id="_xWcMsLoCEe6yNs2FzguhlQ" event="_RYkUgLCDEe6zeo6uvgVLWA"/>
       </transition>
       <transition xmi:type="uml:Transition" xmi:id="_duoNsLoEEe6yNs2FzguhlQ" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_uSPjQLn_Ee6yNs2FzguhlQ"/>
-      <transition xmi:type="uml:Transition" xmi:id="_qvk7gLoEEe6yNs2FzguhlQ" source="_lUS-kLoEEe6yNs2FzguhlQ" target="_dizDALXkEe6PAs2TUsdVsw"/>
       <transition xmi:type="uml:Transition" xmi:id="_2w1t8LoEEe6yNs2FzguhlQ" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_yybJ4Ln_Ee6yNs2FzguhlQ"/>
+      <transition xmi:type="uml:Transition" xmi:id="_BILcILztEe6WIIctFrkbQg" source="_lUS-kLoEEe6yNs2FzguhlQ" target="__Z-08LzsEe6WIIctFrkbQg"/>
       <subvertex xmi:type="uml:State" xmi:id="_Gay-IKAWEe6Sh616vaZpZA" name="PendingActivate">
         <entry xmi:type="uml:OpaqueBehavior" xmi:id="_NsvyYLUKEe6GmqK4b9jh0A" name="stateLogAction">
           <language>bean</language>
@@ -22,34 +22,37 @@
         </entry>
       </subvertex>
       <subvertex xmi:type="uml:State" xmi:id="_rfbL0LCHEe6zeo6uvgVLWA" name="Aborted"/>
-      <subvertex xmi:type="uml:State" xmi:id="_dizDALXkEe6PAs2TUsdVsw" name="Disconnect"/>
       <subvertex xmi:type="uml:State" xmi:id="_JUMqgLn8Ee6yNs2FzguhlQ" name="Provision">
         <region xmi:type="uml:Region" xmi:id="_0jIZ4Ln8Ee6yNs2FzguhlQ" name="Region1">
           <transition xmi:type="uml:Transition" xmi:id="_21ZQELn_Ee6yNs2FzguhlQ" source="_rT7YALn_Ee6yNs2FzguhlQ" target="_uSPjQLn_Ee6yNs2FzguhlQ"/>
+          <transition xmi:type="uml:Transition" xmi:id="_sU7cYLz8Ee6WIIctFrkbQg" source="_pUzTQLz8Ee6WIIctFrkbQg" target="_lUS-kLoEEe6yNs2FzguhlQ"/>
           <subvertex xmi:type="uml:Pseudostate" xmi:id="_rT7YALn_Ee6yNs2FzguhlQ"/>
           <subvertex xmi:type="uml:State" xmi:id="_uSPjQLn_Ee6yNs2FzguhlQ" name="Usage">
-            <entry xmi:type="uml:OpaqueBehavior" xmi:id="_9DfpsLoCEe6yNs2FzguhlQ">
-              <language>bean</language>
-              <body>stateLogAction</body>
+            <entry xmi:type="uml:OpaqueBehavior" xmi:id="_7cIycL0EEe6WIIctFrkbQg">
+              <language>spel</language>
+              <body>extendedState.getVariables().put(&quot;usage&quot;,&quot;Usage&quot;)</body>
             </entry>
           </subvertex>
+          <subvertex xmi:type="uml:FinalState" xmi:id="_pUzTQLz8Ee6WIIctFrkbQg" name="UsageFinal"/>
         </region>
         <region xmi:type="uml:Region" xmi:id="_qVQJQLn_Ee6yNs2FzguhlQ" name="Region2">
           <transition xmi:type="uml:Transition" xmi:id="_1Edd8Ln_Ee6yNs2FzguhlQ" source="_rygxcLn_Ee6yNs2FzguhlQ" target="_yybJ4Ln_Ee6yNs2FzguhlQ"/>
-          <transition xmi:type="uml:Transition" xmi:id="_RhSOcLoBEe6yNs2FzguhlQ" source="_uSPjQLn_Ee6yNs2FzguhlQ" target="_lUS-kLoEEe6yNs2FzguhlQ"/>
-          <transition xmi:type="uml:Transition" xmi:id="_4PbL0LoEEe6yNs2FzguhlQ" source="_yybJ4Ln_Ee6yNs2FzguhlQ" target="_lUS-kLoEEe6yNs2FzguhlQ"/>
+          <transition xmi:type="uml:Transition" xmi:id="_RhSOcLoBEe6yNs2FzguhlQ" source="_uSPjQLn_Ee6yNs2FzguhlQ" target="_pUzTQLz8Ee6WIIctFrkbQg">
+            <trigger xmi:type="uml:Trigger" xmi:id="_yldy4LznEe6WIIctFrkbQg" event="_VSTmMLCDEe6zeo6uvgVLWA"/>
+          </transition>
+          <transition xmi:type="uml:Transition" xmi:id="_asHLkLz8Ee6WIIctFrkbQg" source="_yybJ4Ln_Ee6yNs2FzguhlQ" target="_XTQZYLz8Ee6WIIctFrkbQg">
+            <trigger xmi:type="uml:Trigger" xmi:id="_dxkgoLz8Ee6WIIctFrkbQg" event="_ZOkncLCDEe6zeo6uvgVLWA"/>
+          </transition>
+          <transition xmi:type="uml:Transition" xmi:id="_fJG7ULz8Ee6WIIctFrkbQg" source="_XTQZYLz8Ee6WIIctFrkbQg" target="_lUS-kLoEEe6yNs2FzguhlQ"/>
           <subvertex xmi:type="uml:Pseudostate" xmi:id="_rygxcLn_Ee6yNs2FzguhlQ" name=""/>
-          <subvertex xmi:type="uml:State" xmi:id="_yybJ4Ln_Ee6yNs2FzguhlQ" name="Payment">
-            <doActivity xmi:type="uml:OpaqueBehavior" xmi:id="_S7a0sLoCEe6yNs2FzguhlQ">
-              <language>bean</language>
-              <body>stateLogAction</body>
-            </doActivity>
-          </subvertex>
+          <subvertex xmi:type="uml:State" xmi:id="_yybJ4Ln_Ee6yNs2FzguhlQ" name="Payment"/>
+          <subvertex xmi:type="uml:FinalState" xmi:id="_XTQZYLz8Ee6WIIctFrkbQg" name="PaymentFinal"/>
         </region>
       </subvertex>
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_ZdmsILn-Ee6yNs2FzguhlQ" name=""/>
-      <subvertex xmi:type="uml:Pseudostate" xmi:id="_bp6j8LoEEe6yNs2FzguhlQ" name="" kind="fork"/>
-      <subvertex xmi:type="uml:Pseudostate" xmi:id="_lUS-kLoEEe6yNs2FzguhlQ" kind="join"/>
+      <subvertex xmi:type="uml:Pseudostate" xmi:id="_bp6j8LoEEe6yNs2FzguhlQ" name="SFork" kind="fork"/>
+      <subvertex xmi:type="uml:Pseudostate" xmi:id="_lUS-kLoEEe6yNs2FzguhlQ" name="SJoin" kind="join"/>
+      <subvertex xmi:type="uml:State" xmi:id="__Z-08LzsEe6WIIctFrkbQg" name="Disconnect"/>
     </region>
   </packagedElement>
   <packagedElement xmi:type="uml:Signal" xmi:id="_1mdCwKALEe6Sh616vaZpZA" name="suspend"/>

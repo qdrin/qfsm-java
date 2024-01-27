@@ -57,7 +57,8 @@ public class Application implements CommandLineRunner {
 				evResult.block();
 				state = stateMachine.getState();
 				sname = getMachineState();
-				log.info("new state: {}", sname);
+				var variables = stateMachine.getExtendedState().getVariables();
+				log.info("new state: {}, variables: {}", sname, variables);
 			} catch(IllegalArgumentException e) {
 				log.info("'{}' is not valid event name. Try more", input);
 				continue;
