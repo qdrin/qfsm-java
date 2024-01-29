@@ -12,6 +12,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.state.AbstractState;
+import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
 
 @Slf4j
@@ -21,16 +22,32 @@ public class Application implements CommandLineRunner {
 	@Autowired
 	private StateMachine<String, String> stateMachine;
 
-	private String getMachineState() {
-		State<String, String> state = stateMachine.getState();
+	private String getMachineState(State<String, String> state) {
 		String mstate = state.getId();
-		while(state.isSubmachineState()) {
+		log.info("state {} ({}).isOrthogonal(): {}", state.getId(), state.getClass().getName(), state.isOrthogonal());
+		if (state.isOrthogonal()) {
+			RegionState<String, String> rstate = (RegionState) state;
+			log.info("regions: {}", rstate.getRegions());
+			mstate += "->[";
+			for(var r: rstate.getRegions()) {
+				log.info("orthogonal region: {}, state: {}", r.getId(), r.getState().getId());
+				mstate += getMachineState(r.getState()) + ",";
+			}
+			mstate = mstate.substring(0, mstate.length()-1) + "]";
+		}
+		if(state.isSubmachineState()) {
 			StateMachine<String, String> submachine = ((AbstractState<String, String>) state).getSubmachine();
-			state = submachine.getState();
-			mstate = mstate + "->" + state.getId();
+			State<String, String> sstate = submachine.getState();
+			mstate = mstate + "->" + getMachineState(sstate);
 		}
 		return mstate;
 	}
+
+	private String getMachineState() {
+		State<String, String> state = stateMachine.getState();
+		return getMachineState(state);
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}

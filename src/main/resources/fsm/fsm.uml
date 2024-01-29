@@ -45,7 +45,12 @@
           </transition>
           <transition xmi:type="uml:Transition" xmi:id="_fJG7ULz8Ee6WIIctFrkbQg" source="_XTQZYLz8Ee6WIIctFrkbQg" target="_lUS-kLoEEe6yNs2FzguhlQ"/>
           <subvertex xmi:type="uml:Pseudostate" xmi:id="_rygxcLn_Ee6yNs2FzguhlQ" name=""/>
-          <subvertex xmi:type="uml:State" xmi:id="_yybJ4Ln_Ee6yNs2FzguhlQ" name="Payment"/>
+          <subvertex xmi:type="uml:State" xmi:id="_yybJ4Ln_Ee6yNs2FzguhlQ" name="Payment">
+            <entry xmi:type="uml:OpaqueBehavior" xmi:id="_kgq6IL6iEe6_VZ6xu7bqOA">
+              <language>spel</language>
+              <body>extendedState.getVariables().put(&quot;payment&quot;,&quot;Payment&quot;)</body>
+            </entry>
+          </subvertex>
           <subvertex xmi:type="uml:FinalState" xmi:id="_XTQZYLz8Ee6WIIctFrkbQg" name="PaymentFinal"/>
         </region>
       </subvertex>
