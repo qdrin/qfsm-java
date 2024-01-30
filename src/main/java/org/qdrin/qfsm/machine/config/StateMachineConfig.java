@@ -1,6 +1,8 @@
 package org.qdrin.qfsm.machine.config;
 
 import org.qdrin.qfsm.machine.StateLogAction;
+import org.qdrin.qfsm.machine.guards.ActivatedGuard;
+import org.qdrin.qfsm.machine.states.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.config.EnableStateMachine;
@@ -27,5 +29,20 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   @Bean
   public StateLogAction stateLogAction() {
     return new StateLogAction();
+  }
+
+  @Bean
+  PendingDisconnectEntry pendingDisconnectEntry() {
+    return new PendingDisconnectEntry();
+  }
+
+  @Bean
+  public ActivatedGuard activeGuard() {
+    return new ActivatedGuard("ACTIVE");
+  }
+
+  @Bean
+  public ActivatedGuard activeTrialGuard() {
+    return new ActivatedGuard("ACTIVE_TRIAL");
   }
 }

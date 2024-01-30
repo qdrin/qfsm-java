@@ -17,6 +17,10 @@
       <transition xmi:type="uml:Transition" xmi:id="_QMAa8L9OEe65db1_bM-TwQ" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_yybJ4Ln_Ee6yNs2FzguhlQ"/>
       <transition xmi:type="uml:Transition" xmi:id="_WtcHoL9OEe65db1_bM-TwQ" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_5uBHwL9JEe65db1_bM-TwQ"/>
       <subvertex xmi:type="uml:State" xmi:id="_Gay-IKAWEe6Sh616vaZpZA" name="PendingActivate">
+        <doActivity xmi:type="uml:OpaqueBehavior" xmi:id="_hAkAoL93Ee65db1_bM-TwQ">
+          <language>spel</language>
+          <body>extendedState.getVariables().put(&quot;productStatus&quot;, &quot;ACTIVE&quot;)</body>
+        </doActivity>
         <entry xmi:type="uml:OpaqueBehavior" xmi:id="_NsvyYLUKEe6GmqK4b9jh0A" name="stateLogAction">
           <language>bean</language>
           <body>stateLogAction</body>
@@ -64,7 +68,22 @@
               </transition>
               <subvertex xmi:type="uml:State" xmi:id="_s3PiQr9MEe65db1_bM-TwQ" name="Activated">
                 <region xmi:type="uml:Region" xmi:id="_442S8L9MEe65db1_bM-TwQ" name="Region1">
-                  <transition xmi:type="uml:Transition" xmi:id="_CxqLIL9NEe65db1_bM-TwQ" source="_9cYIgL9MEe65db1_bM-TwQ" target="_444vML9MEe65db1_bM-TwQ"/>
+                  <transition xmi:type="uml:Transition" xmi:id="_CxqLIL9NEe65db1_bM-TwQ" source="_9cYIgL9MEe65db1_bM-TwQ" target="_444vML9MEe65db1_bM-TwQ">
+                    <ownedRule xmi:type="uml:Constraint" xmi:id="_yWFFgL94Ee65db1_bM-TwQ">
+                      <specification xmi:type="uml:OpaqueExpression" xmi:id="_yWFFgb94Ee65db1_bM-TwQ">
+                        <language>bean</language>
+                        <body>activeGuard</body>
+                      </specification>
+                    </ownedRule>
+                  </transition>
+                  <transition xmi:type="uml:Transition" xmi:id="__opu0L94Ee65db1_bM-TwQ" guard="_MzIMEL95Ee65db1_bM-TwQ" source="_444vML9MEe65db1_bM-TwQ" target="_6H448L9MEe65db1_bM-TwQ">
+                    <ownedRule xmi:type="uml:Constraint" xmi:id="_MzIMEL95Ee65db1_bM-TwQ">
+                      <specification xmi:type="uml:OpaqueExpression" xmi:id="_MzIMEb95Ee65db1_bM-TwQ">
+                        <language>bean</language>
+                        <body>activeTrialGuard</body>
+                      </specification>
+                    </ownedRule>
+                  </transition>
                   <subvertex xmi:type="uml:State" xmi:id="_444vML9MEe65db1_bM-TwQ" name="Active"/>
                   <subvertex xmi:type="uml:State" xmi:id="_6H448L9MEe65db1_bM-TwQ" name="ActiveTrial"/>
                   <subvertex xmi:type="uml:Pseudostate" xmi:id="_9cYIgL9MEe65db1_bM-TwQ"/>
