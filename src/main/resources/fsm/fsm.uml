@@ -44,11 +44,23 @@
             </entry>
             <region xmi:type="uml:Region" xmi:id="_s3O7ML9MEe65db1_bM-TwQ" name="Region2">
               <transition xmi:type="uml:Transition" xmi:id="_2tSaUL9MEe65db1_bM-TwQ" source="_zsHvYL9MEe65db1_bM-TwQ" target="_s3PiQr9MEe65db1_bM-TwQ"/>
-              <transition xmi:type="uml:Transition" xmi:id="_RmhtoL9NEe65db1_bM-TwQ" source="_s3PiQr9MEe65db1_bM-TwQ" target="_KhfkoL9NEe65db1_bM-TwQ">
+              <transition xmi:type="uml:Transition" xmi:id="_RmhtoL9NEe65db1_bM-TwQ" source="_s3PiQr9MEe65db1_bM-TwQ" target="_UnhUQL9fEe65db1_bM-TwQ">
                 <trigger xmi:type="uml:Trigger" xmi:id="_UDeRML9NEe65db1_bM-TwQ" event="_1PsuoKAWEe6Sh616vaZpZA"/>
               </transition>
-              <transition xmi:type="uml:Transition" xmi:id="_XAkUcL9NEe65db1_bM-TwQ" source="_KhfkoL9NEe65db1_bM-TwQ" target="_444vML9MEe65db1_bM-TwQ">
+              <transition xmi:type="uml:Transition" xmi:id="_XAkUcL9NEe65db1_bM-TwQ" source="_KhfkoL9NEe65db1_bM-TwQ" target="_1sOrUL9fEe65db1_bM-TwQ">
                 <trigger xmi:type="uml:Trigger" xmi:id="_YeRBgL9NEe65db1_bM-TwQ" event="_667zIKAWEe6Sh616vaZpZA"/>
+              </transition>
+              <transition xmi:type="uml:Transition" xmi:id="_rFiZcL9fEe65db1_bM-TwQ" source="_UnhUQL9fEe65db1_bM-TwQ" target="_KhfkoL9NEe65db1_bM-TwQ">
+                <trigger xmi:type="uml:Trigger" xmi:id="_shQJgL9fEe65db1_bM-TwQ" event="_gz6_sL9fEe65db1_bM-TwQ"/>
+              </transition>
+              <transition xmi:type="uml:Transition" xmi:id="_5_9xYL9fEe65db1_bM-TwQ" source="_1sOrUL9fEe65db1_bM-TwQ" target="_s3PiQr9MEe65db1_bM-TwQ">
+                <trigger xmi:type="uml:Trigger" xmi:id="_ehP9AL9gEe65db1_bM-TwQ" event="_n1V0AL9fEe65db1_bM-TwQ"/>
+              </transition>
+              <transition xmi:type="uml:Transition" xmi:id="_AdOIsL9gEe65db1_bM-TwQ" source="_s3PiQr9MEe65db1_bM-TwQ" target="_9e_dAL9fEe65db1_bM-TwQ">
+                <trigger xmi:type="uml:Trigger" xmi:id="_RFQ5AL9gEe65db1_bM-TwQ" event="_J5ICcL9gEe65db1_bM-TwQ"/>
+              </transition>
+              <transition xmi:type="uml:Transition" xmi:id="_CtjMkL9gEe65db1_bM-TwQ" source="_9e_dAL9fEe65db1_bM-TwQ" target="_s3PiQr9MEe65db1_bM-TwQ">
+                <trigger xmi:type="uml:Trigger" xmi:id="_lAU5QL9gEe65db1_bM-TwQ" event="_OAoDUL9gEe65db1_bM-TwQ"/>
               </transition>
               <subvertex xmi:type="uml:State" xmi:id="_s3PiQr9MEe65db1_bM-TwQ" name="Activated">
                 <region xmi:type="uml:Region" xmi:id="_442S8L9MEe65db1_bM-TwQ" name="Region1">
@@ -60,6 +72,9 @@
               </subvertex>
               <subvertex xmi:type="uml:Pseudostate" xmi:id="_zsHvYL9MEe65db1_bM-TwQ" name=""/>
               <subvertex xmi:type="uml:State" xmi:id="_KhfkoL9NEe65db1_bM-TwQ" name="Suspended"/>
+              <subvertex xmi:type="uml:State" xmi:id="_UnhUQL9fEe65db1_bM-TwQ" name="Suspending"/>
+              <subvertex xmi:type="uml:State" xmi:id="_1sOrUL9fEe65db1_bM-TwQ" name="Resuming"/>
+              <subvertex xmi:type="uml:State" xmi:id="_9e_dAL9fEe65db1_bM-TwQ" name="Prolongation"/>
             </region>
           </subvertex>
           <subvertex xmi:type="uml:FinalState" xmi:id="_pUzTQLz8Ee6WIIctFrkbQg" name="UsageFinal"/>
@@ -201,4 +216,12 @@
   <packagedElement xmi:type="uml:SignalEvent" xmi:id="_c8Qc4LXjEe6PAs2TUsdVsw" name="SEChangePriceCompleted" signal="_ZxP5cLXjEe6PAs2TUsdVsw"/>
   <packagedElement xmi:type="uml:Signal" xmi:id="_TOw3wL9CEe65db1_bM-TwQ" name="waiting_pay_ended"/>
   <packagedElement xmi:type="uml:SignalEvent" xmi:id="_XrDc4L9CEe65db1_bM-TwQ" name="SEWaitingPayEnded" signal="_TOw3wL9CEe65db1_bM-TwQ"/>
+  <packagedElement xmi:type="uml:Signal" xmi:id="_d22xoL9fEe65db1_bM-TwQ" name="suspend_completed"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_gz6_sL9fEe65db1_bM-TwQ" name="SESuspendCompleted" signal="_d22xoL9fEe65db1_bM-TwQ"/>
+  <packagedElement xmi:type="uml:Signal" xmi:id="_lPgaML9fEe65db1_bM-TwQ" name="resume_completed"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_n1V0AL9fEe65db1_bM-TwQ" name="SEResumeCompleted" signal="_lPgaML9fEe65db1_bM-TwQ"/>
+  <packagedElement xmi:type="uml:Signal" xmi:id="_EtgSIL9gEe65db1_bM-TwQ" name="prolong"/>
+  <packagedElement xmi:type="uml:Signal" xmi:id="_HLc7QL9gEe65db1_bM-TwQ" name="prolong_completed"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_J5ICcL9gEe65db1_bM-TwQ" name="SEProlong" signal="_EtgSIL9gEe65db1_bM-TwQ"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_OAoDUL9gEe65db1_bM-TwQ" name="SEProlongCompleted" signal="_HLc7QL9gEe65db1_bM-TwQ"/>
 </uml:Model>
