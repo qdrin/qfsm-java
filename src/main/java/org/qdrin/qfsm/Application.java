@@ -24,13 +24,12 @@ public class Application implements CommandLineRunner {
 
 	private String getMachineState(State<String, String> state) {
 		String mstate = state.getId();
-		log.info("state {} ({}).isOrthogonal(): {}", state.getId(), state.getClass().getName(), state.isOrthogonal());
 		if (state.isOrthogonal()) {
 			RegionState<String, String> rstate = (RegionState) state;
-			log.info("regions: {}", rstate.getRegions());
+			// log.info("regions: {}", rstate.getRegions());
 			mstate += "->[";
 			for(var r: rstate.getRegions()) {
-				log.info("orthogonal region: {}, state: {}", r.getId(), r.getState().getId());
+				// log.info("orthogonal region: {}, state: {}", r.getId(), r.getState().getId());
 				mstate += getMachineState(r.getState()) + ",";
 			}
 			mstate = mstate.substring(0, mstate.length()-1) + "]";
@@ -60,14 +59,13 @@ public class Application implements CommandLineRunner {
 		runsm.block();
 		var state = stateMachine.getState();
 		String sname = (state == null) ? "null" : state.getId();
-		log.info("state: {}, isSubmachineState: {}", sname, state.isSubmachineState());
+		log.info("initial state: {}", sname);
 		while(! input.equals("exit")) {
 			log.info("input event name(exit to exit):");
 			input = in.nextLine();
 			try {
 				var state0 = stateMachine.getState();
-				String sname0 = (state0 == null) ? "null" : state0.getId();
-				log.info("current state: {}, sending event: {}", sname0, input);
+				log.info("sending event: {}", input);
 				Mono<Message<String>> msg = Mono.just(MessageBuilder
 					.withPayload(input).build());
 				var evResult = stateMachine.sendEvent(msg).collectList();
