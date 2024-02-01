@@ -146,6 +146,10 @@
                 <trigger xmi:type="uml:Trigger" xmi:id="_GXj70L9CEe65db1_bM-TwQ" event="_77j1YLXdEe6PAs2TUsdVsw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_Jh_3gL9CEe65db1_bM-TwQ" source="_cx3bIL9BEe65db1_bM-TwQ" target="_feRXAL9BEe65db1_bM-TwQ">
+                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_DZdMYME5Ee67INGf_CTjFg">
+                  <language>bean</language>
+                  <body>signalAction</body>
+                </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_N_8CcL9CEe65db1_bM-TwQ" event="_3thusLXdEe6PAs2TUsdVsw"/>
                 <trigger xmi:type="uml:Trigger" xmi:id="_cXdhoL9CEe65db1_bM-TwQ" event="_XrDc4L9CEe65db1_bM-TwQ"/>
               </transition>

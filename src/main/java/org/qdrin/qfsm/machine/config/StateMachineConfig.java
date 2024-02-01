@@ -37,6 +37,12 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   }
 
   @Bean
+  SignalAction signalAction() {
+    String signal = "suspend";
+    return new SignalAction(signal);
+  }
+
+  @Bean
   public ActivatedGuard activeGuard() {
     return new ActivatedGuard("ACTIVE");
   }
