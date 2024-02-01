@@ -16,7 +16,7 @@ public class ActivatedGuard implements Guard<String, String> {
 
   @Override
   public boolean evaluate(StateContext<String, String> context) {
-    log.info("productStatus: {}", context.getExtendedState().getVariables().get("productStatus").toString());
+    log.info("ActivatedGuard.evaluate productStatus: {}", context.getExtendedState().getVariables().get("productStatus").toString());
     return ObjectUtils.nullSafeEquals(match, context.getExtendedState().getVariables().get("productStatus").toString());
   }
   
