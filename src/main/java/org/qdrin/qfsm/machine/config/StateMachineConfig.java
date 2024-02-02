@@ -37,9 +37,13 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   }
 
   @Bean
-  SignalAction signalAction() {
-    String signal = "suspend";
-    return new SignalAction(signal);
+  SignalAction sendSuspend() {
+    return new SignalAction("suspend");
+  }
+
+  @Bean
+  SignalAction sendResume() {
+    return new SignalAction("resume");
   }
 
   @Bean

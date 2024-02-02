@@ -143,12 +143,16 @@
                 <trigger xmi:type="uml:Trigger" xmi:id="_tZqT0L9BEe65db1_bM-TwQ" event="_B2NO4LXeEe6PAs2TUsdVsw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_EO8CcL9CEe65db1_bM-TwQ" source="_feRXAL9BEe65db1_bM-TwQ" target="_avDO0L9BEe65db1_bM-TwQ">
+                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_uENWYMGWEe6PsK9RLkwP4w">
+                  <language>bean</language>
+                  <body>sendResume</body>
+                </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_GXj70L9CEe65db1_bM-TwQ" event="_77j1YLXdEe6PAs2TUsdVsw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_Jh_3gL9CEe65db1_bM-TwQ" source="_cx3bIL9BEe65db1_bM-TwQ" target="_feRXAL9BEe65db1_bM-TwQ">
                 <effect xmi:type="uml:OpaqueBehavior" xmi:id="_DZdMYME5Ee67INGf_CTjFg">
                   <language>bean</language>
-                  <body>signalAction</body>
+                  <body>sendSuspend</body>
                 </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_N_8CcL9CEe65db1_bM-TwQ" event="_3thusLXdEe6PAs2TUsdVsw"/>
                 <trigger xmi:type="uml:Trigger" xmi:id="_cXdhoL9CEe65db1_bM-TwQ" event="_XrDc4L9CEe65db1_bM-TwQ"/>
@@ -162,7 +166,7 @@
                 <ownedRule xmi:type="uml:Constraint" xmi:id="_w7ZtYMDPEe6ubM7h2HVYrA">
                   <specification xmi:type="uml:OpaqueExpression" xmi:id="_w7ZtYcDPEe6ubM7h2HVYrA">
                     <language>bean</language>
-                    <body>activeGuard</body>
+                    <body>activeTrialGuard</body>
                   </specification>
                 </ownedRule>
               </transition>
@@ -170,7 +174,7 @@
                 <ownedRule xmi:type="uml:Constraint" xmi:id="_2vrZIMDPEe6ubM7h2HVYrA">
                   <specification xmi:type="uml:OpaqueExpression" xmi:id="_2vrZIcDPEe6ubM7h2HVYrA">
                     <language>bean</language>
-                    <body>activeTrialGuard</body>
+                    <body>activeGuard</body>
                   </specification>
                 </ownedRule>
               </transition>
@@ -265,7 +269,7 @@
   <packagedElement xmi:type="uml:SignalEvent" xmi:id="_fGZWALXfEe6PAs2TUsdVsw" name="SESuspendEnded" signal="_cktcYLXfEe6PAs2TUsdVsw"/>
   <packagedElement xmi:type="uml:Signal" xmi:id="_yylz0LXfEe6PAs2TUsdVsw" name="deactivation_external"/>
   <packagedElement xmi:type="uml:SignalEvent" xmi:id="_1WbCgLXfEe6PAs2TUsdVsw" name="SEDeactivationExternal" signal="_yylz0LXfEe6PAs2TUsdVsw"/>
-  <packagedElement xmi:type="uml:Signal" xmi:id="_ZxP5cLXjEe6PAs2TUsdVsw" name="changed_price_completed"/>
+  <packagedElement xmi:type="uml:Signal" xmi:id="_ZxP5cLXjEe6PAs2TUsdVsw" name="change_price_completed"/>
   <packagedElement xmi:type="uml:SignalEvent" xmi:id="_c8Qc4LXjEe6PAs2TUsdVsw" name="SEChangePriceCompleted" signal="_ZxP5cLXjEe6PAs2TUsdVsw"/>
   <packagedElement xmi:type="uml:Signal" xmi:id="_TOw3wL9CEe65db1_bM-TwQ" name="waiting_pay_ended"/>
   <packagedElement xmi:type="uml:SignalEvent" xmi:id="_XrDc4L9CEe65db1_bM-TwQ" name="SEWaitingPayEnded" signal="_TOw3wL9CEe65db1_bM-TwQ"/>
