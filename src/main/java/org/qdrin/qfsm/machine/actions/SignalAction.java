@@ -1,4 +1,4 @@
-package org.qdrin.qfsm.machine.states;
+package org.qdrin.qfsm.machine.actions;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;

@@ -1,6 +1,7 @@
 package org.qdrin.qfsm.machine.config;
 
 import org.qdrin.qfsm.machine.StateLogAction;
+import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.ActivatedGuard;
 import org.qdrin.qfsm.machine.states.*;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +27,8 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
     // return new UmlStateMachineModelFactory("classpath:uml_sample/simple-forkjoin.uml");
   }
 
+  // ------------------------------------------------------------------------------------------
+  // actions
   @Bean
   public StateLogAction stateLogAction() {
     return new StateLogAction();
@@ -34,6 +37,11 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   @Bean
   PendingDisconnectEntry pendingDisconnectEntry() {
     return new PendingDisconnectEntry();
+  }
+
+  @Bean
+  PriceActiveEntry priceActiveEntry() {
+    return new PriceActiveEntry();
   }
 
   @Bean
@@ -47,12 +55,25 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   }
 
   @Bean
-  public ActivatedGuard activeGuard() {
+  SignalAction sendWaitPayment() {
+    return new SignalAction("wait_payment");
+  }
+
+  @Bean
+  SignalAction sendProlong() {
+    return new SignalAction("prolong");
+  }
+
+
+  // -----------------------------------------------------------------
+  // guards
+  @Bean
+  public ActivatedGuard isActive() {
     return new ActivatedGuard("ACTIVE");
   }
 
   @Bean
-  public ActivatedGuard activeTrialGuard() {
+  public ActivatedGuard isTrial() {
     return new ActivatedGuard("ACTIVE_TRIAL");
   }
 }

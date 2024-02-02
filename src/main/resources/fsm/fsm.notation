@@ -535,6 +535,14 @@
                             <children xmi:type="notation:BasicCompartment" xmi:id="_eZULBb9KEe65db1_bM-TwQ" type="State_RegionCompartment">
                               <layoutConstraint xmi:type="notation:Bounds" xmi:id="_eZULBr9KEe65db1_bM-TwQ" y="-1" width="115"/>
                             </children>
+                            <children xmi:type="notation:BasicCompartment" xmi:id="_c14skMG_Ee6se6mu01HMvg" type="compartment_shape_display">
+                              <styles xmi:type="notation:TitleStyle" xmi:id="_c14skcG_Ee6se6mu01HMvg"/>
+                              <layoutConstraint xmi:type="notation:Bounds" xmi:id="_c14sksG_Ee6se6mu01HMvg"/>
+                            </children>
+                            <children xmi:type="notation:Shape" xmi:id="_F-1k4MHWEe6se6mu01HMvg" type="Behavior_EntryBehaviorLabel">
+                              <element xmi:type="uml:OpaqueBehavior" href="fsm.uml#_F9HGkMHWEe6se6mu01HMvg"/>
+                              <layoutConstraint xmi:type="notation:Location" xmi:id="_F-1k4cHWEe6se6mu01HMvg" x="-10" y="-10"/>
+                            </children>
                             <element xmi:type="uml:State" href="fsm.uml#_eYu8ML9KEe65db1_bM-TwQ"/>
                             <layoutConstraint xmi:type="notation:Bounds" xmi:id="_eZULAb9KEe65db1_bM-TwQ" x="186" y="266" width="115"/>
                           </children>

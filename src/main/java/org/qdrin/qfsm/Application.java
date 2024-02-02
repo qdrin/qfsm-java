@@ -1,5 +1,6 @@
 package org.qdrin.qfsm;
 
+import java.util.Map;
 import java.util.Scanner;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -57,6 +58,10 @@ public class Application implements CommandLineRunner {
 		String input = "AAA";
 		var runsm = stateMachine.startReactively();
 		runsm.block();
+		Map<Object, Object> machineVars = stateMachine.getExtendedState().getVariables();
+		log.info("input productStatus (ACTIVE or ACTIVE_TRIAL):");
+		input = in.nextLine();
+		machineVars.put("productStatus", input);
 		var state = stateMachine.getState();
 		String sname = (state == null) ? "null" : state.getId();
 		log.info("initial state: {}", sname);
