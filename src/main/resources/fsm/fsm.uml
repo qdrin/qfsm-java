@@ -49,10 +49,6 @@
           </transition>
           <subvertex xmi:type="uml:Pseudostate" xmi:id="_rT7YALn_Ee6yNs2FzguhlQ"/>
           <subvertex xmi:type="uml:State" xmi:id="_uSPjQLn_Ee6yNs2FzguhlQ" name="UsageOn">
-            <entry xmi:type="uml:OpaqueBehavior" xmi:id="_7cIycL0EEe6WIIctFrkbQg">
-              <language>spel</language>
-              <body>extendedState.getVariables().put(&quot;usage&quot;,&quot;UsageOn&quot;)</body>
-            </entry>
             <region xmi:type="uml:Region" xmi:id="_s3O7ML9MEe65db1_bM-TwQ" name="Region2">
               <transition xmi:type="uml:Transition" xmi:id="_2tSaUL9MEe65db1_bM-TwQ" source="_zsHvYL9MEe65db1_bM-TwQ" target="_s3PiQr9MEe65db1_bM-TwQ"/>
               <transition xmi:type="uml:Transition" xmi:id="_RmhtoL9NEe65db1_bM-TwQ" source="_s3PiQr9MEe65db1_bM-TwQ" target="_UnhUQL9fEe65db1_bM-TwQ">
@@ -150,10 +146,6 @@
           <transition xmi:type="uml:Transition" xmi:id="_V_vVIL9DEe65db1_bM-TwQ" source="_rygxcLn_Ee6yNs2FzguhlQ" target="_yybJ4Ln_Ee6yNs2FzguhlQ"/>
           <subvertex xmi:type="uml:Pseudostate" xmi:id="_rygxcLn_Ee6yNs2FzguhlQ" name=""/>
           <subvertex xmi:type="uml:State" xmi:id="_yybJ4Ln_Ee6yNs2FzguhlQ" name="PaymentOn">
-            <entry xmi:type="uml:OpaqueBehavior" xmi:id="_kgq6IL6iEe6_VZ6xu7bqOA">
-              <language>spel</language>
-              <body>extendedState.getVariables().put(&quot;payment&quot;,&quot;Payment&quot;)</body>
-            </entry>
             <region xmi:type="uml:Region" xmi:id="_avCAsL9BEe65db1_bM-TwQ" name="Region2">
               <transition xmi:type="uml:Transition" xmi:id="_qfY7EL9BEe65db1_bM-TwQ" source="_avDO0L9BEe65db1_bM-TwQ" target="_cx3bIL9BEe65db1_bM-TwQ">
                 <trigger xmi:type="uml:Trigger" xmi:id="_tZqT0L9BEe65db1_bM-TwQ" event="_B2NO4LXeEe6PAs2TUsdVsw"/>

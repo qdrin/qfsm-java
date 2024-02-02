@@ -15,6 +15,7 @@ import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
+import org.qdrin.qfsm.model.*;
 
 @Slf4j
 @SpringBootApplication
@@ -22,6 +23,19 @@ public class Application implements CommandLineRunner {
 
 	@Autowired
 	private StateMachine<String, String> stateMachine;
+
+	private Price getPriceFromConsole() {
+		Scanner in = new Scanner(System.in);
+		Price price = new Price();
+		System.out.println("Input price attributes");
+		System.out.println("priceId:");
+		price.setPriceId(in.nextLine());
+		System.out.println("productStatus[ACTIVE/ACTIVE_TRIAL]:");
+		price.setProductStatus(in.nextLine());
+		System.out.println("duration");
+		price.setDuration(Integer.valueOf(in.nextLine()));
+		return price;
+	}
 
 	private String getMachineState(State<String, String> state) {
 		String mstate = state.getId();
@@ -59,9 +73,9 @@ public class Application implements CommandLineRunner {
 		var runsm = stateMachine.startReactively();
 		runsm.block();
 		Map<Object, Object> machineVars = stateMachine.getExtendedState().getVariables();
-		log.info("input productStatus (ACTIVE or ACTIVE_TRIAL):");
-		input = in.nextLine();
-		machineVars.put("productStatus", input);
+		var price = getPriceFromConsole();
+		machineVars.put("productStatus", price.getProductStatus());
+		machineVars.put("price", price);
 		var state = stateMachine.getState();
 		String sname = (state == null) ? "null" : state.getId();
 		log.info("initial state: {}", sname);
