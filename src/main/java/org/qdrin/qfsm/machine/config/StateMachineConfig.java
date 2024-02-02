@@ -6,10 +6,12 @@ import org.qdrin.qfsm.machine.guards.ActivatedGuard;
 import org.qdrin.qfsm.machine.states.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
+import org.springframework.statemachine.guard.Guard;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
 
 @Configuration
@@ -75,5 +77,16 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   @Bean
   public ActivatedGuard isTrial() {
     return new ActivatedGuard("ACTIVE_TRIAL");
+  }
+
+  @Bean
+  public Guard<String, String> notFirstPeriod() {
+    return new Guard<String, String>() {
+      @Override
+      public boolean evaluate(StateContext<String, String> context) {
+        int period = (int) context.getExtendedState().getVariables().get("tarificationPeriod");
+        return period > 1;
+      }
+    };
   }
 }

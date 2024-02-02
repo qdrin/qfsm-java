@@ -67,11 +67,17 @@
               <transition xmi:type="uml:Transition" xmi:id="_5_9xYL9fEe65db1_bM-TwQ" source="_1sOrUL9fEe65db1_bM-TwQ" target="_s3PiQr9MEe65db1_bM-TwQ">
                 <trigger xmi:type="uml:Trigger" xmi:id="_ehP9AL9gEe65db1_bM-TwQ" event="_n1V0AL9fEe65db1_bM-TwQ"/>
               </transition>
-              <transition xmi:type="uml:Transition" xmi:id="_AdOIsL9gEe65db1_bM-TwQ" guard="_DrFy4MHREe6se6mu01HMvg" source="_s3PiQr9MEe65db1_bM-TwQ" target="_9e_dAL9fEe65db1_bM-TwQ">
+              <transition xmi:type="uml:Transition" xmi:id="_AdOIsL9gEe65db1_bM-TwQ" guard="_YAwzEMHzEe6E1Nu1bdPzAA" source="_s3PiQr9MEe65db1_bM-TwQ" target="_9e_dAL9fEe65db1_bM-TwQ">
                 <ownedRule xmi:type="uml:Constraint" xmi:id="_DrFy4MHREe6se6mu01HMvg">
                   <specification xmi:type="uml:OpaqueExpression" xmi:id="_DrFy4cHREe6se6mu01HMvg">
                     <language>spel</language>
                     <body>extendedState.getVariables().get(&quot;tarificationPeriod&quot;) > 1</body>
+                  </specification>
+                </ownedRule>
+                <ownedRule xmi:type="uml:Constraint" xmi:id="_YAwzEMHzEe6E1Nu1bdPzAA">
+                  <specification xmi:type="uml:OpaqueExpression" xmi:id="_YAwzEcHzEe6E1Nu1bdPzAA">
+                    <language>bean</language>
+                    <body>notFirstPeriod</body>
                   </specification>
                 </ownedRule>
                 <trigger xmi:type="uml:Trigger" xmi:id="_RFQ5AL9gEe65db1_bM-TwQ" event="_J5ICcL9gEe65db1_bM-TwQ"/>
