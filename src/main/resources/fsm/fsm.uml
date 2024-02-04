@@ -55,6 +55,10 @@
                 <trigger xmi:type="uml:Trigger" xmi:id="_UDeRML9NEe65db1_bM-TwQ" event="_1PsuoKAWEe6Sh616vaZpZA"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_XAkUcL9NEe65db1_bM-TwQ" source="_KhfkoL9NEe65db1_bM-TwQ" target="_1sOrUL9fEe65db1_bM-TwQ">
+                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_nwK-0MM-Ee6X9syf-CmCRw">
+                  <language>bean</language>
+                  <body>sendPriceEnded</body>
+                </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_YeRBgL9NEe65db1_bM-TwQ" event="_667zIKAWEe6Sh616vaZpZA"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_rFiZcL9fEe65db1_bM-TwQ" source="_UnhUQL9fEe65db1_bM-TwQ" target="_KhfkoL9NEe65db1_bM-TwQ">
@@ -110,7 +114,12 @@
               </subvertex>
               <subvertex xmi:type="uml:Pseudostate" xmi:id="_zsHvYL9MEe65db1_bM-TwQ" name=""/>
               <subvertex xmi:type="uml:State" xmi:id="_KhfkoL9NEe65db1_bM-TwQ" name="Suspended"/>
-              <subvertex xmi:type="uml:State" xmi:id="_UnhUQL9fEe65db1_bM-TwQ" name="Suspending"/>
+              <subvertex xmi:type="uml:State" xmi:id="_UnhUQL9fEe65db1_bM-TwQ" name="Suspending">
+                <entry xmi:type="uml:OpaqueBehavior" xmi:id="_gDlN8MM7Ee6X9syf-CmCRw">
+                  <language>bean</language>
+                  <body>suspendingEntry</body>
+                </entry>
+              </subvertex>
               <subvertex xmi:type="uml:State" xmi:id="_1sOrUL9fEe65db1_bM-TwQ" name="Resuming"/>
               <subvertex xmi:type="uml:State" xmi:id="_9e_dAL9fEe65db1_bM-TwQ" name="Prolongation"/>
             </region>
@@ -212,8 +221,14 @@
               <transition xmi:type="uml:Transition" xmi:id="_yROwoL9KEe65db1_bM-TwQ" source="_YsCfJr9KEe65db1_bM-TwQ" target="_aiBJUL9KEe65db1_bM-TwQ">
                 <trigger xmi:type="uml:Trigger" xmi:id="_1OUz4L9KEe65db1_bM-TwQ" event="_K9PWwLXcEe6PAs2TUsdVsw"/>
               </transition>
-              <transition xmi:type="uml:Transition" xmi:id="_3M1H8L9KEe65db1_bM-TwQ" source="_YsCfJr9KEe65db1_bM-TwQ" target="_cxyzkL9KEe65db1_bM-TwQ">
-                <trigger xmi:type="uml:Trigger" xmi:id="_5CDkML9KEe65db1_bM-TwQ" event="_PugtYLXcEe6PAs2TUsdVsw"/>
+              <transition xmi:type="uml:Transition" xmi:id="_3M1H8L9KEe65db1_bM-TwQ" guard="_TMm_sMM0Ee6X9syf-CmCRw" source="_YsCfJr9KEe65db1_bM-TwQ" target="_cxyzkL9KEe65db1_bM-TwQ">
+                <ownedRule xmi:type="uml:Constraint" xmi:id="_TMm_sMM0Ee6X9syf-CmCRw">
+                  <specification xmi:type="uml:OpaqueExpression" xmi:id="_TMm_scM0Ee6X9syf-CmCRw">
+                    <language>bean</language>
+                    <body>samePrice</body>
+                  </specification>
+                </ownedRule>
+                <trigger xmi:type="uml:Trigger" xmi:id="_Oo3HsMM0Ee6X9syf-CmCRw" event="_K9PWwLXcEe6PAs2TUsdVsw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="__oOm8L9KEe65db1_bM-TwQ" source="_eYu8ML9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ">
                 <effect xmi:type="uml:OpaqueBehavior" xmi:id="_HgjNEMHHEe6se6mu01HMvg">
@@ -226,9 +241,25 @@
               <transition xmi:type="uml:Transition" xmi:id="_L0uZAL9LEe65db1_bM-TwQ" source="_aiBJUL9KEe65db1_bM-TwQ" target="_eYu8ML9KEe65db1_bM-TwQ">
                 <trigger xmi:type="uml:Trigger" xmi:id="_N3or8L9LEe65db1_bM-TwQ" event="_c8Qc4LXjEe6PAs2TUsdVsw"/>
               </transition>
+              <transition xmi:type="uml:Transition" xmi:id="_6M71EMM-Ee6X9syf-CmCRw" source="_aiBJUL9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ">
+                <trigger xmi:type="uml:Trigger" xmi:id="_-CysUMM-Ee6X9syf-CmCRw" event="_j8zoILXbEe6PAs2TUsdVsw"/>
+              </transition>
+              <transition xmi:type="uml:Transition" xmi:id="_A0YDIMM_Ee6X9syf-CmCRw" source="_cxyzkL9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ">
+                <trigger xmi:type="uml:Trigger" xmi:id="_C4ny0MM_Ee6X9syf-CmCRw" event="_j8zoILXbEe6PAs2TUsdVsw"/>
+              </transition>
               <subvertex xmi:type="uml:State" xmi:id="_YsCfJr9KEe65db1_bM-TwQ" name="PriceChanging"/>
-              <subvertex xmi:type="uml:State" xmi:id="_aiBJUL9KEe65db1_bM-TwQ" name="PriceChanged"/>
-              <subvertex xmi:type="uml:State" xmi:id="_cxyzkL9KEe65db1_bM-TwQ" name="PriceNotChanged"/>
+              <subvertex xmi:type="uml:State" xmi:id="_aiBJUL9KEe65db1_bM-TwQ" name="PriceChanged">
+                <entry xmi:type="uml:OpaqueBehavior" xmi:id="_WBmLoMM7Ee6X9syf-CmCRw">
+                  <language>bean</language>
+                  <body>priceChangedEntry</body>
+                </entry>
+              </subvertex>
+              <subvertex xmi:type="uml:State" xmi:id="_cxyzkL9KEe65db1_bM-TwQ" name="PriceNotChanged">
+                <entry xmi:type="uml:OpaqueBehavior" xmi:id="_ZGWWEMM7Ee6X9syf-CmCRw">
+                  <language>bean</language>
+                  <body>priceNotChangedEntry</body>
+                </entry>
+              </subvertex>
               <subvertex xmi:type="uml:State" xmi:id="_eYu8ML9KEe65db1_bM-TwQ" name="PriceActive">
                 <entry xmi:type="uml:OpaqueBehavior" xmi:id="_F9HGkMHWEe6se6mu01HMvg">
                   <language>bean</language>

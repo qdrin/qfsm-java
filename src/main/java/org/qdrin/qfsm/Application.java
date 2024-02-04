@@ -1,5 +1,6 @@
 package org.qdrin.qfsm;
 
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Scanner;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
 import org.qdrin.qfsm.model.*;
+import org.qdrin.qfsm.tasks.ExternalData;
 
 @Slf4j
 @SpringBootApplication
@@ -23,19 +25,6 @@ public class Application implements CommandLineRunner {
 
 	@Autowired
 	private StateMachine<String, String> stateMachine;
-
-	private Price getPriceFromConsole() {
-		Scanner in = new Scanner(System.in);
-		Price price = new Price();
-		System.out.println("Input price attributes");
-		System.out.println("priceId:");
-		price.setPriceId(in.nextLine());
-		System.out.println("productStatus[ACTIVE/ACTIVE_TRIAL]:");
-		price.setProductStatus(in.nextLine());
-		System.out.println("duration");
-		price.setDuration(Integer.valueOf(in.nextLine()));
-		return price;
-	}
 
 	private String getMachineState(State<String, String> state) {
 		String mstate = state.getId();
@@ -62,6 +51,23 @@ public class Application implements CommandLineRunner {
 		return getMachineState(state);
 	}
 
+	private void sendUserEvent(String eventName) {
+		Message<String> message = MessageBuilder
+			.withPayload(eventName)
+			.setHeader("now", OffsetDateTime.now())
+			.build();
+		Mono<Message<String>> monomsg = Mono.just(message);
+		log.info("sending event: {}, message: {}", eventName, message);
+		if(eventName.equals("change_price") || eventName.equals("resume_completed")) {
+			ProductPrice nextPrice = ExternalData.RequestProductPrice();
+			stateMachine.getExtendedState().getVariables().put("nextPrice", nextPrice);
+		} else {
+			stateMachine.getExtendedState().getVariables().remove("nextPrice");
+		}
+		var evResult = stateMachine.sendEvent(monomsg).collectList();
+		evResult.block();
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
@@ -73,30 +79,20 @@ public class Application implements CommandLineRunner {
 		var runsm = stateMachine.startReactively();
 		runsm.block();
 		Map<Object, Object> machineVars = stateMachine.getExtendedState().getVariables();
-		var price = getPriceFromConsole();
-		machineVars.put("productStatus", price.getProductStatus());
-		machineVars.put("price", price);
+		var price = ExternalData.RequestProductPrice();
+		log.info("price: {}", price);
+		machineVars.put("productPrice", price);
 		var state = stateMachine.getState();
 		String sname = (state == null) ? "null" : state.getId();
 		log.info("initial state: {}", sname);
 		while(! input.equals("exit")) {
-			log.info("input event name(exit to exit):");
+			System.out.print("input event name(exit to exit):");
 			input = in.nextLine();
-			try {
-				var state0 = stateMachine.getState();
-				log.info("sending event: {}", input);
-				Mono<Message<String>> msg = Mono.just(MessageBuilder
-					.withPayload(input).build());
-				var evResult = stateMachine.sendEvent(msg).collectList();
-				evResult.block();
-				state = stateMachine.getState();
-				sname = getMachineState();
-				var variables = stateMachine.getExtendedState().getVariables();
-				log.info("new state: {}, variables: {}", sname, variables);
-			} catch(IllegalArgumentException e) {
-				log.info("'{}' is not valid event name. Try more", input);
-				continue;
-			}
+			sendUserEvent(input);
+			state = stateMachine.getState();
+			sname = getMachineState();
+			var variables = stateMachine.getExtendedState().getVariables();
+			log.info("new state: {}, variables: {}", sname, variables);
 		}
 		log.info("exiting...");
 		in.close();

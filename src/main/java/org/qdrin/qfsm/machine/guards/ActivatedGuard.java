@@ -3,6 +3,7 @@ package org.qdrin.qfsm.machine.guards;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.guard.Guard;
 import org.springframework.util.ObjectUtils;
+import org.qdrin.qfsm.model.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,8 +17,10 @@ public class ActivatedGuard implements Guard<String, String> {
 
   @Override
   public boolean evaluate(StateContext<String, String> context) {
-    log.info("ActivatedGuard.evaluate productStatus: {}", context.getExtendedState().getVariables().get("productStatus").toString());
-    return ObjectUtils.nullSafeEquals(match, context.getExtendedState().getVariables().get("productStatus").toString());
+    ProductPrice price = (ProductPrice) context.getExtendedState().getVariables().get("productPrice");
+    String prstatus = price.getProductStatus();
+    // log.info("ActivatedGuard.evaluate productStatus: {}", prstatus);
+    return ObjectUtils.nullSafeEquals(match, prstatus);
   }
   
 }

@@ -1,5 +1,7 @@
 package org.qdrin.qfsm.model;
 
+import java.time.OffsetDateTime;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -11,9 +13,10 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Price {
+public class ProductPrice {
   String priceId;
   String productStatus;
   int duration;
-  int period;  
+  int period;
+  OffsetDateTime nextPayDate;
 }

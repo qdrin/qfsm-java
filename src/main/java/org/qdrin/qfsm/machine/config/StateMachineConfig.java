@@ -3,6 +3,7 @@ package org.qdrin.qfsm.machine.config;
 import org.qdrin.qfsm.machine.StateLogAction;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.ActivatedGuard;
+import org.qdrin.qfsm.machine.guards.SamePriceGuard;
 import org.qdrin.qfsm.machine.states.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,6 +48,21 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   }
 
   @Bean
+  PriceChangedEntry priceChangedEntry() {
+    return new PriceChangedEntry();
+  }
+
+  @Bean
+  PriceNotChangedEntry priceNotChangedEntry() {
+    return new PriceNotChangedEntry();
+  }
+
+  @Bean
+  SuspendingEntry suspendingEntry() {
+    return new SuspendingEntry();
+  }
+
+  @Bean
   SignalAction sendSuspend() {
     return new SignalAction("suspend");
   }
@@ -64,6 +80,11 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   @Bean
   SignalAction sendProlong() {
     return new SignalAction("prolong");
+  }
+
+  @Bean
+  SignalAction sendPriceEnded() {
+    return new SignalAction("price_ended");
   }
 
 
@@ -89,4 +110,14 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
       }
     };
   }
+
+  @Bean
+  public Guard<String, String> samePrice() {
+    return new SamePriceGuard(true);
+  }
+
+  // @Bean
+  // public Guard<String, String> notSamePrice() {
+  //   return new SamePriceGuard(false);
+  // }
 }
