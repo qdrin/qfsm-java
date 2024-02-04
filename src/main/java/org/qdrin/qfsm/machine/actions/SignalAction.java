@@ -22,5 +22,5 @@ public class SignalAction implements Action<String, String> {
     var res = context.getStateMachine().sendEvent(msg).collectList();
     res.block();
     log.info("SignalAction[{}].execute res: {}", signal, res);
-  }  
+  }
 }

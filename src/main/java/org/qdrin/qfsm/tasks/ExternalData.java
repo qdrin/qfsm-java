@@ -24,15 +24,16 @@ public class ExternalData {
 		price.setProductStatus(in.nextLine());
 		System.out.print("duration:");
 		price.setDuration(Integer.valueOf(in.nextLine()));
-    System.out.print("nextPayDate('YYYY-MM-DDTHH:mm:SS'):");
+    System.out.print("nextPayDate('YYYY-MM-DDTHH:mm:SS'/null):");
     String dateStr = in.nextLine();
-    // @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
-    try {
-      OffsetDateTime date = OffsetDateTime.parse(dateStr);
-      price.setNextPayDate(date);
-    } catch(Exception e) {
-      log.error("Cannot parse your value. {}", e.getMessage());
-      price.setNextPayDate(OffsetDateTime.now().plusDays(30));
+    if(! dateStr.equals("null")) {
+      try {
+        OffsetDateTime date = OffsetDateTime.parse(dateStr);
+        price.setNextPayDate(date);
+      } catch(Exception e) {
+        log.error("Cannot parse your value. {}", e.getMessage());
+        price.setNextPayDate(OffsetDateTime.now().plusDays(30));
+      }
     }
 		return price;
   }

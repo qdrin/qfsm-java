@@ -1,9 +1,13 @@
 package org.qdrin.qfsm.machine.config;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.qdrin.qfsm.machine.StateLogAction;
 import org.qdrin.qfsm.machine.actions.SignalAction;
-import org.qdrin.qfsm.machine.guards.ActivatedGuard;
-import org.qdrin.qfsm.machine.guards.SamePriceGuard;
+import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +17,13 @@ import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
 import org.springframework.statemachine.guard.Guard;
+import org.springframework.statemachine.region.Region;
+import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 @EnableStateMachine
 public class StateMachineConfig extends StateMachineConfigurerAdapter<String, String>{
@@ -107,6 +116,11 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
     return new SignalAction("resume_price");
   }
 
+  @Bean
+  SignalAction sendCompletePrice() {
+    return new SignalAction("complete_price");
+  }
+
 
   // -----------------------------------------------------------------
   // guards
@@ -121,19 +135,23 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   }
 
   @Bean
-  public Guard<String, String> notFirstPeriod() {
-    return new Guard<String, String>() {
-      @Override
-      public boolean evaluate(StateContext<String, String> context) {
-        int period = (int) context.getExtendedState().getVariables().get("tarificationPeriod");
-        return period > 1;
-      }
-    };
+  public Guard<String, String> priceActiveAndPaid() {
+    return new ActiveStatesGuard(Arrays.asList("PriceActive", "Paid"));
+  }
+
+  @Bean
+  public Guard<String, String> notFullPrice() {
+    return new PriceGuard(Optional.of(false), Optional.empty());
+  }
+
+  @Bean
+  public Guard<String, String> newPrice() {
+    return new PriceGuard(Optional.of(true), Optional.of(false));
   }
 
   @Bean
   public Guard<String, String> samePrice() {
-    return new SamePriceGuard(true);
+    return new PriceGuard(Optional.of(true), Optional.of(true));
   }
 
   // @Bean
