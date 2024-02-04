@@ -55,16 +55,16 @@
                 <trigger xmi:type="uml:Trigger" xmi:id="_UDeRML9NEe65db1_bM-TwQ" event="_1PsuoKAWEe6Sh616vaZpZA"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_XAkUcL9NEe65db1_bM-TwQ" source="_KhfkoL9NEe65db1_bM-TwQ" target="_1sOrUL9fEe65db1_bM-TwQ">
-                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_nwK-0MM-Ee6X9syf-CmCRw">
-                  <language>bean</language>
-                  <body>sendPriceEnded</body>
-                </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_YeRBgL9NEe65db1_bM-TwQ" event="_667zIKAWEe6Sh616vaZpZA"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_rFiZcL9fEe65db1_bM-TwQ" source="_UnhUQL9fEe65db1_bM-TwQ" target="_KhfkoL9NEe65db1_bM-TwQ">
                 <trigger xmi:type="uml:Trigger" xmi:id="_shQJgL9fEe65db1_bM-TwQ" event="_gz6_sL9fEe65db1_bM-TwQ"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_5_9xYL9fEe65db1_bM-TwQ" source="_1sOrUL9fEe65db1_bM-TwQ" target="_s3PiQr9MEe65db1_bM-TwQ">
+                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_6GWuIMNNEe6X9syf-CmCRw">
+                  <language>bean</language>
+                  <body>sendChangePriceCompleted</body>
+                </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_ehP9AL9gEe65db1_bM-TwQ" event="_n1V0AL9fEe65db1_bM-TwQ"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_AdOIsL9gEe65db1_bM-TwQ" guard="_YAwzEMHzEe6E1Nu1bdPzAA" source="_s3PiQr9MEe65db1_bM-TwQ" target="_9e_dAL9fEe65db1_bM-TwQ">
@@ -160,9 +160,9 @@
                 <trigger xmi:type="uml:Trigger" xmi:id="_tZqT0L9BEe65db1_bM-TwQ" event="_B2NO4LXeEe6PAs2TUsdVsw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_EO8CcL9CEe65db1_bM-TwQ" source="_feRXAL9BEe65db1_bM-TwQ" target="_avDO0L9BEe65db1_bM-TwQ">
-                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_uENWYMGWEe6PsK9RLkwP4w">
+                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_jATw4MNTEe6X9syf-CmCRw">
                   <language>bean</language>
-                  <body>sendResume</body>
+                  <body>sendResumePrice</body>
                 </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_GXj70L9CEe65db1_bM-TwQ" event="_77j1YLXdEe6PAs2TUsdVsw"/>
               </transition>
@@ -219,6 +219,10 @@
             <region xmi:type="uml:Region" xmi:id="_YsB4Eb9KEe65db1_bM-TwQ" name="Region1">
               <transition xmi:type="uml:Transition" xmi:id="_ql9HAL9KEe65db1_bM-TwQ" source="_orm6ML9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ"/>
               <transition xmi:type="uml:Transition" xmi:id="_yROwoL9KEe65db1_bM-TwQ" source="_YsCfJr9KEe65db1_bM-TwQ" target="_aiBJUL9KEe65db1_bM-TwQ">
+                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_MRJGwMNSEe6X9syf-CmCRw">
+                  <language>bean</language>
+                  <body>sendResume</body>
+                </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_1OUz4L9KEe65db1_bM-TwQ" event="_K9PWwLXcEe6PAs2TUsdVsw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_3M1H8L9KEe65db1_bM-TwQ" guard="_TMm_sMM0Ee6X9syf-CmCRw" source="_YsCfJr9KEe65db1_bM-TwQ" target="_cxyzkL9KEe65db1_bM-TwQ">
@@ -228,6 +232,10 @@
                     <body>samePrice</body>
                   </specification>
                 </ownedRule>
+                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_X5jCYMNUEe6X9syf-CmCRw">
+                  <language>bean</language>
+                  <body>sendResume</body>
+                </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_Oo3HsMM0Ee6X9syf-CmCRw" event="_K9PWwLXcEe6PAs2TUsdVsw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="__oOm8L9KEe65db1_bM-TwQ" source="_eYu8ML9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ">
@@ -242,12 +250,17 @@
                 <trigger xmi:type="uml:Trigger" xmi:id="_N3or8L9LEe65db1_bM-TwQ" event="_c8Qc4LXjEe6PAs2TUsdVsw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_6M71EMM-Ee6X9syf-CmCRw" source="_aiBJUL9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ">
-                <trigger xmi:type="uml:Trigger" xmi:id="_-CysUMM-Ee6X9syf-CmCRw" event="_j8zoILXbEe6PAs2TUsdVsw"/>
+                <trigger xmi:type="uml:Trigger" xmi:id="_-CysUMM-Ee6X9syf-CmCRw" event="_a_mX4MNVEe6X9syf-CmCRw"/>
               </transition>
-              <transition xmi:type="uml:Transition" xmi:id="_A0YDIMM_Ee6X9syf-CmCRw" source="_cxyzkL9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ">
-                <trigger xmi:type="uml:Trigger" xmi:id="_C4ny0MM_Ee6X9syf-CmCRw" event="_j8zoILXbEe6PAs2TUsdVsw"/>
+              <transition xmi:type="uml:Transition" xmi:id="_I39AkMNWEe6X9syf-CmCRw" source="_eYu8ML9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ">
+                <trigger xmi:type="uml:Trigger" xmi:id="_VOxMQMNWEe6X9syf-CmCRw" event="_a_mX4MNVEe6X9syf-CmCRw"/>
               </transition>
-              <subvertex xmi:type="uml:State" xmi:id="_YsCfJr9KEe65db1_bM-TwQ" name="PriceChanging"/>
+              <subvertex xmi:type="uml:State" xmi:id="_YsCfJr9KEe65db1_bM-TwQ" name="PriceChanging">
+                <entry xmi:type="uml:OpaqueBehavior" xmi:id="_k2_OYMNCEe6X9syf-CmCRw">
+                  <language>bean</language>
+                  <body>priceChangingEntry</body>
+                </entry>
+              </subvertex>
               <subvertex xmi:type="uml:State" xmi:id="_aiBJUL9KEe65db1_bM-TwQ" name="PriceChanged">
                 <entry xmi:type="uml:OpaqueBehavior" xmi:id="_WBmLoMM7Ee6X9syf-CmCRw">
                   <language>bean</language>
@@ -298,9 +311,7 @@
   <packagedElement xmi:type="uml:Signal" xmi:id="_f1SZILXbEe6PAs2TUsdVsw" name="price_ended"/>
   <packagedElement xmi:type="uml:SignalEvent" xmi:id="_j8zoILXbEe6PAs2TUsdVsw" name="SEPriceEnded" signal="_f1SZILXbEe6PAs2TUsdVsw"/>
   <packagedElement xmi:type="uml:Signal" xmi:id="_DcDdQLXcEe6PAs2TUsdVsw" name="change_price"/>
-  <packagedElement xmi:type="uml:Signal" xmi:id="_HgimYLXcEe6PAs2TUsdVsw" name="keep_price"/>
   <packagedElement xmi:type="uml:SignalEvent" xmi:id="_K9PWwLXcEe6PAs2TUsdVsw" name="SEChangePrice" signal="_DcDdQLXcEe6PAs2TUsdVsw"/>
-  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_PugtYLXcEe6PAs2TUsdVsw" name="SEKeepPrice" signal="_HgimYLXcEe6PAs2TUsdVsw"/>
   <packagedElement xmi:type="uml:Signal" xmi:id="_ruKPILXcEe6PAs2TUsdVsw" name="price_off"/>
   <packagedElement xmi:type="uml:SignalEvent" xmi:id="_uKDp0LXcEe6PAs2TUsdVsw" name="SEPriceOff" signal="_ruKPILXcEe6PAs2TUsdVsw"/>
   <packagedElement xmi:type="uml:Signal" xmi:id="_wMBsILXdEe6PAs2TUsdVsw" name="wait_payment"/>
@@ -327,6 +338,8 @@
   <packagedElement xmi:type="uml:Signal" xmi:id="_HLc7QL9gEe65db1_bM-TwQ" name="prolong_completed"/>
   <packagedElement xmi:type="uml:SignalEvent" xmi:id="_J5ICcL9gEe65db1_bM-TwQ" name="SEProlong" signal="_EtgSIL9gEe65db1_bM-TwQ"/>
   <packagedElement xmi:type="uml:SignalEvent" xmi:id="_OAoDUL9gEe65db1_bM-TwQ" name="SEProlongCompleted" signal="_HLc7QL9gEe65db1_bM-TwQ"/>
+  <packagedElement xmi:type="uml:Signal" xmi:id="_X-zgYMNVEe6X9syf-CmCRw" name="resume_price"/>
+  <packagedElement xmi:type="uml:SignalEvent" xmi:id="_a_mX4MNVEe6X9syf-CmCRw" name="SEResumePrice" signal="_X-zgYMNVEe6X9syf-CmCRw"/>
   <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_xVex0MBBEe64IK3ZTfm97w">
     <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xVh1IMBBEe64IK3ZTfm97w" source="http://www.eclipse.org/uml2/2.0.0/UML">
       <references xmi:type="ecore:EPackage" href="pathmap://PAPYRUS_ACTIONLANGUAGE_PROFILE/ActionLanguage-Profile.profile.uml#_Kv8EIKFXEeS_KNX0nfvIVQ"/>

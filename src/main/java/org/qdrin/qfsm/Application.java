@@ -58,12 +58,6 @@ public class Application implements CommandLineRunner {
 			.build();
 		Mono<Message<String>> monomsg = Mono.just(message);
 		log.info("sending event: {}, message: {}", eventName, message);
-		if(eventName.equals("change_price") || eventName.equals("resume_completed")) {
-			ProductPrice nextPrice = ExternalData.RequestProductPrice();
-			stateMachine.getExtendedState().getVariables().put("nextPrice", nextPrice);
-		} else {
-			stateMachine.getExtendedState().getVariables().remove("nextPrice");
-		}
 		var evResult = stateMachine.sendEvent(monomsg).collectList();
 		evResult.block();
 	}

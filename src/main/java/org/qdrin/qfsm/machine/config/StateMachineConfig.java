@@ -48,6 +48,11 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   }
 
   @Bean
+  PriceChangingEntry priceChangingEntry() {
+    return new PriceChangingEntry();
+  }
+
+  @Bean
   PriceChangedEntry priceChangedEntry() {
     return new PriceChangedEntry();
   }
@@ -85,6 +90,21 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   @Bean
   SignalAction sendPriceEnded() {
     return new SignalAction("price_ended");
+  }
+
+  @Bean
+  SignalAction sendChangePrice() {
+    return new SignalAction("change_price");
+  }
+
+  @Bean
+  SignalAction sendChangePriceCompleted() {
+    return new SignalAction("change_price_completed");
+  }
+
+  @Bean
+  SignalAction sendResumePrice() {
+    return new SignalAction("resume_price");
   }
 
 
