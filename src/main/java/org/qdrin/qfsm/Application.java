@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
@@ -51,15 +52,22 @@ public class Application implements CommandLineRunner {
 		return getMachineState(state);
 	}
 
-	private void sendUserEvent(String eventName) {
+	private void sendUserEvent(String eventName) throws IllegalArgumentException {
+		stateMachine.getExtendedState().getVariables().put("transitionCount", 0);
 		Message<String> message = MessageBuilder
 			.withPayload(eventName)
-			.setHeader("now", OffsetDateTime.now())
+			.setHeader("origin", "user")
 			.build();
 		Mono<Message<String>> monomsg = Mono.just(message);
 		log.info("sending event: {}, message: {}", eventName, message);
 		var evResult = stateMachine.sendEvent(monomsg).collectList();
 		evResult.block();
+		int trcount = (int) stateMachine.getExtendedState().getVariables().get("transitionCount");
+		if(trcount == 0) {
+			log.error("Not transition triggered. Event vasted");
+		} else {
+			log.info("event processed, transitionCount={}", trcount);
+		}
 	}
 
 	public static void main(String[] args) {
@@ -82,11 +90,15 @@ public class Application implements CommandLineRunner {
 		while(! input.equals("exit")) {
 			System.out.print("input event name(exit to exit):");
 			input = in.nextLine();
-			sendUserEvent(input);
-			state = stateMachine.getState();
-			sname = getMachineState();
-			var variables = stateMachine.getExtendedState().getVariables();
-			log.info("new state: {}, variables: {}", sname, variables);
+			try {
+				sendUserEvent(input);
+				state = stateMachine.getState();
+				sname = getMachineState();
+				var variables = stateMachine.getExtendedState().getVariables();
+				log.info("new state: {}, variables: {}", sname, variables);
+			} catch(IllegalArgumentException e) {
+				log.error("Event {} not accepted in current state: {}", input, e.getMessage());
+			}
 		}
 		log.info("exiting...");
 		in.close();

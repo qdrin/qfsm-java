@@ -28,7 +28,6 @@ public class ActiveStatesGuard implements Guard<String, String> {
         break;
       }
     }
-    // log.info("ActivatedGuard.evaluate productStatus: {}", prstatus);
     return res;
   }
   

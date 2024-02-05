@@ -1,9 +1,7 @@
 package org.qdrin.qfsm.machine.config;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.qdrin.qfsm.machine.StateLogAction;
 import org.qdrin.qfsm.machine.actions.SignalAction;
@@ -11,14 +9,12 @@ import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.statemachine.StateContext;
+import org.springframework.statemachine.annotation.OnTransition;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
 import org.springframework.statemachine.guard.Guard;
-import org.springframework.statemachine.region.Region;
-import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
 
 import lombok.extern.slf4j.Slf4j;

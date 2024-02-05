@@ -19,7 +19,6 @@ public class ActivatedGuard implements Guard<String, String> {
   public boolean evaluate(StateContext<String, String> context) {
     ProductPrice price = (ProductPrice) context.getExtendedState().getVariables().get("productPrice");
     String prstatus = price.getProductStatus();
-    // log.info("ActivatedGuard.evaluate productStatus: {}", prstatus);
     return ObjectUtils.nullSafeEquals(match, prstatus);
   }
   

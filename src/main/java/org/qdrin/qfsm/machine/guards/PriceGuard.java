@@ -35,17 +35,14 @@ public class PriceGuard implements Guard<String, String> {
     ProductPrice price = (ProductPrice) context.getExtendedState().getVariables().get("productPrice");
     ProductPrice nextPrice = (ProductPrice) context.getExtendedState().getVariables().get("nextPrice");
     boolean res = true;
-    log.info("fullCompare:{}, equalCompare:{}", fullCompare, equalCompare);
     if(fullCompare) {
       boolean isFull = nextPrice.getNextPayDate() != null;
       res = fullDir? isFull : ! isFull;
-      log.info("isFull:{}, res:{}", isFull, res);
     }
     if(equalCompare) {
       boolean isEqual = price.getPriceId().equals(nextPrice.getPriceId());
       res = res && (equalDir? isEqual : ! isEqual);
     }
-    log.info("res={}, price: {}, nextPrice: {}, equals? {}", res, price, nextPrice);
     return res;
   }
   
