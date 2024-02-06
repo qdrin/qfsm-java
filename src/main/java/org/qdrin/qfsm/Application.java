@@ -63,6 +63,7 @@ public class Application implements CommandLineRunner {
 		var evResult = stateMachine.sendEvent(monomsg).collectList();
 		evResult.block();
 		int trcount = (int) stateMachine.getExtendedState().getVariables().get("transitionCount");
+		// Here we can distinguish accepted event from non-accepted
 		if(trcount == 0) {
 			log.error("Not transition triggered. Event vasted");
 		} else {

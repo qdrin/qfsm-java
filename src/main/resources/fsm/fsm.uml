@@ -28,10 +28,6 @@
           <language>spel</language>
           <body>extendedState.getVariables().put(&quot;tarificationPeriod&quot;, 0)</body>
         </doActivity>
-        <entry xmi:type="uml:OpaqueBehavior" xmi:id="_NsvyYLUKEe6GmqK4b9jh0A" name="stateLogAction">
-          <language>bean</language>
-          <body>stateLogAction</body>
-        </entry>
       </subvertex>
       <subvertex xmi:type="uml:State" xmi:id="_rfbL0LCHEe6zeo6uvgVLWA" name="Aborted"/>
       <subvertex xmi:type="uml:State" xmi:id="_JUMqgLn8Ee6yNs2FzguhlQ" name="Provision">

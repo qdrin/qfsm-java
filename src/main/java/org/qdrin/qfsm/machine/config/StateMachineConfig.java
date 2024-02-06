@@ -3,7 +3,6 @@ package org.qdrin.qfsm.machine.config;
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.qdrin.qfsm.machine.StateLogAction;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
@@ -36,10 +35,6 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
 
   // ------------------------------------------------------------------------------------------
   // actions
-  @Bean
-  public StateLogAction stateLogAction() {
-    return new StateLogAction();
-  }
 
   @Bean
   PendingDisconnectEntry pendingDisconnectEntry() {
