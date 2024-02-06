@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Optional;
 
 import org.qdrin.qfsm.model.*;
+import org.qdrin.qfsm.utils.PriceHelper;
 
 @Slf4j
 public class PriceGuard implements Guard<String, String> {
@@ -32,8 +33,8 @@ public class PriceGuard implements Guard<String, String> {
 
   @Override
   public boolean evaluate(StateContext<String, String> context) {
-    ProductPrice price = (ProductPrice) context.getExtendedState().getVariables().get("productPrice");
-    ProductPrice nextPrice = (ProductPrice) context.getExtendedState().getVariables().get("nextPrice");
+    ProductPrice price =  PriceHelper.getProductPrice(context);
+    ProductPrice nextPrice = PriceHelper.getNextPrice(context);
     boolean res = true;
     if(fullCompare) {
       boolean isFull = nextPrice.getNextPayDate() != null;

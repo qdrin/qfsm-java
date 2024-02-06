@@ -1,6 +1,7 @@
 package org.qdrin.qfsm;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Scanner;
 import lombok.extern.slf4j.Slf4j;
@@ -79,24 +80,25 @@ public class Application implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		Scanner in = new Scanner(System.in);
 		String input = "AAA";
+		Map<Object, Object> machineVars = stateMachine.getExtendedState().getVariables();
+		Product product = new Product();
+		ProductPrice price = ExternalData.RequestProductPrice();
+		log.info("price: {}", price);
+		product.setProductPrices(Arrays.asList(price));
+		machineVars.put("product", product);
 		var runsm = stateMachine.startReactively();
 		runsm.block();
-		Map<Object, Object> machineVars = stateMachine.getExtendedState().getVariables();
-		var price = ExternalData.RequestProductPrice();
-		log.info("price: {}", price);
-		machineVars.put("productPrice", price);
 		var state = stateMachine.getState();
-		String sname = (state == null) ? "null" : state.getId();
-		log.info("initial state: {}", sname);
+		log.info("initial state: {}, variables: {}", state.getId(), machineVars);
 		while(! input.equals("exit")) {
 			System.out.print("input event name(exit to exit):");
 			input = in.nextLine();
 			try {
 				sendUserEvent(input);
 				state = stateMachine.getState();
-				sname = getMachineState();
+				String machineState = getMachineState();
 				var variables = stateMachine.getExtendedState().getVariables();
-				log.info("new state: {}, variables: {}", sname, variables);
+				log.info("new state: {}, variables: {}", machineState, variables);
 			} catch(IllegalArgumentException e) {
 				log.error("Event {} not accepted in current state: {}", input, e.getMessage());
 			}

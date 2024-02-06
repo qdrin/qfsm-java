@@ -3,6 +3,7 @@ import java.util.Map;
 
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.tasks.ExternalData;
+import org.qdrin.qfsm.utils.PriceHelper;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.qdrin.qfsm.machine.actions.SignalAction;
@@ -19,13 +20,13 @@ public class PriceChangingEntry implements Action<String, String> {
     // Emulate external price-calculator request;
     int tPeriod = (int) cvars.get("tarificationPeriod");
     if (tPeriod == 0) {
-      ProductPrice price = (ProductPrice) cvars.get("productPrice");
-      cvars.put("nextPrice", price);
+      ProductPrice price = PriceHelper.getProductPrice(context);
+      PriceHelper.setNextPrice(context, price);
       SignalAction act = new SignalAction("change_price");
       act.execute(context);
     } else {
       ProductPrice nextPrice = ExternalData.RequestProductPrice();
-      cvars.put("nextPrice", nextPrice);
+      PriceHelper.setNextPrice(context, nextPrice);
     }
   }
 }
