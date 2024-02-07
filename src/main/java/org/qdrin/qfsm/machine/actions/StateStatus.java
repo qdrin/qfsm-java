@@ -2,9 +2,7 @@ package org.qdrin.qfsm.machine.actions;
 
 import java.util.Map;
 
-import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
-import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.annotation.OnStateEntry;
 import org.springframework.statemachine.annotation.WithStateMachine;
 import org.springframework.statemachine.state.State;
