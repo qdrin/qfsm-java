@@ -42,6 +42,11 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   }
 
   @Bean
+  PaidEntry paidEntry() {
+    return new PaidEntry();
+  }
+
+  @Bean
   PriceActiveEntry priceActiveEntry() {
     return new PriceActiveEntry();
   }
@@ -125,8 +130,8 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
   }
 
   @Bean
-  public Guard<String, String> priceActiveAndPaid() {
-    return new ActiveStatesGuard(Arrays.asList("PriceActive", "Paid"));
+  public Guard<String, String> prolongGuard() {
+    return new ProlongGuard();
   }
 
   @Bean

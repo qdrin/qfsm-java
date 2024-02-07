@@ -16,7 +16,7 @@ public class PriceChangedEntry implements Action<String, String> {
     log.info("PriceChangedEntry started. event: {}, message: {}", context.getEvent());
     ProductPrice nextPrice = PriceHelper.getNextPrice(context);
     nextPrice.setPeriod(1);
-    log.info("PriceChangedEntry productPrice: {}", nextPrice);
-    PriceHelper.setNextPrice(context, nextPrice);
+    PriceHelper.setProductPrice(context, nextPrice);
+    log.info("PriceChangedEntry productPrice: {}", PriceHelper.getProductPrice(context));
   }
 }

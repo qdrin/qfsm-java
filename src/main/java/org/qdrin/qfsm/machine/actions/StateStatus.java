@@ -25,11 +25,9 @@ public class StateStatus {
   
   @OnStateEntry
   public void setStatus(StateContext<String, String> context) {
-    // State<String, String> state = stateMachine.getState();
     State<String, String> state = context.getTarget();
     var extendedState = context.getExtendedState();
     String status = statusMap.getOrDefault(state.getId(), null);
-    log.info("setStatus id: {}, status: {}", state.getId(), status);
     if(status != null) {
       ((Product) extendedState.getVariables().get("product")).setStatus(status);
     }

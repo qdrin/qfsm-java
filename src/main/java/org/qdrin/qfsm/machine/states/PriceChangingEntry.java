@@ -1,6 +1,7 @@
 package org.qdrin.qfsm.machine.states;
 import java.util.Map;
 
+import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.tasks.ExternalData;
 import org.qdrin.qfsm.utils.PriceHelper;
@@ -18,7 +19,7 @@ public class PriceChangingEntry implements Action<String, String> {
     log.info("PriceChangingEntry started. event: {}, message: {}", context.getEvent(), context.getMessage());
     Map<Object, Object> cvars = context.getExtendedState().getVariables();
     // Emulate external price-calculator request;
-    int tPeriod = (int) cvars.get("tarificationPeriod");
+    int tPeriod = ((Product) cvars.get("product")).getTarificationPeriod();
     if (tPeriod == 0) {
       ProductPrice price = PriceHelper.getProductPrice(context);
       PriceHelper.setNextPrice(context, price);

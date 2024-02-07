@@ -24,8 +24,8 @@ public class PriceHelper {
     Product product = (Product) cvars.get("product");
     List<ProductPrice> priceList = Arrays.asList(price);
     product.setProductPrices(priceList);
-    // cvars.put("product", product);
-    log.info("setProductPrices result product: {}", cvars.get("product"));
+    // context.getExtendedState().getVariables().put("product", product);
+    log.info("setProductPrice result product: {}", cvars.get("product"));
   }
 
   public static ProductPrice getNextPrice(StateContext<String, String> context) {
