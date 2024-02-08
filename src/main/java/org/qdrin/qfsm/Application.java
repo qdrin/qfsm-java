@@ -60,8 +60,8 @@ public class Application implements CommandLineRunner {
 			.build();
 		Mono<Message<String>> monomsg = Mono.just(message);
 		log.info("sending event: {}, message: {}", eventName, message);
-		var evResult = stateMachine.sendEvent(monomsg).collectList();
-		evResult.block();
+		stateMachine.sendEvent(monomsg).blockLast();
+		
 		int trcount = (int) stateMachine.getExtendedState().getVariables().get("transitionCount");
 		// Here we can distinguish accepted event from non-accepted
 		if(trcount == 0) {
