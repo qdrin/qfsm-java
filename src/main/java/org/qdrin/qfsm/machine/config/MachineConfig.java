@@ -1,6 +1,7 @@
 package org.qdrin.qfsm.machine.config;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.qdrin.qfsm.machine.actions.SignalAction;
@@ -8,6 +9,8 @@ import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.StateMachineContext;
+import org.springframework.statemachine.StateMachinePersist;
 import org.springframework.statemachine.annotation.OnTransition;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
@@ -21,6 +24,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Configuration
 public class MachineConfig {
+
+  public static class InMemoryStateMachinePersist implements StateMachinePersist<String, String, String> {
+    private final HashMap<String, StateMachineContext<String, String>> contexts = new HashMap<>();
+
+    @Override
+    public void write(StateMachineContext<String, String> context, String id) throws Exception {
+      contexts.put(id, context);
+    }
+    
+    @Override
+    public StateMachineContext<String, String> read(String id) throws Exception {
+      return contexts.get(id);
+    }
+  }
+
+  @Bean
+  public InMemoryStateMachinePersist stateMachinePersist() {
+    return new InMemoryStateMachinePersist();
+  }
 
   @Configuration
   @EnableStateMachine

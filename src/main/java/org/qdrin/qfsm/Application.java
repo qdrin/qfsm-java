@@ -17,6 +17,7 @@ import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
+import org.qdrin.qfsm.machine.config.MachineConfig.InMemoryStateMachinePersist;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.tasks.ExternalData;
 
@@ -27,8 +28,8 @@ public class Application implements CommandLineRunner {
 	@Autowired
 	private StateMachine<String, String> stateMachine;
 
-	// @Autowired
-	// private StateMachinePersist<String, String, String> stateMachinePersist;
+	@Autowired
+	private InMemoryStateMachinePersist stateMachinePersist;
 
 	private String getMachineState(State<String, String> state) {
 		String mstate = state.getId();
@@ -55,8 +56,13 @@ public class Application implements CommandLineRunner {
 		return getMachineState(state);
 	}
 
-	private void sendUserEvent(String eventName) throws IllegalArgumentException {
+	private void sendUserEvent(String machineId, String eventName) throws IllegalArgumentException {
 		stateMachine.getExtendedState().getVariables().put("transitionCount", 0);
+		try {
+			log.info("persist: {}", stateMachinePersist.read(machineId));
+		} catch(Exception e) {
+			log.error("Exception reading persistence: {}", e.getLocalizedMessage());
+		}
 		Message<String> message = MessageBuilder
 			.withPayload(eventName)
 			.setHeader("origin", "user")
@@ -71,6 +77,11 @@ public class Application implements CommandLineRunner {
 			log.error("Not transition triggered. Event vasted");
 		} else {
 			log.info("event processed, transitionCount={}", trcount);
+			try {
+				stateMachinePersist.write(stateMachine, machineId);
+			} catch(Exception e) {
+				log.error("write persist exception: {}", e.getLocalizedMessage());
+			}
 		}
 	}
 
