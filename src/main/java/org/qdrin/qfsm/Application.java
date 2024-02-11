@@ -27,6 +27,9 @@ public class Application implements CommandLineRunner {
 	@Autowired
 	private StateMachine<String, String> stateMachine;
 
+	// @Autowired
+	// private StateMachinePersist<String, String, String> stateMachinePersist;
+
 	private String getMachineState(State<String, String> state) {
 		String mstate = state.getId();
 		if (state.isOrthogonal()) {
