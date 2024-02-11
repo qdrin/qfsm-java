@@ -14,10 +14,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
-import org.qdrin.qfsm.machine.config.MachineConfig.InMemoryStateMachinePersist;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.tasks.ExternalData;
 
@@ -29,7 +29,7 @@ public class Application implements CommandLineRunner {
 	private StateMachine<String, String> stateMachine;
 
 	@Autowired
-	private InMemoryStateMachinePersist stateMachinePersist;
+	private StateMachinePersister<String, String, String> stateMachinePersister;
 
 	private String getMachineState(State<String, String> state) {
 		String mstate = state.getId();
@@ -58,11 +58,6 @@ public class Application implements CommandLineRunner {
 
 	private void sendUserEvent(String machineId, String eventName) throws IllegalArgumentException {
 		stateMachine.getExtendedState().getVariables().put("transitionCount", 0);
-		try {
-			log.info("persist: {}", stateMachinePersist.read(machineId));
-		} catch(Exception e) {
-			log.error("Exception reading persistence: {}", e.getLocalizedMessage());
-		}
 		Message<String> message = MessageBuilder
 			.withPayload(eventName)
 			.setHeader("origin", "user")
@@ -77,11 +72,6 @@ public class Application implements CommandLineRunner {
 			log.error("Not transition triggered. Event vasted");
 		} else {
 			log.info("event processed, transitionCount={}", trcount);
-			try {
-				stateMachinePersist.write(stateMachine, machineId);
-			} catch(Exception e) {
-				log.error("write persist exception: {}", e.getLocalizedMessage());
-			}
 		}
 	}
 
@@ -93,25 +83,22 @@ public class Application implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		Scanner in = new Scanner(System.in);
 		String input = "AAA";
-		Map<Object, Object> machineVars = stateMachine.getExtendedState().getVariables();
-		Product product = new Product();
-		ProductPrice price = ExternalData.RequestProductPrice();
-		log.info("price: {}", price);
-		product.setProductPrices(Arrays.asList(price));
-		machineVars.put("product", product);
+		String mid = "1";
 		var runsm = stateMachine.startReactively();
 		runsm.block();
-		var state = stateMachine.getState();
-		log.info("initial state: {}, variables: {}", state.getId(), machineVars);
 		while(! input.equals("exit")) {
+			System.out.print("input machineId:");
+			mid = in.nextLine();
 			System.out.print("input event name(exit to exit):");
 			input = in.nextLine();
 			try {
-				sendUserEvent(input);
-				state = stateMachine.getState();
+				stateMachinePersister.restore(stateMachine, mid);
+				sendUserEvent(mid, input);
+				State<String, String> state = stateMachine.getState();
 				String machineState = getMachineState();
 				var variables = stateMachine.getExtendedState().getVariables();
 				log.info("new state: {}, variables: {}", machineState, variables);
+				stateMachinePersister.persist(stateMachine, mid);
 			} catch(IllegalArgumentException e) {
 				log.error("Event {} not accepted in current state: {}", input, e.getMessage());
 			}

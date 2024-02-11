@@ -1,6 +1,5 @@
 package org.qdrin.qfsm.machine.config;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -11,12 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.StateMachinePersist;
-import org.springframework.statemachine.annotation.OnTransition;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
 import org.springframework.statemachine.guard.Guard;
+import org.springframework.statemachine.persist.DefaultStateMachinePersister;
+import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +39,13 @@ public class MachineConfig {
     }
   }
 
-  @Bean
   public InMemoryStateMachinePersist stateMachinePersist() {
     return new InMemoryStateMachinePersist();
+  }
+
+  @Bean
+  public StateMachinePersister<String, String, String> stateMachinePersister() {
+    return new DefaultStateMachinePersister<String, String, String>(stateMachinePersist());
   }
 
   @Configuration
@@ -62,6 +66,11 @@ public class MachineConfig {
   public static class SchemBeans {
     // ------------------------------------------------------------------------------------------
     // actions
+    @Bean
+    PendingActivateEntry pendingActivateEntry() {
+      return new PendingActivateEntry();
+    }
+
     @Bean
     PendingDisconnectEntry pendingDisconnectEntry() {
       return new PendingDisconnectEntry();

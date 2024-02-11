@@ -8,7 +8,12 @@
       <transition xmi:type="uml:Transition" xmi:id="_2aPTkLCHEe6zeo6uvgVLWA" source="_Gay-IKAWEe6Sh616vaZpZA" target="_rfbL0LCHEe6zeo6uvgVLWA">
         <trigger xmi:type="uml:Trigger" xmi:id="_4i_IwLCHEe6zeo6uvgVLWA" event="_yjXIoLCHEe6zeo6uvgVLWA"/>
       </transition>
-      <transition xmi:type="uml:Transition" xmi:id="_bB4iULn-Ee6yNs2FzguhlQ" source="_ZdmsILn-Ee6yNs2FzguhlQ" target="_Gay-IKAWEe6Sh616vaZpZA"/>
+      <transition xmi:type="uml:Transition" xmi:id="_bB4iULn-Ee6yNs2FzguhlQ" source="_ZdmsILn-Ee6yNs2FzguhlQ" target="_Gay-IKAWEe6Sh616vaZpZA">
+        <effect xmi:type="uml:OpaqueBehavior" xmi:id="_JSGYUMkcEe6effYLEMAa_A">
+          <language>spel</language>
+          <body>extendedState.getVariables().put(&quot;product&quot;, new org.qdrin.qfsm.model.Product())</body>
+        </effect>
+      </transition>
       <transition xmi:type="uml:Transition" xmi:id="_BpRM4LoBEe6yNs2FzguhlQ" source="_Gay-IKAWEe6Sh616vaZpZA" target="_bp6j8LoEEe6yNs2FzguhlQ">
         <trigger xmi:type="uml:Trigger" xmi:id="_xWcMsLoCEe6yNs2FzguhlQ" event="_RYkUgLCDEe6zeo6uvgVLWA"/>
       </transition>
@@ -23,7 +28,12 @@
           </specification>
         </ownedRule>
       </transition>
-      <subvertex xmi:type="uml:State" xmi:id="_Gay-IKAWEe6Sh616vaZpZA" name="PendingActivate"/>
+      <subvertex xmi:type="uml:State" xmi:id="_Gay-IKAWEe6Sh616vaZpZA" name="PendingActivate">
+        <entry xmi:type="uml:OpaqueBehavior" xmi:id="_Y2EucMkaEe6effYLEMAa_A">
+          <language>bean</language>
+          <body>pendingActivateEntry</body>
+        </entry>
+      </subvertex>
       <subvertex xmi:type="uml:State" xmi:id="_rfbL0LCHEe6zeo6uvgVLWA" name="Aborted"/>
       <subvertex xmi:type="uml:State" xmi:id="_JUMqgLn8Ee6yNs2FzguhlQ" name="Provision">
         <region xmi:type="uml:Region" xmi:id="_0jIZ4Ln8Ee6yNs2FzguhlQ" name="UsageRegion">
