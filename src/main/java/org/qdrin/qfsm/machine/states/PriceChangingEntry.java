@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PriceChangingEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
-    log.info("PriceChangingEntry started. event: {}, message: {}", context.getEvent(), context.getMessage());
+    log.debug("PriceChangingEntry started. event: {}, message: {}", context.getEvent(), context.getMessage());
     Map<Object, Object> cvars = context.getExtendedState().getVariables();
     // Emulate external price-calculator request;
     int tPeriod = ((Product) cvars.get("product")).getTarificationPeriod();

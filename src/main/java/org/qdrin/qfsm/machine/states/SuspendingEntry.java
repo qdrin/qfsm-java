@@ -13,10 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 public class SuspendingEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
-    log.info("SuspendingEntry started. event: {}, message: {}", context.getEvent());
+    log.debug("SuspendingEntry started. event: {}, message: {}", context.getEvent());
     ProductPrice price = PriceHelper.getProductPrice(context);
     price.setPeriod(0);
-    log.info("SuspendingEntry productPrice: {}", price);
+    log.debug("SuspendingEntry productPrice: {}", price);
     PriceHelper.setProductPrice(context, price);
   }
 }

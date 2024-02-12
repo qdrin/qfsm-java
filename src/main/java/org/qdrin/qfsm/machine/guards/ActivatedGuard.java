@@ -20,7 +20,7 @@ public class ActivatedGuard implements Guard<String, String> {
   public boolean evaluate(StateContext<String, String> context) {
     ProductPrice price = PriceHelper.getProductPrice(context);
     String prstatus = price.getProductStatus();
-    log.info("ActivatedGuard productStatus: {}, match: {}", prstatus, match);
+    log.debug("ActivatedGuard productStatus: {}, match: {}", prstatus, match);
     return ObjectUtils.nullSafeEquals(match, prstatus);
   }
   

@@ -16,7 +16,6 @@ public class CustomTransition {
   
   @OnTransition
   public void registerTransition(@EventHeaders Map<String, Object> headers, ExtendedState extendedState) {
-    log.info("registerTransition ");
     int count = (int) extendedState.getVariables().getOrDefault("transitionCount", 0) + 1;
     extendedState.getVariables().put("transitionCount", count);
   }

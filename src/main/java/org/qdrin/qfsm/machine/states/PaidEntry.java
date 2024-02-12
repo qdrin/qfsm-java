@@ -16,7 +16,7 @@ public class PaidEntry implements Action<String, String> {
     Map<Object, Object> cvars = context.getExtendedState().getVariables();
     Product product = (Product) cvars.get("product");
     int tPeriod = product.getTarificationPeriod() + 1;
-    log.info("PaidEntry setting tarificationPeriod={}", tPeriod);
+    log.debug("PaidEntry setting tarificationPeriod={}", tPeriod);
     product.setTarificationPeriod(tPeriod);
   }
 }

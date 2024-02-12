@@ -1,0 +1,16 @@
+# See http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+logging:
+  level:
+    root: INFO
+    org.qdrin.qfsm: DEBUG
+spring:
+  thymeleaf:
+    cache: false
+  main:
+    show-banner: true
+  # h2:
+  #   console:
+  #     enabled: true
+  security:
+    basic:
+      enabled: true
