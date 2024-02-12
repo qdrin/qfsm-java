@@ -8,9 +8,26 @@ spring:
     cache: false
   main:
     show-banner: true
-  # h2:
-  #   console:
-  #     enabled: true
   security:
     basic:
       enabled: true
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        # open-in-view: false
+  datasource:
+    username: ${DB_USER:psi}
+    password: ${DB_PASSWORD:psi}
+    url: "jdbc:postgresql://localhost:5432/psi_db"
+    # url: ${DB_URI}
+    testOnBorrow: true
+    validationQuery: select 1
+  liquibase:
+    enabled: false
+  environment:
+    istio-host: ${ISTIO_HOST:localhost}

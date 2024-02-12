@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.StateMachineContext;
@@ -18,6 +19,7 @@ import org.springframework.statemachine.guard.Guard;
 import org.springframework.statemachine.persist.DefaultStateMachinePersister;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,6 +38,21 @@ public class MachineConfig {
     @Override
     public StateMachineContext<String, String> read(String id) throws Exception {
       return contexts.get(id);
+    }
+  }
+
+  public static class JpaStateMachinePersist implements StateMachinePersist<String, String, String> {
+    @Autowired
+    private JpaRepository<StateMachineContext<String, String>, String> jpaRepository;
+
+    @Override
+    public void write(StateMachineContext<String, String> context, String id) throws Exception {
+      jpaRepository.save(context);
+    }
+    
+    @Override
+    public StateMachineContext<String, String> read(String id) throws Exception {
+      return jpaRepository.findById(id).get();
     }
   }
 
