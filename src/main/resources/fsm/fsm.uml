@@ -8,19 +8,14 @@
       <transition xmi:type="uml:Transition" xmi:id="_2aPTkLCHEe6zeo6uvgVLWA" source="_Gay-IKAWEe6Sh616vaZpZA" target="_rfbL0LCHEe6zeo6uvgVLWA">
         <trigger xmi:type="uml:Trigger" xmi:id="_4i_IwLCHEe6zeo6uvgVLWA" event="_yjXIoLCHEe6zeo6uvgVLWA"/>
       </transition>
-      <transition xmi:type="uml:Transition" xmi:id="_bB4iULn-Ee6yNs2FzguhlQ" source="_ZdmsILn-Ee6yNs2FzguhlQ" target="_Gay-IKAWEe6Sh616vaZpZA">
-        <effect xmi:type="uml:OpaqueBehavior" xmi:id="_JSGYUMkcEe6effYLEMAa_A">
-          <language>spel</language>
-          <body>extendedState.getVariables().put(&quot;product&quot;, new org.qdrin.qfsm.model.Product())</body>
-        </effect>
-      </transition>
+      <transition xmi:type="uml:Transition" xmi:id="_bB4iULn-Ee6yNs2FzguhlQ" source="_ZdmsILn-Ee6yNs2FzguhlQ" target="_mBTgYMlsEe6D_qDhyLHyWw"/>
       <transition xmi:type="uml:Transition" xmi:id="_BpRM4LoBEe6yNs2FzguhlQ" source="_Gay-IKAWEe6Sh616vaZpZA" target="_bp6j8LoEEe6yNs2FzguhlQ">
         <trigger xmi:type="uml:Trigger" xmi:id="_xWcMsLoCEe6yNs2FzguhlQ" event="_RYkUgLCDEe6zeo6uvgVLWA"/>
       </transition>
       <transition xmi:type="uml:Transition" xmi:id="_BILcILztEe6WIIctFrkbQg" source="_lUS-kLoEEe6yNs2FzguhlQ" target="__Z-08LzsEe6WIIctFrkbQg"/>
-      <transition xmi:type="uml:Transition" xmi:id="_WtcHoL9OEe65db1_bM-TwQ" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_5uBHwL9JEe65db1_bM-TwQ"/>
-      <transition xmi:type="uml:Transition" xmi:id="_EwcgQMBDEe64IK3ZTfm97w" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_uSPjQLn_Ee6yNs2FzguhlQ"/>
-      <transition xmi:type="uml:Transition" xmi:id="_Si0rAMBDEe64IK3ZTfm97w" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_yybJ4Ln_Ee6yNs2FzguhlQ">
+      <transition xmi:type="uml:Transition" xmi:id="_WtcHoL9OEe65db1_bM-TwQ" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_YsCfJr9KEe65db1_bM-TwQ"/>
+      <transition xmi:type="uml:Transition" xmi:id="_EwcgQMBDEe64IK3ZTfm97w" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_vh29AMDOEe6ubM7h2HVYrA"/>
+      <transition xmi:type="uml:Transition" xmi:id="_Si0rAMBDEe64IK3ZTfm97w" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_ihvgMMDPEe6ubM7h2HVYrA">
         <ownedRule xmi:type="uml:Constraint" xmi:id="_ovceMMBDEe64IK3ZTfm97w">
           <specification xmi:type="uml:OpaqueExpression" xmi:id="_ovceMcBDEe64IK3ZTfm97w">
             <language>bean</language>
@@ -28,12 +23,10 @@
           </specification>
         </ownedRule>
       </transition>
-      <subvertex xmi:type="uml:State" xmi:id="_Gay-IKAWEe6Sh616vaZpZA" name="PendingActivate">
-        <entry xmi:type="uml:OpaqueBehavior" xmi:id="_Y2EucMkaEe6effYLEMAa_A">
-          <language>bean</language>
-          <body>pendingActivateEntry</body>
-        </entry>
-      </subvertex>
+      <transition xmi:type="uml:Transition" xmi:id="_tSSasMlsEe6D_qDhyLHyWw" source="_mBTgYMlsEe6D_qDhyLHyWw" target="_Gay-IKAWEe6Sh616vaZpZA">
+        <trigger xmi:type="uml:Trigger" xmi:id="_0dVFEMlsEe6D_qDhyLHyWw" event="_HGxUkLCDEe6zeo6uvgVLWA"/>
+      </transition>
+      <subvertex xmi:type="uml:State" xmi:id="_Gay-IKAWEe6Sh616vaZpZA" name="PendingActivate"/>
       <subvertex xmi:type="uml:State" xmi:id="_rfbL0LCHEe6zeo6uvgVLWA" name="Aborted"/>
       <subvertex xmi:type="uml:State" xmi:id="_JUMqgLn8Ee6yNs2FzguhlQ" name="Provision">
         <region xmi:type="uml:Region" xmi:id="_0jIZ4Ln8Ee6yNs2FzguhlQ" name="UsageRegion">
@@ -308,6 +301,12 @@
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_bp6j8LoEEe6yNs2FzguhlQ" name="ProvisionFork" kind="fork"/>
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_lUS-kLoEEe6yNs2FzguhlQ" name="ProvisionJoin" kind="join"/>
       <subvertex xmi:type="uml:State" xmi:id="__Z-08LzsEe6WIIctFrkbQg" name="Disconnect"/>
+      <subvertex xmi:type="uml:State" xmi:id="_mBTgYMlsEe6D_qDhyLHyWw" name="Entry">
+        <exit xmi:type="uml:OpaqueBehavior" xmi:id="_NRilkMltEe6D_qDhyLHyWw">
+          <language>bean</language>
+          <body>entryExit</body>
+        </exit>
+      </subvertex>
     </region>
   </packagedElement>
   <packagedElement xmi:type="uml:Signal" xmi:id="_1mdCwKALEe6Sh616vaZpZA" name="suspend"/>

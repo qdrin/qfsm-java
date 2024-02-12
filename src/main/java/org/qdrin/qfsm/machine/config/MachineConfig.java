@@ -63,12 +63,13 @@ public class MachineConfig {
     }
   }
 
-  public static class SchemBeans {
+  @Configuration
+  public static class SchemeBeans {
     // ------------------------------------------------------------------------------------------
     // actions
     @Bean
-    PendingActivateEntry pendingActivateEntry() {
-      return new PendingActivateEntry();
+    EntryExit entryExit() {
+      return new EntryExit();
     }
 
     @Bean

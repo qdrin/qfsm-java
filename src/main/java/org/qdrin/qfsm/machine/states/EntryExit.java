@@ -1,6 +1,5 @@
 package org.qdrin.qfsm.machine.states;
 import java.util.Arrays;
-import java.util.Map;
 
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
@@ -12,15 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class PendingActivateEntry implements Action<String, String> {
+public class EntryExit implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
-    var mvars = context.getExtendedState().getVariables();
-    Product product = (Product) mvars.get("product");
-    log.info("PendingActivateEntry start. product: {}", product);
+    Product product = new Product();
     ProductPrice price = ExternalData.RequestProductPrice();
     product.setProductPrices(Arrays.asList(price));
-    // mvars.put("product", product);
-    log.info("PendingsActivateEntry exit. product: {}", product);
+    context.getExtendedState().getVariables().put("product", product);
   }
 }

@@ -1,8 +1,5 @@
 package org.qdrin.qfsm;
 
-import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.Map;
 import java.util.Scanner;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -18,8 +15,7 @@ import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
-import org.qdrin.qfsm.model.*;
-import org.qdrin.qfsm.tasks.ExternalData;
+
 
 @Slf4j
 @SpringBootApplication
