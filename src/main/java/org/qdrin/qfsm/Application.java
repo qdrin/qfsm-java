@@ -8,10 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.StateMachinePersist;
+import org.springframework.statemachine.config.StateMachineFactory;
+import org.springframework.statemachine.config.model.StateMachineModelFactory;
 import org.springframework.statemachine.persist.StateMachinePersister;
+import org.springframework.statemachine.service.DefaultStateMachineService;
+import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
@@ -22,10 +28,13 @@ import org.springframework.statemachine.state.State;
 public class Application implements CommandLineRunner {
 
 	@Autowired
-	private StateMachine<String, String> stateMachine;
+	private StateMachineService<String, String> stateMachineService;
 
-	@Autowired
-	private StateMachinePersister<String, String, String> stateMachinePersister;
+	// @Autowired
+	// private StateMachine<String, String> stateMachine;
+
+	// @Autowired
+	// private StateMachinePersister<String, String, String> stateMachinePersister;
 
 	private String getMachineState(State<String, String> state) {
 		String mstate = state.getId();
@@ -47,22 +56,41 @@ public class Application implements CommandLineRunner {
 		return mstate;
 	}
 
-	private String getMachineState() {
-		State<String, String> state = stateMachine.getState();
-		return getMachineState(state);
-	}
+	// private String getMachineState() {
+	// 	State<String, String> state = stateMachine.getState();
+	// 	return getMachineState(state);
+	// }
 
-	private void sendUserEvent(String machineId, String eventName) throws IllegalArgumentException {
-		stateMachine.getExtendedState().getVariables().put("transitionCount", 0);
+	// private void sendUserEvent(String machineId, String eventName) throws IllegalArgumentException {
+	// 	stateMachine.getExtendedState().getVariables().put("transitionCount", 0);
+	// 	Message<String> message = MessageBuilder
+	// 		.withPayload(eventName)
+	// 		.setHeader("origin", "user")
+	// 		.build();
+	// 	Mono<Message<String>> monomsg = Mono.just(message);
+	// 	log.info("sending event: {}, message: {}", eventName, message);
+	// 	stateMachine.sendEvent(monomsg).blockLast();
+		
+	// 	int trcount = (int) stateMachine.getExtendedState().getVariables().get("transitionCount");
+	// 	// Here we can distinguish accepted event from non-accepted
+	// 	if(trcount == 0) {
+	// 		log.error("Not transition triggered. Event vasted");
+	// 	} else {
+	// 		log.info("event processed, transitionCount={}", trcount);
+	// 	}
+	// }
+
+	private void sendUserEvent1(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {
+		machine.getExtendedState().getVariables().put("transitionCount", 0);
 		Message<String> message = MessageBuilder
 			.withPayload(eventName)
 			.setHeader("origin", "user")
 			.build();
 		Mono<Message<String>> monomsg = Mono.just(message);
 		log.info("sending event: {}, message: {}", eventName, message);
-		stateMachine.sendEvent(monomsg).blockLast();
+		machine.sendEvent(monomsg).blockLast();
 		
-		int trcount = (int) stateMachine.getExtendedState().getVariables().get("transitionCount");
+		int trcount = (int) machine.getExtendedState().getVariables().get("transitionCount");
 		// Here we can distinguish accepted event from non-accepted
 		if(trcount == 0) {
 			log.error("Not transition triggered. Event vasted");
@@ -80,28 +108,31 @@ public class Application implements CommandLineRunner {
 		Scanner in = new Scanner(System.in);
 		String input = "AAA";
 		String mid = "1";
-		var runsm = stateMachine.startReactively();
-		runsm.block();
+		// var runsm = stateMachine.startReactively();
+		// runsm.block();
 		while(! input.equals("exit")) {
 			System.out.print("input machineId:");
 			mid = in.nextLine();
 			System.out.print("input event name(exit to exit):");
 			input = in.nextLine();
 			try {
-				stateMachinePersister.restore(stateMachine, mid);
-				sendUserEvent(mid, input);
-				State<String, String> state = stateMachine.getState();
-				String machineState = getMachineState();
-				var variables = stateMachine.getExtendedState().getVariables();
+				StateMachine<String, String> machine = stateMachineService.acquireStateMachine(mid);
+				// stateMachinePersister.restore(stateMachine, mid);
+				sendUserEvent1(machine, input);
+				State<String, String> state = machine.getState();
+				String machineState = getMachineState(machine.getState());
+				// var variables = stateMachine.getExtendedState().getVariables();
+				var variables = machine.getExtendedState().getVariables();
+				stateMachineService.releaseStateMachine(mid, false);
 				log.info("new state: {}, variables: {}", machineState, variables);
-				stateMachinePersister.persist(stateMachine, mid);
+				// stateMachinePersister.persist(stateMachine, mid);
 			} catch(IllegalArgumentException e) {
 				log.error("Event {} not accepted in current state: {}", input, e.getMessage());
 			}
 		}
 		log.info("exiting...");
 		in.close();
-		var stop_sm = stateMachine.stopReactively();
-		stop_sm.block();
+		// var stop_sm = stateMachine.stopReactively();
+		// stop_sm.block();
 	}
 }

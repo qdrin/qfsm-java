@@ -7,25 +7,55 @@ import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.StateMachinePersist;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
+import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
 import org.springframework.statemachine.guard.Guard;
 import org.springframework.statemachine.persist.DefaultStateMachinePersister;
+import org.springframework.statemachine.persist.RepositoryStateMachinePersist;
 import org.springframework.statemachine.persist.StateMachinePersister;
+import org.springframework.statemachine.persist.StateMachineRuntimePersister;
+import org.springframework.statemachine.service.DefaultStateMachineService;
+import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.statemachine.data.jpa.JpaPersistingStateMachineInterceptor;
+import org.springframework.statemachine.data.jpa.JpaRepositoryStateMachinePersist;
+import org.springframework.statemachine.data.jpa.JpaStateMachineRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
 public class MachineConfig {
+
+  @Configuration
+  @EntityScan("org.springframework.statemachine.data.jpa")
+  @EnableJpaRepositories("org.springframework.statemachine.data.jpa")
+  public static class JpaPersisterConfig {
+
+    @Bean
+    public StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister(
+        JpaStateMachineRepository jpaStateMachineRepository) {
+      return new JpaPersistingStateMachineInterceptor<>(jpaStateMachineRepository);
+    }
+  }
+
+  @Bean
+	public StateMachineService<String, String> stateMachineService(
+					final StateMachineModelFactory<String, String> stateMachineFactory,
+					final StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister) {
+			return new DefaultStateMachineService<>((StateMachineFactory) stateMachineFactory, stateMachineRuntimePersister);
+	}
 
   public static class InMemoryStateMachinePersist implements StateMachinePersist<String, String, String> {
     private final HashMap<String, StateMachineContext<String, String>> contexts = new HashMap<>();
@@ -41,29 +71,6 @@ public class MachineConfig {
     }
   }
 
-  public static class JpaStateMachinePersist implements StateMachinePersist<String, String, String> {
-    @Autowired
-    private JpaRepository<StateMachineContext<String, String>, String> jpaRepository;
-
-    @Override
-    public void write(StateMachineContext<String, String> context, String id) throws Exception {
-      jpaRepository.save(context);
-    }
-    
-    @Override
-    public StateMachineContext<String, String> read(String id) throws Exception {
-      return jpaRepository.findById(id).get();
-    }
-  }
-
-  public InMemoryStateMachinePersist stateMachinePersist() {
-    return new InMemoryStateMachinePersist();
-  }
-
-  @Bean
-  public StateMachinePersister<String, String, String> stateMachinePersister() {
-    return new DefaultStateMachinePersister<String, String, String>(stateMachinePersist());
-  }
 
   @Configuration
   @EnableStateMachine
