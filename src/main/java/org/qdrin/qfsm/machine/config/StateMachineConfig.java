@@ -1,6 +1,5 @@
 package org.qdrin.qfsm.machine.config;
 
-import java.util.HashMap;
 import java.util.Optional;
 
 import org.qdrin.qfsm.machine.actions.SignalAction;
@@ -10,10 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.config.EnableStateMachine;
+import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
+import org.springframework.statemachine.config.model.DefaultStateMachineComponentResolver;
+import org.springframework.statemachine.config.model.StateMachineComponentResolver;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
 import org.springframework.statemachine.guard.Guard;
 import org.springframework.statemachine.persist.StateMachineRuntimePersister;
@@ -25,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
+@EnableStateMachineFactory
 public class StateMachineConfig extends StateMachineConfigurerAdapter<String, String> {
 
   @Configuration
@@ -48,17 +51,18 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
 
     @Bean
     public StateMachineModelFactory<String, String> modelFactory() {
-      return new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
+      UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
+      return factory;
     }
 
     @Configuration
     public static class ServiceConfig {
-
         @Bean
         public StateMachineService<String,String> stateMachineService(
-                StateMachineModelFactory<String,String> stateMachineFactory,
+                StateMachineFactory<String,String> stateMachineFactory,
+                // StateMachineModelFactory<String,String> stateMachineFactory,
                 StateMachineRuntimePersister<String,String, String> stateMachineRuntimePersister) {
-            return new DefaultStateMachineService<>((StateMachineFactory) stateMachineFactory, stateMachineRuntimePersister);
+            return new DefaultStateMachineService<>(stateMachineFactory, stateMachineRuntimePersister);
         }
     }
   }
