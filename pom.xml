@@ -12,14 +12,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.5</version>
+        <version>3.2.3</version>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <start-class>org.qdrin.qfsm.Application</start-class>
 		<java.version>17</java.version>
-		<spring-statemachine.version>3.2.1</spring-statemachine.version>    
+		<spring-statemachine.version>4.0.0</spring-statemachine.version>    
         <lombok.version>1.18.30</lombok.version>
     </properties>
 

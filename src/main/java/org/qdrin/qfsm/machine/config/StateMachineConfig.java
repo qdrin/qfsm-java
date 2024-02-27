@@ -9,6 +9,10 @@ import org.qdrin.qfsm.machine.states.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.StateMachinePersist;
@@ -25,6 +29,14 @@ import org.springframework.statemachine.config.builders.StateMachineModelConfigu
 import org.springframework.statemachine.config.model.DefaultStateMachineComponentResolver;
 import org.springframework.statemachine.config.model.StateMachineComponentResolver;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
+import org.springframework.statemachine.data.RepositoryState;
+import org.springframework.statemachine.data.RepositoryStateMachineModelFactory;
+import org.springframework.statemachine.data.RepositoryTransition;
+import org.springframework.statemachine.data.StateRepository;
+import org.springframework.statemachine.data.TransitionRepository;
+import org.springframework.statemachine.data.jpa.JpaPersistingStateMachineInterceptor;
+import org.springframework.statemachine.data.jpa.JpaStateMachineRepository;
+import org.springframework.statemachine.data.support.StateMachineJackson2RepositoryPopulatorFactoryBean;
 import org.springframework.statemachine.guard.Guard;
 import org.springframework.statemachine.persist.StateMachineRuntimePersister;
 import org.springframework.statemachine.service.DefaultStateMachineService;
@@ -33,45 +45,55 @@ import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+// @Slf4j
 @Configuration
-@EnableStateMachineFactory
-public class StateMachineConfig extends StateMachineConfigurerAdapter<String, String> {
+public class StateMachineConfig {
 
-  // @Configuration
-  // public static class InMemoryStateMachinePersist implements StateMachinePersist<String, String, String> {
-  //   private final HashMap<String, StateMachineContext<String, String>> contexts = new HashMap<>();
+  @Bean
+  public StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister(
+          JpaStateMachineRepository jpaStateMachineRepository) {
+      return new JpaPersistingStateMachineInterceptor<>(jpaStateMachineRepository);
+  }
 
-  //   @Override
-  //   public void write(StateMachineContext<String, String> context, String id) throws Exception {
-  //     contexts.put(id, context);
-  //   }
-    
-  //   @Override
-  //   public StateMachineContext<String, String> read(String id) throws Exception {
-  //     return contexts.get(id);
-  //   }
-  // }
+  @Bean
+  public StateMachineService<String,String> stateMachineService(
+        StateMachineFactory<String,String> stateMachineFactory,
+        StateMachineRuntimePersister<String,String, String> stateMachineRuntimePersister) {
+    return new DefaultStateMachineService<String, String>(stateMachineFactory, stateMachineRuntimePersister);
+  }
+
+  // @Bean
+	// public StateMachineJackson2RepositoryPopulatorFactoryBean jackson2RepositoryPopulatorFactoryBean() {
+	// 	StateMachineJackson2RepositoryPopulatorFactoryBean factoryBean = new StateMachineJackson2RepositoryPopulatorFactoryBean();
+	// 	factoryBean.setResources(new Resource[] { new ClassPathResource("datajpamultipersist.json") });
+	// 	return factoryBean;
+	// }
 
   @Configuration
-  @EnableStateMachine  // TODO: Удалить после отладки machineFactory
+  @EnableStateMachineFactory
+  // @EnableStateMachine  // TODO: Удалить после отладки machineFactory
   public static class MachineConfig extends StateMachineConfigurerAdapter<String, String> {
 
-    // @Autowired
-    // InMemoryStateMachinePersist stateMachineRuntimePersister;
-    // private StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister;
+		@Autowired
+		private StateRepository<? extends RepositoryState> stateRepository;
+
+		@Autowired
+		private TransitionRepository<? extends RepositoryTransition> transitionRepository;
+
+		@Autowired
+		private StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister;
 
     @Override
     public void configure(StateMachineModelConfigurer<String, String> model) throws Exception {
       model.withModel().factory(modelFactory());
     }
 
-    // @Override
-    // public void configure(StateMachineConfigurationConfigurer<String, String> config) throws Exception {
-    //   config
-    //     .withPersistence();
-    //     // .runtimePersister(stateMachineRuntimePersister);
-    // }
+    @Override
+    public void configure(StateMachineConfigurationConfigurer<String, String> config) throws Exception {
+      config
+        .withPersistence()
+        .runtimePersister(stateMachineRuntimePersister);
+    }
 
     @Bean
     public StateMachineModelFactory<String, String> modelFactory() {
@@ -79,20 +101,11 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
       return factory;
     }
 
-    @Configuration
-    public static class ServiceConfig {
-        @Bean
-        public StateMachineService<String,String> stateMachineService(
-                StateMachineFactory<String,String> stateMachineFactory) {
-                // StateMachinePersist<String, String, String> persister) {
-                // StateMachineRuntimePersister<String,String, String> stateMachineRuntimePersister) {
-            log.debug("factory: {}", stateMachineFactory);
-            var factory = (ObjectStateMachineFactory) stateMachineFactory;
-            var machine = stateMachineFactory.getStateMachine();
-            log.debug("machine: {}", machine);
-            return new DefaultStateMachineService<>(stateMachineFactory);  // , persister);
-        }
-    }
+    // @Bean
+		// public StateMachineModelFactory<String, String> modelFactory() {
+		// 	return new RepositoryStateMachineModelFactory(stateRepository, transitionRepository);
+		// }
+
   }
 
   @Configuration

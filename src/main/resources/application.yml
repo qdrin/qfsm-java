@@ -20,11 +20,10 @@ spring:
         show_sql: false
         format_sql: true
         # open-in-view: false
-  spring:
-    h2:
-      console:
-        enabled: true
-        path: /console/
+  h2:
+    console:
+      enabled: true
+      path: /console/
   datasource:
     # username: ${DB_USER:psi}
     # password: ${DB_PASSWORD:psi}

@@ -8,15 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.StateMachinePersist;
-import org.springframework.statemachine.config.StateMachineFactory;
-import org.springframework.statemachine.config.model.StateMachineModelFactory;
-import org.springframework.statemachine.persist.StateMachinePersister;
-import org.springframework.statemachine.service.DefaultStateMachineService;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
@@ -24,17 +20,17 @@ import org.springframework.statemachine.state.State;
 
 
 @Slf4j
+// @EnableJpaRepositories("org.springframework.statemachine.data.jpa")
+// @EntityScan("org.springframework.statemachine.data.jpa")
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
 	@Autowired
 	private StateMachineService<String, String> stateMachineService;
 
-	@Autowired
-	private StateMachine<String, String> stateMachine;
-
 	// @Autowired
-	// private StateMachinePersister<String, String, String> stateMachinePersister;
+	// private StateMachine<String, String> stateMachine;
+
 
 	private String getMachineState(State<String, String> state) {
 		String mstate = state.getId();
@@ -108,7 +104,5 @@ public class Application implements CommandLineRunner {
 		}
 		log.info("exiting...");
 		in.close();
-		// var stop_sm = stateMachine.stopReactively();
-		// stop_sm.block();
 	}
 }
