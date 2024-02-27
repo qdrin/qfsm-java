@@ -60,9 +60,8 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
         @Bean
         public StateMachineService<String,String> stateMachineService(
                 StateMachineFactory<String,String> stateMachineFactory,
-                // StateMachineModelFactory<String,String> stateMachineFactory,
                 StateMachineRuntimePersister<String,String, String> stateMachineRuntimePersister) {
-            return new DefaultStateMachineService<>(stateMachineFactory, stateMachineRuntimePersister);
+            return new DefaultStateMachineService<>(stateMachineFactory);  // , stateMachineRuntimePersister);
         }
     }
   }

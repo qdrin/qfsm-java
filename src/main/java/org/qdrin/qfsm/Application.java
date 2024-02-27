@@ -30,8 +30,8 @@ public class Application implements CommandLineRunner {
 	@Autowired
 	private StateMachineService<String, String> stateMachineService;
 
-	// @Autowired
-	// private StateMachine<String, String> stateMachine;
+	@Autowired
+	private StateMachine<String, String> stateMachine;
 
 	// @Autowired
 	// private StateMachinePersister<String, String, String> stateMachinePersister;
@@ -56,31 +56,7 @@ public class Application implements CommandLineRunner {
 		return mstate;
 	}
 
-	// private String getMachineState() {
-	// 	State<String, String> state = stateMachine.getState();
-	// 	return getMachineState(state);
-	// }
-
-	// private void sendUserEvent(String machineId, String eventName) throws IllegalArgumentException {
-	// 	stateMachine.getExtendedState().getVariables().put("transitionCount", 0);
-	// 	Message<String> message = MessageBuilder
-	// 		.withPayload(eventName)
-	// 		.setHeader("origin", "user")
-	// 		.build();
-	// 	Mono<Message<String>> monomsg = Mono.just(message);
-	// 	log.info("sending event: {}, message: {}", eventName, message);
-	// 	stateMachine.sendEvent(monomsg).blockLast();
-		
-	// 	int trcount = (int) stateMachine.getExtendedState().getVariables().get("transitionCount");
-	// 	// Here we can distinguish accepted event from non-accepted
-	// 	if(trcount == 0) {
-	// 		log.error("Not transition triggered. Event vasted");
-	// 	} else {
-	// 		log.info("event processed, transitionCount={}", trcount);
-	// 	}
-	// }
-
-	private void sendUserEvent1(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {
+	private void sendUserEvent(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {
 		machine.getExtendedState().getVariables().put("transitionCount", 0);
 		Message<String> message = MessageBuilder
 			.withPayload(eventName)
@@ -108,17 +84,18 @@ public class Application implements CommandLineRunner {
 		Scanner in = new Scanner(System.in);
 		String input = "AAA";
 		String mid = "1";
-		// var runsm = stateMachine.startReactively();
-		// runsm.block();
+		var runsm = stateMachine.startReactively();
+		runsm.block();
 		while(! input.equals("exit")) {
 			System.out.print("input machineId:");
 			mid = in.nextLine();
 			System.out.print("input event name(exit to exit):");
 			input = in.nextLine();
 			try {
-				StateMachine<String, String> machine = stateMachineService.acquireStateMachine(mid);
+				// StateMachine<String, String> machine = stateMachineService.acquireStateMachine(mid);
+				var machine = stateMachine;
 				// stateMachinePersister.restore(stateMachine, mid);
-				sendUserEvent1(machine, input);
+				sendUserEvent(machine, input);
 				State<String, String> state = machine.getState();
 				String machineState = getMachineState(machine.getState());
 				// var variables = stateMachine.getExtendedState().getVariables();
