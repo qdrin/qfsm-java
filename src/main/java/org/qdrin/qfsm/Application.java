@@ -84,19 +84,18 @@ public class Application implements CommandLineRunner {
 		Scanner in = new Scanner(System.in);
 		String input = "AAA";
 		String mid = "1";
-		var runsm = stateMachine.startReactively();
-		runsm.block();
+		// var runsm = stateMachine.startReactively();
+		// runsm.block();
 		while(! input.equals("exit")) {
 			System.out.print("input machineId:");
 			mid = in.nextLine();
 			System.out.print("input event name(exit to exit):");
 			input = in.nextLine();
 			try {
-				// StateMachine<String, String> machine = stateMachineService.acquireStateMachine(mid);
-				var machine = stateMachine;
+				StateMachine<String, String> machine = stateMachineService.acquireStateMachine(mid);
+				// var machine = stateMachine;
 				// stateMachinePersister.restore(stateMachine, mid);
 				sendUserEvent(machine, input);
-				State<String, String> state = machine.getState();
 				String machineState = getMachineState(machine.getState());
 				// var variables = stateMachine.getExtendedState().getVariables();
 				var variables = machine.getExtendedState().getVariables();

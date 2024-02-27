@@ -1,5 +1,6 @@
 package org.qdrin.qfsm.machine.config;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.qdrin.qfsm.machine.actions.SignalAction;
@@ -8,10 +9,17 @@ import org.qdrin.qfsm.machine.states.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.StateContext;
+import org.springframework.statemachine.StateMachineContext;
+import org.springframework.statemachine.StateMachinePersist;
+import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
+import org.springframework.statemachine.config.ObjectStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.StateMachineFactory;
+import org.springframework.statemachine.config.builders.StateMachineConfigBuilder;
+import org.springframework.statemachine.config.builders.StateMachineConfigurationBuilder;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.DefaultStateMachineComponentResolver;
@@ -30,24 +38,40 @@ import lombok.extern.slf4j.Slf4j;
 @EnableStateMachineFactory
 public class StateMachineConfig extends StateMachineConfigurerAdapter<String, String> {
 
+  // @Configuration
+  // public static class InMemoryStateMachinePersist implements StateMachinePersist<String, String, String> {
+  //   private final HashMap<String, StateMachineContext<String, String>> contexts = new HashMap<>();
+
+  //   @Override
+  //   public void write(StateMachineContext<String, String> context, String id) throws Exception {
+  //     contexts.put(id, context);
+  //   }
+    
+  //   @Override
+  //   public StateMachineContext<String, String> read(String id) throws Exception {
+  //     return contexts.get(id);
+  //   }
+  // }
+
   @Configuration
-  @EnableStateMachine
+  @EnableStateMachine  // TODO: Удалить после отладки machineFactory
   public static class MachineConfig extends StateMachineConfigurerAdapter<String, String> {
 
-    @Autowired
-    private StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister;
+    // @Autowired
+    // InMemoryStateMachinePersist stateMachineRuntimePersister;
+    // private StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister;
 
     @Override
     public void configure(StateMachineModelConfigurer<String, String> model) throws Exception {
       model.withModel().factory(modelFactory());
     }
 
-    @Override
-    public void configure(StateMachineConfigurationConfigurer<String, String> config) throws Exception {
-      config
-        .withPersistence()
-        .runtimePersister(stateMachineRuntimePersister);
-    }
+    // @Override
+    // public void configure(StateMachineConfigurationConfigurer<String, String> config) throws Exception {
+    //   config
+    //     .withPersistence();
+    //     // .runtimePersister(stateMachineRuntimePersister);
+    // }
 
     @Bean
     public StateMachineModelFactory<String, String> modelFactory() {
@@ -59,9 +83,14 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<String, St
     public static class ServiceConfig {
         @Bean
         public StateMachineService<String,String> stateMachineService(
-                StateMachineFactory<String,String> stateMachineFactory,
-                StateMachineRuntimePersister<String,String, String> stateMachineRuntimePersister) {
-            return new DefaultStateMachineService<>(stateMachineFactory);  // , stateMachineRuntimePersister);
+                StateMachineFactory<String,String> stateMachineFactory) {
+                // StateMachinePersist<String, String, String> persister) {
+                // StateMachineRuntimePersister<String,String, String> stateMachineRuntimePersister) {
+            log.debug("factory: {}", stateMachineFactory);
+            var factory = (ObjectStateMachineFactory) stateMachineFactory;
+            var machine = stateMachineFactory.getStateMachine();
+            log.debug("machine: {}", machine);
+            return new DefaultStateMachineService<>(stateMachineFactory);  // , persister);
         }
     }
   }

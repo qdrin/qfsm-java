@@ -20,10 +20,15 @@ spring:
         show_sql: false
         format_sql: true
         # open-in-view: false
+  spring:
+    h2:
+      console:
+        enabled: true
+        path: /console/
   datasource:
-    username: ${DB_USER:psi}
-    password: ${DB_PASSWORD:psi}
-    url: "jdbc:postgresql://localhost:5432/psi_db"
+    # username: ${DB_USER:psi}
+    # password: ${DB_PASSWORD:psi}
+    # url: "jdbc:postgresql://localhost:5432/psi_db"
     # url: ${DB_URI}
     testOnBorrow: true
     validationQuery: select 1
