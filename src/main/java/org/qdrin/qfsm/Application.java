@@ -17,11 +17,10 @@ import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
+import org.springframework.util.ObjectUtils;
 
 
 @Slf4j
-// @EnableJpaRepositories("org.springframework.statemachine.data.jpa")
-// @EntityScan("org.springframework.statemachine.data.jpa")
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
@@ -29,7 +28,7 @@ public class Application implements CommandLineRunner {
 	private StateMachineService<String, String> stateMachineService;
 
 	// @Autowired
-	// private StateMachine<String, String> stateMachine;
+	private StateMachine<String, String> stateMachine;
 
 
 	private String getMachineState(State<String, String> state) {
@@ -50,6 +49,18 @@ public class Application implements CommandLineRunner {
 			mstate = mstate + "->" + getMachineState(sstate);
 		}
 		return mstate;
+	}
+
+	private synchronized StateMachine<String, String> getStateMachine(String machineId) {
+		if(stateMachine == null) {
+			stateMachine = stateMachineService.acquireStateMachine(machineId);
+			stateMachine.startReactively().block();
+		} else if(! ObjectUtils.nullSafeEquals(stateMachine.getId(), machineId)) {
+			stateMachine.stopReactively().block();
+			stateMachine = stateMachineService.acquireStateMachine(machineId);
+			stateMachine.startReactively().block();
+		}
+		return stateMachine;
 	}
 
 	private void sendUserEvent(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {
@@ -80,8 +91,6 @@ public class Application implements CommandLineRunner {
 		Scanner in = new Scanner(System.in);
 		String input = "AAA";
 		String mid = "1";
-		// var runsm = stateMachine.startReactively();
-		// runsm.block();
 		while(! input.equals("exit")) {
 			System.out.print("input machineId:");
 			mid = in.nextLine();
@@ -89,15 +98,11 @@ public class Application implements CommandLineRunner {
 			input = in.nextLine();
 			try {
 				StateMachine<String, String> machine = stateMachineService.acquireStateMachine(mid);
-				// var machine = stateMachine;
-				// stateMachinePersister.restore(stateMachine, mid);
 				sendUserEvent(machine, input);
 				String machineState = getMachineState(machine.getState());
-				// var variables = stateMachine.getExtendedState().getVariables();
 				var variables = machine.getExtendedState().getVariables();
 				stateMachineService.releaseStateMachine(mid, false);
 				log.info("new state: {}, variables: {}", machineState, variables);
-				// stateMachinePersister.persist(stateMachine, mid);
 			} catch(IllegalArgumentException e) {
 				log.error("Event {} not accepted in current state: {}", input, e.getMessage());
 			}

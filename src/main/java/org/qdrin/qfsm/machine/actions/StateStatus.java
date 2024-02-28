@@ -28,6 +28,7 @@ public class StateStatus {
     State<String, String> state = context.getTarget();
     var extendedState = context.getExtendedState();
     String status = statusMap.getOrDefault(state.getId(), null);
+    log.debug("variables: {}", extendedState.getVariables());
     if(status != null) {
       ((Product) extendedState.getVariables().get("product")).setStatus(status);
     }

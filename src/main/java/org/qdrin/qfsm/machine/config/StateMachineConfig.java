@@ -74,11 +74,11 @@ public class StateMachineConfig {
   // @EnableStateMachine  // TODO: Удалить после отладки machineFactory
   public static class MachineConfig extends StateMachineConfigurerAdapter<String, String> {
 
-		@Autowired
-		private StateRepository<? extends RepositoryState> stateRepository;
+		// @Autowired
+		// private StateRepository<? extends RepositoryState> stateRepository;
 
-		@Autowired
-		private TransitionRepository<? extends RepositoryTransition> transitionRepository;
+		// @Autowired
+		// private TransitionRepository<? extends RepositoryTransition> transitionRepository;
 
 		@Autowired
 		private StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister;
@@ -100,11 +100,6 @@ public class StateMachineConfig {
       UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
       return factory;
     }
-
-    // @Bean
-		// public StateMachineModelFactory<String, String> modelFactory() {
-		// 	return new RepositoryStateMachineModelFactory(stateRepository, transitionRepository);
-		// }
 
   }
 
