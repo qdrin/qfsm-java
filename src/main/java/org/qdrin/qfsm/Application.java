@@ -97,7 +97,8 @@ public class Application implements CommandLineRunner {
 			System.out.print("input event name(exit to exit):");
 			input = in.nextLine();
 			try {
-				StateMachine<String, String> machine = stateMachineService.acquireStateMachine(mid);
+				// StateMachine<String, String> machine = stateMachineService.acquireStateMachine(mid);
+				StateMachine<String, String> machine = getStateMachine(mid);
 				sendUserEvent(machine, input);
 				String machineState = getMachineState(machine.getState());
 				var variables = machine.getExtendedState().getVariables();

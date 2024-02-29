@@ -17,11 +17,43 @@
       <transition xmi:type="uml:Transition" xmi:id="_PiG4UNbGEe6hBcJbWWFDFg" source="_HKJu4NbGEe6hBcJbWWFDFg" target="_Jm5eINbGEe6hBcJbWWFDFg">
         <trigger xmi:type="uml:Trigger" xmi:id="_Z0XyUNbGEe6hBcJbWWFDFg" event="_caph4LCDEe6zeo6uvgVLWA"/>
       </transition>
-      <subvertex xmi:type="uml:State" xmi:id="_rfbL0LCHEe6zeo6uvgVLWA" name="Aborted"/>
+      <transition xmi:type="uml:Transition" xmi:id="_HWNv8Nb9Ee6jPqGAGuc2DQ" source="_HKJu4NbGEe6hBcJbWWFDFg" target="_68A5ENb8Ee6jPqGAGuc2DQ">
+        <trigger xmi:type="uml:Trigger" xmi:id="_LngmANb9Ee6jPqGAGuc2DQ" event="_1PsuoKAWEe6Sh616vaZpZA"/>
+      </transition>
+      <transition xmi:type="uml:Transition" xmi:id="_NoEvkNb9Ee6jPqGAGuc2DQ" source="_68A5ENb8Ee6jPqGAGuc2DQ" target="_HKJu4NbGEe6hBcJbWWFDFg">
+        <trigger xmi:type="uml:Trigger" xmi:id="_PRgLgNb9Ee6jPqGAGuc2DQ" event="_667zIKAWEe6Sh616vaZpZA"/>
+      </transition>
+      <subvertex xmi:type="uml:State" xmi:id="_rfbL0LCHEe6zeo6uvgVLWA" name="Aborted">
+        <entry xmi:type="uml:OpaqueBehavior" xmi:id="_skiyUNb-Ee6iOewLX9weBw">
+          <language>spel</language>
+          <body>extendedState.getVariables.put(&quot;status&quot;, &quot;Aborted&quot;)</body>
+        </entry>
+      </subvertex>
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_ZdmsILn-Ee6yNs2FzguhlQ" name=""/>
-      <subvertex xmi:type="uml:State" xmi:id="_CLHpENbGEe6hBcJbWWFDFg" name="PendingActivate"/>
-      <subvertex xmi:type="uml:State" xmi:id="_HKJu4NbGEe6hBcJbWWFDFg" name="Active"/>
-      <subvertex xmi:type="uml:State" xmi:id="_Jm5eINbGEe6hBcJbWWFDFg" name="Disconnected"/>
+      <subvertex xmi:type="uml:State" xmi:id="_CLHpENbGEe6hBcJbWWFDFg" name="PendingActivate">
+        <entry xmi:type="uml:OpaqueBehavior" xmi:id="_YNMT8NbYEe6jPqGAGuc2DQ">
+          <language>spel</language>
+          <body>extendedState.getVariables.put(&quot;status&quot;, &quot;PendingActivate&quot;)</body>
+        </entry>
+      </subvertex>
+      <subvertex xmi:type="uml:State" xmi:id="_HKJu4NbGEe6hBcJbWWFDFg" name="Active">
+        <entry xmi:type="uml:OpaqueBehavior" xmi:id="_5DOgYNbZEe6jPqGAGuc2DQ">
+          <language>spel</language>
+          <body>extendedState.getVariables.put(&quot;status&quot;, &quot;Active&quot;)</body>
+        </entry>
+      </subvertex>
+      <subvertex xmi:type="uml:State" xmi:id="_Jm5eINbGEe6hBcJbWWFDFg" name="Disconnected">
+        <doActivity xmi:type="uml:OpaqueBehavior" xmi:id="_ANquANb_Ee6iOewLX9weBw">
+          <language>spel</language>
+          <body>extendedState.getVariables.put(&quot;status&quot;, &quot;Disconnected&quot;)</body>
+        </doActivity>
+      </subvertex>
+      <subvertex xmi:type="uml:State" xmi:id="_68A5ENb8Ee6jPqGAGuc2DQ" name="Suspended">
+        <doActivity xmi:type="uml:OpaqueBehavior" xmi:id="_4R80oNb-Ee6iOewLX9weBw">
+          <language>spel</language>
+          <body>extendedState.getVariables.put(&quot;status&quot;, &quot;Suspended&quot;)</body>
+        </doActivity>
+      </subvertex>
     </region>
   </packagedElement>
   <packagedElement xmi:type="uml:Signal" xmi:id="_1mdCwKALEe6Sh616vaZpZA" name="suspend"/>
