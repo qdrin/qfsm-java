@@ -97,7 +97,8 @@ public class StateMachineConfig {
 
     @Bean
     public StateMachineModelFactory<String, String> modelFactory() {
-      UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
+      // UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
+      UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm.simple/fsm.uml");
       return factory;
     }
 

@@ -5,59 +5,23 @@
   </packageImport>
   <packagedElement xmi:type="uml:StateMachine" xmi:id="_B2NPAJ5dEe6bEMWh5jDIIQ" name="StateMachine1" visibility="public" isActive="true">
     <region xmi:type="uml:Region" xmi:id="_B2814J5dEe6bEMWh5jDIIQ" name="Region1">
-      <transition xmi:type="uml:Transition" xmi:id="_2aPTkLCHEe6zeo6uvgVLWA" source="_Gay-IKAWEe6Sh616vaZpZA" target="_rfbL0LCHEe6zeo6uvgVLWA">
-        <trigger xmi:type="uml:Trigger" xmi:id="_4i_IwLCHEe6zeo6uvgVLWA" event="_yjXIoLCHEe6zeo6uvgVLWA"/>
+      <transition xmi:type="uml:Transition" xmi:id="_MnT7INbGEe6hBcJbWWFDFg" source="_ZdmsILn-Ee6yNs2FzguhlQ" target="_CLHpENbGEe6hBcJbWWFDFg"/>
+      <transition xmi:type="uml:Transition" xmi:id="_N-l3INbGEe6hBcJbWWFDFg" source="_CLHpENbGEe6hBcJbWWFDFg" target="_rfbL0LCHEe6zeo6uvgVLWA">
+        <trigger xmi:type="uml:Trigger" xmi:id="_VM0_cNbGEe6hBcJbWWFDFg">
+          <event xmi:type="uml:SignalEvent" href="../fsm/fsm.uml#_yjXIoLCHEe6zeo6uvgVLWA"/>
+        </trigger>
       </transition>
-      <transition xmi:type="uml:Transition" xmi:id="_bB4iULn-Ee6yNs2FzguhlQ" source="_ZdmsILn-Ee6yNs2FzguhlQ" target="_Gay-IKAWEe6Sh616vaZpZA"/>
-      <transition xmi:type="uml:Transition" xmi:id="_BpRM4LoBEe6yNs2FzguhlQ" source="_Gay-IKAWEe6Sh616vaZpZA" target="_bp6j8LoEEe6yNs2FzguhlQ">
-        <trigger xmi:type="uml:Trigger" xmi:id="_xWcMsLoCEe6yNs2FzguhlQ" event="_RYkUgLCDEe6zeo6uvgVLWA"/>
+      <transition xmi:type="uml:Transition" xmi:id="_O0dvMNbGEe6hBcJbWWFDFg" source="_CLHpENbGEe6hBcJbWWFDFg" target="_HKJu4NbGEe6hBcJbWWFDFg">
+        <trigger xmi:type="uml:Trigger" xmi:id="_XdHAANbGEe6hBcJbWWFDFg" event="_RYkUgLCDEe6zeo6uvgVLWA"/>
       </transition>
-      <transition xmi:type="uml:Transition" xmi:id="_duoNsLoEEe6yNs2FzguhlQ" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_uSPjQLn_Ee6yNs2FzguhlQ"/>
-      <transition xmi:type="uml:Transition" xmi:id="_2w1t8LoEEe6yNs2FzguhlQ" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_yybJ4Ln_Ee6yNs2FzguhlQ"/>
-      <transition xmi:type="uml:Transition" xmi:id="_BILcILztEe6WIIctFrkbQg" source="_lUS-kLoEEe6yNs2FzguhlQ" target="__Z-08LzsEe6WIIctFrkbQg"/>
-      <subvertex xmi:type="uml:State" xmi:id="_Gay-IKAWEe6Sh616vaZpZA" name="PendingActivate">
-        <entry xmi:type="uml:OpaqueBehavior" xmi:id="_NsvyYLUKEe6GmqK4b9jh0A" name="stateLogAction">
-          <language>bean</language>
-          <body>stateLogAction</body>
-        </entry>
-      </subvertex>
+      <transition xmi:type="uml:Transition" xmi:id="_PiG4UNbGEe6hBcJbWWFDFg" source="_HKJu4NbGEe6hBcJbWWFDFg" target="_Jm5eINbGEe6hBcJbWWFDFg">
+        <trigger xmi:type="uml:Trigger" xmi:id="_Z0XyUNbGEe6hBcJbWWFDFg" event="_caph4LCDEe6zeo6uvgVLWA"/>
+      </transition>
       <subvertex xmi:type="uml:State" xmi:id="_rfbL0LCHEe6zeo6uvgVLWA" name="Aborted"/>
-      <subvertex xmi:type="uml:State" xmi:id="_JUMqgLn8Ee6yNs2FzguhlQ" name="Provision">
-        <region xmi:type="uml:Region" xmi:id="_0jIZ4Ln8Ee6yNs2FzguhlQ" name="Region1">
-          <transition xmi:type="uml:Transition" xmi:id="_21ZQELn_Ee6yNs2FzguhlQ" source="_rT7YALn_Ee6yNs2FzguhlQ" target="_uSPjQLn_Ee6yNs2FzguhlQ"/>
-          <transition xmi:type="uml:Transition" xmi:id="_sU7cYLz8Ee6WIIctFrkbQg" source="_pUzTQLz8Ee6WIIctFrkbQg" target="_lUS-kLoEEe6yNs2FzguhlQ"/>
-          <subvertex xmi:type="uml:Pseudostate" xmi:id="_rT7YALn_Ee6yNs2FzguhlQ"/>
-          <subvertex xmi:type="uml:State" xmi:id="_uSPjQLn_Ee6yNs2FzguhlQ" name="Usage">
-            <entry xmi:type="uml:OpaqueBehavior" xmi:id="_7cIycL0EEe6WIIctFrkbQg">
-              <language>spel</language>
-              <body>extendedState.getVariables().put(&quot;usage&quot;,&quot;Usage&quot;)</body>
-            </entry>
-          </subvertex>
-          <subvertex xmi:type="uml:FinalState" xmi:id="_pUzTQLz8Ee6WIIctFrkbQg" name="UsageFinal"/>
-        </region>
-        <region xmi:type="uml:Region" xmi:id="_qVQJQLn_Ee6yNs2FzguhlQ" name="Region2">
-          <transition xmi:type="uml:Transition" xmi:id="_1Edd8Ln_Ee6yNs2FzguhlQ" source="_rygxcLn_Ee6yNs2FzguhlQ" target="_yybJ4Ln_Ee6yNs2FzguhlQ"/>
-          <transition xmi:type="uml:Transition" xmi:id="_RhSOcLoBEe6yNs2FzguhlQ" source="_uSPjQLn_Ee6yNs2FzguhlQ" target="_pUzTQLz8Ee6WIIctFrkbQg">
-            <trigger xmi:type="uml:Trigger" xmi:id="_yldy4LznEe6WIIctFrkbQg" event="_VSTmMLCDEe6zeo6uvgVLWA"/>
-          </transition>
-          <transition xmi:type="uml:Transition" xmi:id="_asHLkLz8Ee6WIIctFrkbQg" source="_yybJ4Ln_Ee6yNs2FzguhlQ" target="_XTQZYLz8Ee6WIIctFrkbQg">
-            <trigger xmi:type="uml:Trigger" xmi:id="_dxkgoLz8Ee6WIIctFrkbQg" event="_ZOkncLCDEe6zeo6uvgVLWA"/>
-          </transition>
-          <transition xmi:type="uml:Transition" xmi:id="_fJG7ULz8Ee6WIIctFrkbQg" source="_XTQZYLz8Ee6WIIctFrkbQg" target="_lUS-kLoEEe6yNs2FzguhlQ"/>
-          <subvertex xmi:type="uml:Pseudostate" xmi:id="_rygxcLn_Ee6yNs2FzguhlQ" name=""/>
-          <subvertex xmi:type="uml:State" xmi:id="_yybJ4Ln_Ee6yNs2FzguhlQ" name="Payment">
-            <entry xmi:type="uml:OpaqueBehavior" xmi:id="_kgq6IL6iEe6_VZ6xu7bqOA">
-              <language>spel</language>
-              <body>extendedState.getVariables().put(&quot;payment&quot;,&quot;Payment&quot;)</body>
-            </entry>
-          </subvertex>
-          <subvertex xmi:type="uml:FinalState" xmi:id="_XTQZYLz8Ee6WIIctFrkbQg" name="PaymentFinal"/>
-        </region>
-      </subvertex>
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_ZdmsILn-Ee6yNs2FzguhlQ" name=""/>
-      <subvertex xmi:type="uml:Pseudostate" xmi:id="_bp6j8LoEEe6yNs2FzguhlQ" name="SFork" kind="fork"/>
-      <subvertex xmi:type="uml:Pseudostate" xmi:id="_lUS-kLoEEe6yNs2FzguhlQ" name="SJoin" kind="join"/>
-      <subvertex xmi:type="uml:State" xmi:id="__Z-08LzsEe6WIIctFrkbQg" name="Disconnect"/>
+      <subvertex xmi:type="uml:State" xmi:id="_CLHpENbGEe6hBcJbWWFDFg" name="PendingActivate"/>
+      <subvertex xmi:type="uml:State" xmi:id="_HKJu4NbGEe6hBcJbWWFDFg" name="Active"/>
+      <subvertex xmi:type="uml:State" xmi:id="_Jm5eINbGEe6hBcJbWWFDFg" name="Disconnected"/>
     </region>
   </packagedElement>
   <packagedElement xmi:type="uml:Signal" xmi:id="_1mdCwKALEe6Sh616vaZpZA" name="suspend"/>

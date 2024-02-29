@@ -30,7 +30,10 @@ public class StateStatus {
     String status = statusMap.getOrDefault(state.getId(), null);
     log.debug("variables: {}", extendedState.getVariables());
     if(status != null) {
-      ((Product) extendedState.getVariables().get("product")).setStatus(status);
+      Product product = (Product) extendedState.getVariables().get("product");
+      if(product != null) {
+        product.setStatus(status);
+      }
     }
   }
 }
