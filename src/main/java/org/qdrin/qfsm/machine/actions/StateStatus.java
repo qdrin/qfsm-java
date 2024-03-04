@@ -27,11 +27,7 @@ public class StateStatus {
   @OnStateEntry
   public void setStatus(StateContext<String, String> context) {
     State<String, String> state = context.getTarget();
-    LocalDateTime t0 = LocalDateTime.now();
-    var extendedState = context.getStateMachine().getExtendedState();
-    String contextStatus = String.format("%s[%s]: %s", context.getStateMachine().getId(), t0, state.getId());
-    log.debug("contextStatus: {}", contextStatus);
-    extendedState.getVariables().put("status", contextStatus);
+    var extendedState = context.getExtendedState();
     String status = statusMap.getOrDefault(state.getId(), null);
     log.debug("variables: {}", extendedState.getVariables());
     if(status != null) {
