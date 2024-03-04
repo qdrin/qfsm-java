@@ -27,6 +27,7 @@ public class PriceChangingEntry implements Action<String, String> {
       SignalAction changePrice = new SignalAction("change_price");
       changePrice.execute(context);
       if(price.getProductStatus().equals("ACTIVE_TRIAL")) {
+        log.debug("First trial period. Sending auto 'payment_processed'");
         SignalAction paymentProcessed = new SignalAction("payment_processed");
         paymentProcessed.execute(context);
       }
