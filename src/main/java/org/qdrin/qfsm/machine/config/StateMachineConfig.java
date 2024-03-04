@@ -62,23 +62,9 @@ public class StateMachineConfig {
     return new DefaultStateMachineService<String, String>(stateMachineFactory, stateMachineRuntimePersister);
   }
 
-  // @Bean
-	// public StateMachineJackson2RepositoryPopulatorFactoryBean jackson2RepositoryPopulatorFactoryBean() {
-	// 	StateMachineJackson2RepositoryPopulatorFactoryBean factoryBean = new StateMachineJackson2RepositoryPopulatorFactoryBean();
-	// 	factoryBean.setResources(new Resource[] { new ClassPathResource("datajpamultipersist.json") });
-	// 	return factoryBean;
-	// }
-
   @Configuration
   @EnableStateMachineFactory
-  // @EnableStateMachine  // TODO: Удалить после отладки machineFactory
   public static class MachineConfig extends StateMachineConfigurerAdapter<String, String> {
-
-		// @Autowired
-		// private StateRepository<? extends RepositoryState> stateRepository;
-
-		// @Autowired
-		// private TransitionRepository<? extends RepositoryTransition> transitionRepository;
 
 		@Autowired
 		private StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister;

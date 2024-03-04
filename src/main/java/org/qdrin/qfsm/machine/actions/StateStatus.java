@@ -1,5 +1,6 @@
 package org.qdrin.qfsm.machine.actions;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.springframework.statemachine.StateContext;
@@ -26,7 +27,11 @@ public class StateStatus {
   @OnStateEntry
   public void setStatus(StateContext<String, String> context) {
     State<String, String> state = context.getTarget();
+    LocalDateTime t0 = LocalDateTime.now();
     var extendedState = context.getExtendedState();
+    String contextStatus = String.format("%s[%s]: %s", context.getStateMachine().getId(), t0, state.getId());
+    log.debug("contextStatus: {}", contextStatus);
+    extendedState.getVariables().put("status", contextStatus);
     String status = statusMap.getOrDefault(state.getId(), null);
     log.debug("variables: {}", extendedState.getVariables());
     if(status != null) {

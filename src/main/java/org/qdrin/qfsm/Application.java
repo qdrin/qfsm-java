@@ -1,6 +1,9 @@
 package org.qdrin.qfsm;
 
 import java.util.Scanner;
+
+import javax.sql.DataSource;
+
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -19,6 +22,8 @@ import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
 import org.springframework.util.ObjectUtils;
 
+import com.zaxxer.hikari.HikariDataSource;
+
 
 @Slf4j
 @SpringBootApplication
@@ -26,6 +31,9 @@ public class Application implements CommandLineRunner {
 
 	@Autowired
 	private StateMachineService<String, String> stateMachineService;
+
+	@Autowired
+	DataSource dataSource;
 
 	// @Autowired
 	private StateMachine<String, String> stateMachine;
@@ -88,6 +96,8 @@ public class Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		HikariDataSource hds = (HikariDataSource) dataSource;
+		log.info("database: {}", hds.getJdbcUrl());
 		Scanner in = new Scanner(System.in);
 		String input = "AAA";
 		String mid = "1";
@@ -99,9 +109,12 @@ public class Application implements CommandLineRunner {
 			try {
 				// StateMachine<String, String> machine = stateMachineService.acquireStateMachine(mid);
 				StateMachine<String, String> machine = getStateMachine(mid);
-				sendUserEvent(machine, input);
 				String machineState = getMachineState(machine.getState());
 				var variables = machine.getExtendedState().getVariables();
+				log.info("current state: {}, variables: {}", machineState, variables);
+				sendUserEvent(machine, input);
+				machineState = getMachineState(machine.getState());
+				variables = machine.getExtendedState().getVariables();
 				stateMachineService.releaseStateMachine(mid, false);
 				log.info("new state: {}, variables: {}", machineState, variables);
 			} catch(IllegalArgumentException e) {
