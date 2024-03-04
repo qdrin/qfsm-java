@@ -64,9 +64,7 @@ public class Application implements CommandLineRunner {
 			stateMachine = stateMachineService.acquireStateMachine(machineId);
 			stateMachine.startReactively().block();
 		} else if(! ObjectUtils.nullSafeEquals(stateMachine.getId(), machineId)) {
-			stateMachine.stopReactively().block();
 			stateMachine = stateMachineService.acquireStateMachine(machineId);
-			stateMachine.startReactively().block();
 		}
 		return stateMachine;
 	}
@@ -102,20 +100,19 @@ public class Application implements CommandLineRunner {
 		String input = "AAA";
 		String mid = "1";
 		while(! input.equals("exit")) {
-			System.out.print("input machineId:");
-			mid = in.nextLine();
-			System.out.print("input event name(exit to exit):");
-			input = in.nextLine();
 			try {
-				// StateMachine<String, String> machine = stateMachineService.acquireStateMachine(mid);
+				System.out.print("input machineId:");
+				mid = in.nextLine();
 				StateMachine<String, String> machine = getStateMachine(mid);
 				String machineState = getMachineState(machine.getState());
 				var variables = machine.getExtendedState().getVariables();
 				log.info("current state: {}, variables: {}", machineState, variables);
+
+				System.out.print("input event name(exit to exit):");
+				input = in.nextLine();
 				sendUserEvent(machine, input);
 				machineState = getMachineState(machine.getState());
 				variables = machine.getExtendedState().getVariables();
-				stateMachineService.releaseStateMachine(mid, false);
 				log.info("new state: {}, variables: {}", machineState, variables);
 			} catch(IllegalArgumentException e) {
 				log.error("Event {} not accepted in current state: {}", input, e.getMessage());
