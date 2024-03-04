@@ -19,12 +19,17 @@ public class PriceChangingEntry implements Action<String, String> {
     log.debug("PriceChangingEntry started. event: {}, message: {}", context.getEvent(), context.getMessage());
     Map<Object, Object> cvars = context.getExtendedState().getVariables();
     // Emulate external price-calculator request;
-    int tPeriod = ((Product) cvars.get("product")).getTarificationPeriod();
+    Product product = (Product) cvars.get("product");
+    int tPeriod = product.getTarificationPeriod();
     if (tPeriod == 0) {
       ProductPrice price = PriceHelper.getProductPrice(context);
       PriceHelper.setNextPrice(context, price);
-      SignalAction act = new SignalAction("change_price");
-      act.execute(context);
+      SignalAction changePrice = new SignalAction("change_price");
+      changePrice.execute(context);
+      if(price.getProductStatus().equals("ACTIVE_TRIAL")) {
+        SignalAction paymentProcessed = new SignalAction("payment_processed");
+        paymentProcessed.execute(context);
+      }
     } else {
       ProductPrice nextPrice = ExternalData.RequestProductPrice();
       PriceHelper.setNextPrice(context, nextPrice);

@@ -157,6 +157,10 @@ public class StateMachineConfig {
       return new SignalAction("complete_price");
     }
 
+    @Bean
+    SignalAction sendPaymentProcessed() {
+      return new SignalAction("payment_processed");
+    }
 
     // -----------------------------------------------------------------
     // guards
