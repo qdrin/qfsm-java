@@ -1,5 +1,6 @@
 package org.qdrin.qfsm;
 
+import java.util.Map;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,5 +92,9 @@ public class FsmApp {
 		} else {
 			log.info("event processed, transitionCount={}", trcount);
 		}
+	}
+
+	public Map<Object, Object> getVariables() {
+		return stateMachine.getExtendedState().getVariables();
 	}
 }
