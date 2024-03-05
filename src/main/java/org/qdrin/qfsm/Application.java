@@ -1,9 +1,9 @@
 package org.qdrin.qfsm;
 
-import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.Map;
 import java.util.Scanner;
+
+import javax.sql.DataSource;
+
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -11,21 +11,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
-import org.qdrin.qfsm.model.*;
-import org.qdrin.qfsm.tasks.ExternalData;
+import org.springframework.util.ObjectUtils;
+
+import com.zaxxer.hikari.HikariDataSource;
+
 
 @Slf4j
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
 	@Autowired
+	private StateMachineService<String, String> stateMachineService;
+
+	@Autowired
+	DataSource dataSource;
+
+	// @Autowired
 	private StateMachine<String, String> stateMachine;
+
 
 	private String getMachineState(State<String, String> state) {
 		String mstate = state.getId();
@@ -47,22 +59,27 @@ public class Application implements CommandLineRunner {
 		return mstate;
 	}
 
-	private String getMachineState() {
-		State<String, String> state = stateMachine.getState();
-		return getMachineState(state);
+	private synchronized StateMachine<String, String> getStateMachine(String machineId) {
+		if(stateMachine == null) {
+			stateMachine = stateMachineService.acquireStateMachine(machineId);
+			stateMachine.startReactively().block();
+		} else if(! ObjectUtils.nullSafeEquals(stateMachine.getId(), machineId)) {
+			stateMachine = stateMachineService.acquireStateMachine(machineId);
+		}
+		return stateMachine;
 	}
 
-	private void sendUserEvent(String eventName) throws IllegalArgumentException {
-		stateMachine.getExtendedState().getVariables().put("transitionCount", 0);
+	private void sendUserEvent(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {
+		machine.getExtendedState().getVariables().put("transitionCount", 0);
 		Message<String> message = MessageBuilder
 			.withPayload(eventName)
 			.setHeader("origin", "user")
 			.build();
 		Mono<Message<String>> monomsg = Mono.just(message);
 		log.info("sending event: {}, message: {}", eventName, message);
-		stateMachine.sendEvent(monomsg).blockLast();
+		machine.sendEvent(monomsg).blockLast();
 		
-		int trcount = (int) stateMachine.getExtendedState().getVariables().get("transitionCount");
+		int trcount = (int) machine.getExtendedState().getVariables().get("transitionCount");
 		// Here we can distinguish accepted event from non-accepted
 		if(trcount == 0) {
 			log.error("Not transition triggered. Event vasted");
@@ -77,26 +94,25 @@ public class Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		HikariDataSource hds = (HikariDataSource) dataSource;
+		log.info("database: {}", hds.getJdbcUrl());
 		Scanner in = new Scanner(System.in);
 		String input = "AAA";
-		Map<Object, Object> machineVars = stateMachine.getExtendedState().getVariables();
-		Product product = new Product();
-		ProductPrice price = ExternalData.RequestProductPrice();
-		log.info("price: {}", price);
-		product.setProductPrices(Arrays.asList(price));
-		machineVars.put("product", product);
-		var runsm = stateMachine.startReactively();
-		runsm.block();
-		var state = stateMachine.getState();
-		log.info("initial state: {}, variables: {}", state.getId(), machineVars);
+		String mid = "1";
 		while(! input.equals("exit")) {
-			System.out.print("input event name(exit to exit):");
-			input = in.nextLine();
 			try {
-				sendUserEvent(input);
-				state = stateMachine.getState();
-				String machineState = getMachineState();
-				var variables = stateMachine.getExtendedState().getVariables();
+				System.out.print("input machineId:");
+				mid = in.nextLine();
+				StateMachine<String, String> machine = getStateMachine(mid);
+				String machineState = getMachineState(machine.getState());
+				var variables = machine.getExtendedState().getVariables();
+				log.info("current state: {}, variables: {}", machineState, variables);
+
+				System.out.print("input event name(exit to exit):");
+				input = in.nextLine();
+				sendUserEvent(machine, input);
+				machineState = getMachineState(machine.getState());
+				variables = machine.getExtendedState().getVariables();
 				log.info("new state: {}, variables: {}", machineState, variables);
 			} catch(IllegalArgumentException e) {
 				log.error("Event {} not accepted in current state: {}", input, e.getMessage());
@@ -104,7 +120,5 @@ public class Application implements CommandLineRunner {
 		}
 		log.info("exiting...");
 		in.close();
-		var stop_sm = stateMachine.stopReactively();
-		stop_sm.block();
 	}
 }

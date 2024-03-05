@@ -1,5 +1,6 @@
 package org.qdrin.qfsm.machine.actions;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.springframework.statemachine.StateContext;
@@ -29,7 +30,10 @@ public class StateStatus {
     var extendedState = context.getExtendedState();
     String status = statusMap.getOrDefault(state.getId(), null);
     if(status != null) {
-      ((Product) extendedState.getVariables().get("product")).setStatus(status);
+      Product product = (Product) extendedState.getVariables().get("product");
+      if(product != null) {
+        product.setStatus(status);
+      }
     }
   }
 }

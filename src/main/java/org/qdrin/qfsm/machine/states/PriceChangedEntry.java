@@ -13,10 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 public class PriceChangedEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
-    log.info("PriceChangedEntry started. event: {}, message: {}", context.getEvent());
+    log.debug("PriceChangedEntry started. event: {}, message: {}", context.getEvent());
     ProductPrice nextPrice = PriceHelper.getNextPrice(context);
     nextPrice.setPeriod(1);
     PriceHelper.setProductPrice(context, nextPrice);
-    log.info("PriceChangedEntry productPrice: {}", PriceHelper.getProductPrice(context));
+    log.debug("PriceChangedEntry productPrice: {}", PriceHelper.getProductPrice(context));
   }
 }

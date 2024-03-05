@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 public class PendingDisconnectEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
-    log.info("PendingActivateEntry started. event: {}, message: {}", context.getEvent());
+    log.debug("PendingActivateEntry started. event: {}, message: {}", context.getEvent());
     Mono<Message<String>> paymentOff = Mono.just(MessageBuilder
       .withPayload("payment_off").build());
     Mono<Message<String>> priceOff = Mono.just(MessageBuilder

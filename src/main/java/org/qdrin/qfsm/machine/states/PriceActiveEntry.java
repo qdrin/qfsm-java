@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PriceActiveEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
-    log.info("PriceActiveEntry started. event: {}", context.getEvent());
+    log.debug("PriceActiveEntry started. event: {}", context.getEvent());
     new SignalAction("prolong").execute(context);
   }
 }
