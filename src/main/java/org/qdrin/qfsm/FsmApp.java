@@ -53,31 +53,22 @@ public class FsmApp {
 		return mstate;
 	}
 
-  private synchronized StateMachine<String, String> getStateMachine(String machineId) {
-		if(stateMachine == null) {
-			stateMachine = stateMachineService.acquireStateMachine(machineId);
-			stateMachine.startReactively().block();
-		} else if(! ObjectUtils.nullSafeEquals(stateMachine.getId(), machineId)) {
-			stateMachine = stateMachineService.acquireStateMachine(machineId);
-		}
-		return stateMachine;
-	}
-
   public void sendUserEvent(String machineId, Scanner scanner) {
-    StateMachine<String, String> machine = getStateMachine(machineId);
+    StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
     String machineState = getMachineState(machine.getState());
     var variables = machine.getExtendedState().getVariables();
     log.info("current state: {}, variables: {}", machineState, variables);
     System.out.print("input event name:");
     String event = scanner.nextLine();
-    sendEvent(machineId, event);
+    sendEvent(machine, event);
     machineState = getMachineState(machine.getState());
     variables = machine.getExtendedState().getVariables();
     log.info("new state: {}, variables: {}", machineState, variables);
+		// stateMachineService.releaseStateMachine(machineId);
   }
 
-  public void sendEvent(String machineId, String eventName) throws IllegalArgumentException {
-    StateMachine<String, String> machine = getStateMachine(machineId);
+  public void sendEvent(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {
+    // StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 		Map<Object, Object> variables = machine.getExtendedState().getVariables();
 		variables.put("transitionCount", 0);
 
