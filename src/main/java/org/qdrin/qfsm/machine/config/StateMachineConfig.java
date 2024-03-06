@@ -30,7 +30,8 @@ public class StateMachineConfig {
   @Bean
   public StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister(
           JpaStateMachineRepository jpaStateMachineRepository) {
-      return new JpaPersistingStateMachineInterceptor<>(jpaStateMachineRepository);
+      // return new JpaPersistingStateMachineInterceptor<>(jpaStateMachineRepository);
+      return new QFsmPersister(jpaStateMachineRepository);
   }
 
   @Bean

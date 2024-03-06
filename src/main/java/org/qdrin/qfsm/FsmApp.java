@@ -80,15 +80,6 @@ public class FsmApp {
     StateMachine<String, String> machine = getStateMachine(machineId);
 		Map<Object, Object> variables = machine.getExtendedState().getVariables();
 		variables.put("transitionCount", 0);
-		Optional<Product> pr = productRepository.findById(machineId);
-		Product product;
-		if(pr.isEmpty()) {
-			product = new Product();
-			product.setProductId(machineId);
-		} else {
-			product = pr.get();
-		}
-		variables.put("product", product);
 
 		Message<String> message = MessageBuilder
 			.withPayload(eventName)
@@ -102,9 +93,6 @@ public class FsmApp {
       log.error("Event {} not accepted in current state: {}", eventName, e.getMessage());
     }
 
-		product = (Product) variables.get("product");
-		productRepository.save(product);
-
 		int trcount = (int) machine.getExtendedState().getVariables().get("transitionCount");
 		// Here we can distinguish accepted event from non-accepted
 		if(trcount == 0) {
@@ -112,7 +100,5 @@ public class FsmApp {
 		} else {
 			log.info("event processed, transitionCount={}", trcount);
 		}
-		variables.remove("product");
-		variables.remove("transitionCount");
 	}
 }

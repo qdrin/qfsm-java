@@ -44,4 +44,8 @@ public class Product {
   // Map<String, Object> metaInfo;
   // Map<String, Object> quantity;
   // Map<String, Object> extraParams;
+
+  public Product(String productId) {
+    this.productId = productId;
+  }
 }

@@ -14,7 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 public class EntryExit implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
-    Product product = (Product) context.getExtendedState().getVariables().get("product");
+    Product product = new Product();
+    product.setProductId(context.getStateMachine().getId());
     ProductPrice price = ExternalData.RequestProductPrice();
     product.setProductPrices(Arrays.asList(price));
     context.getExtendedState().getVariables().put("product", product);
