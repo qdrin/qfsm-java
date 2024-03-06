@@ -58,9 +58,6 @@ public class Application implements CommandLineRunner {
 			System.out.print("input machineId:");
 			mid = in.nextLine();
 			fsmApp.sendUserEvent(mid, in);
-			Product product = (Product) fsmApp.getVariables().get("product");
-			product.setProductId(mid);
-			saveProduct((Product) fsmApp.getVariables().get("product"));
 		}
 		log.info("exiting...");
 		in.close();

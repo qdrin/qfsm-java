@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 
-import org.qdrin.qfsm.model.ProductRelationship;
+import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -80,7 +80,15 @@ public class FsmApp {
     StateMachine<String, String> machine = getStateMachine(machineId);
 		Map<Object, Object> variables = machine.getExtendedState().getVariables();
 		variables.put("transitionCount", 0);
-		// Optional<ProductEntity> ProductEntity = productRepository.findById(machineId);
+		Optional<Product> pr = productRepository.findById(machineId);
+		Product product;
+		if(pr.isEmpty()) {
+			product = new Product();
+			product.setProductId(machineId);
+		} else {
+			product = pr.get();
+		}
+		variables.put("product", product);
 
 		Message<String> message = MessageBuilder
 			.withPayload(eventName)
@@ -93,7 +101,10 @@ public class FsmApp {
     } catch(IllegalArgumentException e) {
       log.error("Event {} not accepted in current state: {}", eventName, e.getMessage());
     }
-		
+
+		product = (Product) variables.get("product");
+		productRepository.save(product);
+
 		int trcount = (int) machine.getExtendedState().getVariables().get("transitionCount");
 		// Here we can distinguish accepted event from non-accepted
 		if(trcount == 0) {
@@ -101,9 +112,7 @@ public class FsmApp {
 		} else {
 			log.info("event processed, transitionCount={}", trcount);
 		}
-	}
-
-	public Map<Object, Object> getVariables() {
-		return stateMachine.getExtendedState().getVariables();
+		variables.remove("product");
+		variables.remove("transitionCount");
 	}
 }
