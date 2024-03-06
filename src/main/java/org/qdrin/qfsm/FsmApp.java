@@ -1,8 +1,11 @@
 package org.qdrin.qfsm;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Scanner;
 
+import org.qdrin.qfsm.model.ProductRelationship;
+import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -25,6 +28,9 @@ public class FsmApp {
 
   @Autowired
 	private StateMachineService<String, String> stateMachineService;
+
+	@Autowired
+	ProductRepository productRepository;
 
   // get stringified full-state
   public String getMachineState(State<String, String> state) {
@@ -72,7 +78,10 @@ public class FsmApp {
 
   public void sendEvent(String machineId, String eventName) throws IllegalArgumentException {
     StateMachine<String, String> machine = getStateMachine(machineId);
-		machine.getExtendedState().getVariables().put("transitionCount", 0);
+		Map<Object, Object> variables = machine.getExtendedState().getVariables();
+		variables.put("transitionCount", 0);
+		// Optional<ProductEntity> ProductEntity = productRepository.findById(machineId);
+
 		Message<String> message = MessageBuilder
 			.withPayload(eventName)
 			.setHeader("origin", "user")
