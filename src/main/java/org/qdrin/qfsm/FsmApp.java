@@ -53,8 +53,28 @@ public class FsmApp {
 		return mstate;
 	}
 
+	private synchronized StateMachine<String, String> getStateMachine(String machineId) throws Exception {
+		if (stateMachine == null) {
+			stateMachine = stateMachineService.acquireStateMachine(machineId);;
+			stateMachine.startReactively().block();
+		} else if (!ObjectUtils.nullSafeEquals(stateMachine.getId(), machineId)) {
+			stateMachineService.releaseStateMachine(stateMachine.getId());
+			stateMachine.stopReactively().block();
+			stateMachine = stateMachineService.acquireStateMachine(machineId);
+			stateMachine.startReactively().block();
+		}
+		return stateMachine;
+	}
+
   public void sendUserEvent(String machineId, Scanner scanner) {
-    StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
+		StateMachine<String, String> machine;
+		try {
+    	machine = getStateMachine(machineId);
+		}
+		catch(Exception e) {
+			log.error("Cannot acquire stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
+			return;
+		}
     String machineState = getMachineState(machine.getState());
     var variables = machine.getExtendedState().getVariables();
     log.info("current state: {}, variables: {}", machineState, variables);
@@ -64,7 +84,6 @@ public class FsmApp {
     machineState = getMachineState(machine.getState());
     variables = machine.getExtendedState().getVariables();
     log.info("new state: {}, variables: {}", machineState, variables);
-		// stateMachineService.releaseStateMachine(machineId);
   }
 
   public void sendEvent(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {
