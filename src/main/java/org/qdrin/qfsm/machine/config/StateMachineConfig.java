@@ -1,27 +1,50 @@
 package org.qdrin.qfsm.machine.config;
 
-import java.util.HashMap;
 import java.util.Optional;
 
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
+import org.qdrin.qfsm.persist.ProductStateMachinePersist;
+import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.statemachine.StateMachineContext;
-import org.springframework.statemachine.StateMachinePersist;
 import org.springframework.statemachine.config.EnableStateMachine;
-import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
+import org.springframework.statemachine.data.jpa.JpaRepositoryStateMachinePersist;
+import org.springframework.statemachine.data.jpa.JpaStateMachineRepository;
 import org.springframework.statemachine.guard.Guard;
+import org.springframework.statemachine.persist.DefaultStateMachinePersister;
+import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
 
 // @Slf4j
 @Configuration
 public class StateMachineConfig {
+
+	@Autowired
+	ProductRepository productRepository;
+
+  @Autowired
+  JpaStateMachineRepository jpaStateMachineRepository;
+
+  @Bean
+  JpaRepositoryStateMachinePersist<String, String> jpaStateMachineRePersist() {
+    return new JpaRepositoryStateMachinePersist<>(jpaStateMachineRepository);
+  }
+
+	@Bean
+	ProductStateMachinePersist stateMachinePersist() {
+		return new ProductStateMachinePersist();
+	}
+
+  @Bean
+  StateMachinePersister<String, String, String> stateMachinePersister() {
+    return new DefaultStateMachinePersister<>(stateMachinePersist());
+  }
 
   @Configuration
   @EnableStateMachine
@@ -35,11 +58,10 @@ public class StateMachineConfig {
 
     @Bean
     public StateMachineModelFactory<String, String> modelFactory() {
-      // UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
-      UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm.simple/fsm.uml");
+      UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
+      // UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm.simple/fsm.uml");
       return factory;
     }
-
   }
 
   @Configuration

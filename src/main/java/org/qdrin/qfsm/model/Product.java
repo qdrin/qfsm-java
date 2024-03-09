@@ -5,15 +5,17 @@ import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.springframework.statemachine.StateMachineContext;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-// @Entity
-// @Table(name = "products")
+@Entity
+@Table(name = "products")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,6 +23,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Product {
   @Id String productId;
+  @JdbcTypeCode(SqlTypes.JSON)
+  StateMachineContext<String, String> context;
   String PartyRoleId;
   String productOfferingId;
   String ProductOfferingName;

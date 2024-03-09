@@ -3,8 +3,10 @@ package org.qdrin.qfsm;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.qdrin.qfsm.persist.InMemoryStateMachinePersist;
+import org.qdrin.qfsm.persist.ProductStateMachinePersist;
+import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -24,14 +26,15 @@ public class FsmApp {
 
 	@Autowired
   private StateMachine<String, String> stateMachine;
-	
-	private InMemoryStateMachinePersist stateMachinePersist = new InMemoryStateMachinePersist();
-	
-	StateMachinePersister<String, String, String> persister = new
-		DefaultStateMachinePersister<>(stateMachinePersist);
 
-	// @Autowired
-	// ProductRepository productRepository;
+	@Autowired
+	ProductRepository productRepository;
+	
+	@Autowired
+	private ProductStateMachinePersist stateMachinePersist;
+	
+	@Autowired
+	StateMachinePersister<String, String, String> persister;
 
   // get stringified full-state
   public String getMachineState(State<String, String> state) {
