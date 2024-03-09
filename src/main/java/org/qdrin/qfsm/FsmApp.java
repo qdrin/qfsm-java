@@ -3,16 +3,17 @@ package org.qdrin.qfsm;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.qdrin.qfsm.persist.InMemoryStateMachinePersist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.service.StateMachineService;
+import org.springframework.statemachine.persist.DefaultStateMachinePersister;
+import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
-import org.springframework.util.ObjectUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -21,10 +22,13 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class FsmApp {
 
+	@Autowired
   private StateMachine<String, String> stateMachine;
-
-  @Autowired
-	private StateMachineService<String, String> stateMachineService;
+	
+	private InMemoryStateMachinePersist stateMachinePersist = new InMemoryStateMachinePersist();
+	
+	StateMachinePersister<String, String, String> persister = new
+		DefaultStateMachinePersister<>(stateMachinePersist);
 
 	// @Autowired
 	// ProductRepository productRepository;
@@ -49,30 +53,12 @@ public class FsmApp {
 		return mstate;
 	}
 
-	private synchronized StateMachine<String, String> getStateMachine(String machineId) throws Exception {
-		if (stateMachine == null) {
-			stateMachine = stateMachineService.acquireStateMachine(machineId);
-			log.debug("getStateMachine created stateMachine: {}", machineId);
-			stateMachine.startReactively().block();
-		} else if (!ObjectUtils.nullSafeEquals(stateMachine.getId(), machineId)) {
-			String oldId = stateMachine.getId();
-			stateMachineService.releaseStateMachine(stateMachine.getId());
-			stateMachine.stopReactively().block();
-			log.debug("getStateMachine released stateMachine: {}", oldId);
-			stateMachine = stateMachineService.acquireStateMachine(machineId);
-			stateMachine.startReactively().block();
-			log.debug("getStateMachine acquired stateMachine: {}, variables: {}", machineId, stateMachine.getExtendedState().getVariables());
-		}
-		return stateMachine;
-	}
-
   public void sendUserEvent(String machineId, Scanner scanner) {
-		StateMachine<String, String> machine;
+		StateMachine<String, String> machine = stateMachine;
 		try {
-    	machine = getStateMachine(machineId);
-		}
-		catch(Exception e) {
-			log.error("Cannot acquire stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
+			persister.restore(machine, machineId);
+		} catch(Exception e) {
+			log.error("Cannot restore stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
 			return;
 		}
     String machineState = getMachineState(machine.getState());
@@ -84,6 +70,11 @@ public class FsmApp {
     machineState = getMachineState(machine.getState());
     variables = machine.getExtendedState().getVariables();
     log.info("new state: {}, variables: {}", machineState, variables);
+		try {
+			persister.persist(machine, machineId);
+		} catch (Exception e) {
+			log.error("Cannot persist stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
+		}
   }
 
   public void sendEvent(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {

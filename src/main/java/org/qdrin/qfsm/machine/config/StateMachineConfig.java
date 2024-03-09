@@ -9,55 +9,28 @@ import org.qdrin.qfsm.machine.states.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.StateMachineContext;
+import org.springframework.statemachine.StateMachinePersist;
+import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
-import org.springframework.statemachine.config.StateMachineFactory;
-import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
-import org.springframework.statemachine.data.jpa.JpaPersistingStateMachineInterceptor;
-import org.springframework.statemachine.data.jpa.JpaStateMachineRepository;
 import org.springframework.statemachine.guard.Guard;
-import org.springframework.statemachine.persist.StateMachineRuntimePersister;
-import org.springframework.statemachine.service.DefaultStateMachineService;
-import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
 
 // @Slf4j
 @Configuration
 public class StateMachineConfig {
 
-  @Bean
-  public StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister(
-          JpaStateMachineRepository jpaStateMachineRepository) {
-      return new JpaPersistingStateMachineInterceptor<>(jpaStateMachineRepository);
-      // return new QFsmPersister(jpaStateMachineRepository);
-  }
-
-  @Bean
-  public StateMachineService<String,String> stateMachineService(
-        StateMachineFactory<String,String> stateMachineFactory,
-        StateMachineRuntimePersister<String,String, String> stateMachineRuntimePersister) {
-    return new DefaultStateMachineService<String, String>(stateMachineFactory, stateMachineRuntimePersister);
-  }
-
   @Configuration
-  @EnableStateMachineFactory
+  @EnableStateMachine
+  // @EnableStateMachineFactory
   public static class MachineConfig extends StateMachineConfigurerAdapter<String, String> {
-
-		@Autowired
-		private StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister;
 
     @Override
     public void configure(StateMachineModelConfigurer<String, String> model) throws Exception {
       model.withModel().factory(modelFactory());
-    }
-
-    @Override
-    public void configure(StateMachineConfigurationConfigurer<String, String> config) throws Exception {
-      config
-        .withPersistence()
-        .runtimePersister(stateMachineRuntimePersister);
     }
 
     @Bean
