@@ -1,11 +1,8 @@
 package org.qdrin.qfsm;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Scanner;
 
-import org.qdrin.qfsm.model.Product;
-import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -29,15 +26,14 @@ public class FsmApp {
   @Autowired
 	private StateMachineService<String, String> stateMachineService;
 
-	@Autowired
-	ProductRepository productRepository;
+	// @Autowired
+	// ProductRepository productRepository;
 
   // get stringified full-state
   public String getMachineState(State<String, String> state) {
 		String mstate = state.getId();
 		if (state.isOrthogonal()) {
 			RegionState<String, String> rstate = (RegionState) state;
-			// log.info("regions: {}", rstate.getRegions());
 			mstate += "->[";
 			for(var r: rstate.getRegions()) {
 				// log.info("orthogonal region: {}, state: {}", r.getId(), r.getState().getId());
@@ -55,13 +51,17 @@ public class FsmApp {
 
 	private synchronized StateMachine<String, String> getStateMachine(String machineId) throws Exception {
 		if (stateMachine == null) {
-			stateMachine = stateMachineService.acquireStateMachine(machineId);;
+			stateMachine = stateMachineService.acquireStateMachine(machineId);
+			log.debug("getStateMachine created stateMachine: {}", machineId);
 			stateMachine.startReactively().block();
 		} else if (!ObjectUtils.nullSafeEquals(stateMachine.getId(), machineId)) {
+			String oldId = stateMachine.getId();
 			stateMachineService.releaseStateMachine(stateMachine.getId());
 			stateMachine.stopReactively().block();
+			log.debug("getStateMachine released stateMachine: {}", oldId);
 			stateMachine = stateMachineService.acquireStateMachine(machineId);
 			stateMachine.startReactively().block();
+			log.debug("getStateMachine acquired stateMachine: {}, variables: {}", machineId, stateMachine.getExtendedState().getVariables());
 		}
 		return stateMachine;
 	}

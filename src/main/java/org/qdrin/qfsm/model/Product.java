@@ -12,10 +12,9 @@ import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Entity
-@Table(name = "products")
+// @Entity
+// @Table(name = "products")
 @Data
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

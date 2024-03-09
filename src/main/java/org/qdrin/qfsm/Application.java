@@ -9,8 +9,6 @@ import javax.sql.DataSource;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.qdrin.qfsm.model.*;
-import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -29,20 +27,7 @@ public class Application implements CommandLineRunner {
 	DataSource dataSource;
 
 	@Autowired
-	ProductRepository productRepository;
-
-	@Autowired
 	FsmApp fsmApp;
-
-	void saveProduct(Product product) {
-		log.debug("saveProduct product: {}, prices: {}", product.getProductId(), product.getProductPrices());
-		productRepository.save(product);
-	}
-
-	Optional<Product> getProduct(String productId) {
-		Optional<Product> product = productRepository.findById(productId);
-		return product;
-	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);

@@ -15,6 +15,7 @@ import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
+import org.springframework.statemachine.data.jpa.JpaPersistingStateMachineInterceptor;
 import org.springframework.statemachine.data.jpa.JpaStateMachineRepository;
 import org.springframework.statemachine.guard.Guard;
 import org.springframework.statemachine.persist.StateMachineRuntimePersister;
@@ -29,8 +30,8 @@ public class StateMachineConfig {
   @Bean
   public StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister(
           JpaStateMachineRepository jpaStateMachineRepository) {
-      // return new JpaPersistingStateMachineInterceptor<>(jpaStateMachineRepository);
-      return new QFsmPersister(jpaStateMachineRepository);
+      return new JpaPersistingStateMachineInterceptor<>(jpaStateMachineRepository);
+      // return new QFsmPersister(jpaStateMachineRepository);
   }
 
   @Bean
@@ -61,8 +62,8 @@ public class StateMachineConfig {
 
     @Bean
     public StateMachineModelFactory<String, String> modelFactory() {
-      UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
-      // UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm.simple/fsm.uml");
+      // UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
+      UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm.simple/fsm.uml");
       return factory;
     }
 

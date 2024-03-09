@@ -26,7 +26,7 @@ spring:
       path: /console/
   datasource:
     # url: jdbc:h2:mem:test
-    url: jdbc:h2:file:/tmp/psi_db
+    url: jdbc:h2:file:./tmp/psi_db
     username: ${DB_USER:psi}
     password: ${DB_PASSWORD:psi}
     # url: "jdbc:postgresql://localhost:5432/psi_db"
