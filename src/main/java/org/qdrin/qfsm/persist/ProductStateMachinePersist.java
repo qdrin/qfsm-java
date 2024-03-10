@@ -3,7 +3,10 @@ package org.qdrin.qfsm.persist;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.uml2.uml.StateMachine;
+import org.qdrin.qfsm.model.ContextEntity;
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.repository.ContextRepository;
 import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -17,16 +20,20 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
-public class ProductStateMachinePersist implements StateMachinePersist<String, String, String> { 
+public class ProductStateMachinePersist implements StateMachinePersist<String, String, String> {
+  Map<String, StateMachineContext<String, String>> contexts = new HashMap<>();
 
   @Autowired
   private ProductRepository productRepository;
 
   @Autowired
-  private JpaStateMachineRepository contextRepository;
+  private ContextRepository contextRepository;
 
-  @Autowired
-  JpaRepositoryStateMachinePersist<String, String> contextPersist;
+  // @Autowired
+  // private JpaStateMachineRepository contextRepository;
+
+  // @Autowired
+  // JpaRepositoryStateMachinePersist<String, String> contextPersist;
 
   // @Override
   public void write(StateMachineContext<String, String> context, String machineId) throws Exception {
@@ -36,22 +43,24 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
       product.setProductId(machineId);
     }
     productRepository.save(product);
-    log.debug("saving machineId {}, context[{}]: {}", machineId, context.getId(), context);
-    contextPersist.write(context, machineId);
+    log.debug("saving machineId {}, product: {}", machineId, product);
+    ContextEntity ce = new ContextEntity();
+    ce.setMachineId(machineId);
+    ce.setContext(context.getState());
+    log.debug("saving machineId {}, contextEntity: {}", machineId, ce);
+    contexts.put(machineId, context);
   }
   // @Override
   public StateMachineContext<String, String> read(String machineId) throws Exception {
     Product product = productRepository.findById(machineId).orElse(new Product());
-    StateMachineContext<String, String> context = contextPersist.read(machineId);
+    ContextEntity ce = contextRepository.findById(machineId).orElse(new ContextEntity());
+    log.debug("read contextEntity: {}", ce);
     if(product.getProductId() == null) {
       log.debug("new product, set productId to '{}'", machineId);
       product.setProductId(machineId);
     }
     log.debug("read product: {}", product);
-    if(context != null) {
-      context.getExtendedState().getVariables().put("product", product);
-    }
-    return context;
+    return contexts.get(machineId);
   }
 }
 

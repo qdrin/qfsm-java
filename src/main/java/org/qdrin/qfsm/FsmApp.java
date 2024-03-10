@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 public class FsmApp {
 
 	@Autowired
-  private StateMachine<String, String> stateMachine;
+  StateMachine<String, String> stateMachine;
 
 	@Autowired
 	ProductRepository productRepository;
@@ -60,6 +60,7 @@ public class FsmApp {
 		StateMachine<String, String> machine = stateMachine;
 		try {
 			persister.restore(machine, machineId);
+			log.debug("machine.getId(): {}", machine.getId());
 		} catch(Exception e) {
 			log.error("Cannot restore stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
 			return;
