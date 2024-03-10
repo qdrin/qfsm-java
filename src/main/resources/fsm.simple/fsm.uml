@@ -27,7 +27,7 @@
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_ZdmsILn-Ee6yNs2FzguhlQ" name=""/>
       <subvertex xmi:type="uml:State" xmi:id="_CLHpENbGEe6hBcJbWWFDFg" name="PendingActivate"/>
       <subvertex xmi:type="uml:State" xmi:id="_HKJu4NbGEe6hBcJbWWFDFg" name="Active"/>
-      <subvertex xmi:type="uml:State" xmi:id="_Jm5eINbGEe6hBcJbWWFDFg" name="Disconnected"/>
+      <subvertex xmi:type="uml:State" xmi:id="_Jm5eINbGEe6hBcJbWWFDFg" name="Disconnect"/>
       <subvertex xmi:type="uml:State" xmi:id="_68A5ENb8Ee6jPqGAGuc2DQ" name="Suspended"/>
     </region>
   </packagedElement>

@@ -57,12 +57,13 @@ public class FsmApp {
 		} else if (!ObjectUtils.nullSafeEquals(stateMachine.getId(), machineId)) {
 			String oldId = stateMachine.getId();
 			stateMachineService.releaseStateMachine(stateMachine.getId());
-			stateMachine.stopReactively().block();
 			log.debug("getStateMachine released stateMachine: {}", oldId);
 			stateMachine = stateMachineService.acquireStateMachine(machineId);
-			stateMachine.startReactively().block();
-			log.debug("getStateMachine acquired stateMachine: {}, variables: {}", machineId, stateMachine.getExtendedState().getVariables());
 		}
+		log.debug("getStateMachine acquired machineId: {}, state: {}, variables: {}",
+							machineId,
+							getMachineState(stateMachine.getState()),
+							stateMachine.getExtendedState().getVariables());
 		return stateMachine;
 	}
 
@@ -75,14 +76,11 @@ public class FsmApp {
 			log.error("Cannot acquire stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
 			return;
 		}
-    String machineState = getMachineState(machine.getState());
-    var variables = machine.getExtendedState().getVariables();
-    log.info("current state: {}, variables: {}", machineState, variables);
     System.out.print("input event name:");
     String event = scanner.nextLine();
     sendEvent(machine, event);
-    machineState = getMachineState(machine.getState());
-    variables = machine.getExtendedState().getVariables();
+    String machineState = getMachineState(machine.getState());
+    Map<Object, Object> variables = machine.getExtendedState().getVariables();
     log.info("new state: {}, variables: {}", machineState, variables);
   }
 
@@ -96,7 +94,7 @@ public class FsmApp {
 			.setHeader("origin", "user")
 			.build();
 		Mono<Message<String>> monomsg = Mono.just(message);
-		log.info("sending event: {}, message: {}", eventName, message);
+		log.info("sending event: {}, machine: {}", eventName, machine.getId());
     try {
 		  machine.sendEvent(monomsg).blockLast();
     } catch(IllegalArgumentException e) {
@@ -106,9 +104,7 @@ public class FsmApp {
 		int trcount = (int) machine.getExtendedState().getVariables().get("transitionCount");
 		// Here we can distinguish accepted event from non-accepted
 		if(trcount == 0) {
-			log.error("Not transition triggered. Event vasted");
-		} else {
-			log.info("event processed, transitionCount={}", trcount);
+			log.warn("No transition triggered. Event vasted");
 		}
 	}
 }
