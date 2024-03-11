@@ -3,8 +3,8 @@ package org.qdrin.qfsm;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.qdrin.qfsm.model.TestEntity;
-import org.qdrin.qfsm.repository.TestRepository;
+import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -28,11 +28,19 @@ public class FsmApp {
   @Autowired
 	private StateMachineService<String, String> stateMachineService;
 
-	// @Autowired
-	// ProductRepository productRepository;
-
 	@Autowired
-	TestRepository testRepository;
+	ProductRepository productRepository;
+
+	// @Autowired
+	// TestRepository testRepository;
+
+	private void saveVariables(StateMachine<String, String> machine) {
+		String machineId = machine.getId();
+		Map<Object, Object> variables = machine.getExtendedState().getVariables();
+		Product product = ((Product) variables.get("product"));
+		product.setProductId(machineId);
+		productRepository.save(product);
+	}
 
   // get stringified full-state
   public String getMachineState(State<String, String> state) {
@@ -86,10 +94,7 @@ public class FsmApp {
     sendEvent(machine, event);
     String machineState = getMachineState(machine.getState());
     Map<Object, Object> variables = machine.getExtendedState().getVariables();
-		TestEntity te = new TestEntity();
-		te.setMachineId(machineId);
-		te.setStatus(variables.get("status").toString());
-		testRepository.save(te);
+		saveVariables(machine);
     log.info("new state: {}, variables: {}", machineState, variables);
   }
 
