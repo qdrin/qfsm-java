@@ -26,6 +26,10 @@ public class StateStatus {
   
   @OnStateEntry
   public void setStatus(StateContext<String, String> context) {
+    log.debug("onStateEntry[{}]. event: {}, message: {}", 
+          context.getTarget().getId(),
+          context.getEvent(),
+          context.getMessage());
     State<String, String> state = context.getTarget();
     // var extendedState = context.getExtendedState();
     var extendedState = context.getStateMachine().getExtendedState();

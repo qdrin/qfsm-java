@@ -29,10 +29,9 @@ public class QFsmPersister extends JpaPersistingStateMachineInterceptor<String, 
   public void write(StateMachineContext<String, String> context, String machineId) throws Exception {
     Map<Object, Object> variables = context.getExtendedState().getVariables();
     Product product = (Product) variables.getOrDefault("product", new Product(machineId));
-    // List<ProductPrice> nextPrice = (List<ProductPrice>) variables.getOrDefault("nextPrice", null);
     productRepository.save(product);
     variables.remove("product");
-    log.debug("QFsmPersister.write variables: {}", variables);
+    // log.debug("QFsmPersister.write variables: {}", variables);
     super.write(context, machineId);
   }
 
@@ -42,7 +41,7 @@ public class QFsmPersister extends JpaPersistingStateMachineInterceptor<String, 
       if(machine == null) {return null;}
       Map<Object, Object> variables = machine.getExtendedState().getVariables();
       Product product = productRepository.findById(machineId).get();  // .orElse(new Product(machineId));
-      log.debug("QFsmPersister.read variables: {}", product, variables);
+      // log.debug("QFsmPersister.read variables: {}", product, variables);
       variables.put("product", product);
       return machine;
   }
