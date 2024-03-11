@@ -1,9 +1,11 @@
 package org.qdrin.qfsm;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Scanner;
 
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.model.entity.ProductEntity;
 import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -38,8 +40,20 @@ public class FsmApp {
 		String machineId = machine.getId();
 		Map<Object, Object> variables = machine.getExtendedState().getVariables();
 		Product product = ((Product) variables.get("product"));
-		product.setProductId(machineId);
+		if(product != null && product.getProductId().isEmpty()) {
+			product.setProductId(machineId);
+		}
 		productRepository.save(product);
+		variables.remove("product");
+	}
+
+	private void restoreVariables(StateMachine<String, String> machine) {
+		String machineId = machine.getId();
+		Map<Object, Object> variables = machine.getExtendedState().getVariables();
+		Optional<Product> product = productRepository.findById(machineId);
+		if(! product.isEmpty()) {
+			variables.put("product", product.get());
+		}
 	}
 
   // get stringified full-state
@@ -49,7 +63,6 @@ public class FsmApp {
 			RegionState<String, String> rstate = (RegionState) state;
 			mstate += "->[";
 			for(var r: rstate.getRegions()) {
-				// log.info("orthogonal region: {}, state: {}", r.getId(), r.getState().getId());
 				mstate += getMachineState(r.getState()) + ",";
 			}
 			mstate = mstate.substring(0, mstate.length()-1) + "]";
@@ -94,7 +107,6 @@ public class FsmApp {
     sendEvent(machine, event);
     String machineState = getMachineState(machine.getState());
     Map<Object, Object> variables = machine.getExtendedState().getVariables();
-		saveVariables(machine);
     log.info("new state: {}, variables: {}", machineState, variables);
   }
 
@@ -109,7 +121,9 @@ public class FsmApp {
 		Mono<Message<String>> monomsg = Mono.just(message);
 		log.info("sending event: {}, machine: {}", eventName, machine.getId());
     try {
+			restoreVariables(machine);
 		  machine.sendEvent(monomsg).blockLast();
+			saveVariables(machine);
     } catch(IllegalArgumentException e) {
       log.error("Event {} not accepted in current state: {}", eventName, e.getMessage());
     }

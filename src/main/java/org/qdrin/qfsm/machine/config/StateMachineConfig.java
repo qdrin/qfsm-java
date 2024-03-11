@@ -30,8 +30,8 @@ public class StateMachineConfig {
   @Bean
   public StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister(
           JpaStateMachineRepository jpaStateMachineRepository) {
-      return new JpaPersistingStateMachineInterceptor<>(jpaStateMachineRepository);
-      // return new QFsmPersister(jpaStateMachineRepository);
+      // return new JpaPersistingStateMachineInterceptor<>(jpaStateMachineRepository);
+      return new QFsmPersister(jpaStateMachineRepository);
   }
 
   @Bean
@@ -45,8 +45,9 @@ public class StateMachineConfig {
   @EnableStateMachineFactory
   public static class MachineConfig extends StateMachineConfigurerAdapter<String, String> {
 
-		@Autowired
-		private StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister;
+
+    @Autowired
+    private StateMachineRuntimePersister<String, String, String> stateMachineRuntimePersister;
 
     @Override
     public void configure(StateMachineModelConfigurer<String, String> model) throws Exception {

@@ -18,10 +18,21 @@ public class ActivatedGuard implements Guard<String, String> {
 
   @Override
   public boolean evaluate(StateContext<String, String> context) {
-    ProductPrice price = PriceHelper.getProductPrice(context);
-    String prstatus = price.getProductStatus();
+    try {
+      ProductPrice price = ((Product) context
+        .getStateMachine()
+        .getExtendedState()
+        .getVariables()
+        .get("product"))
+        .getProductPrices()
+        .get(0);
+      String prstatus = price.getProductStatus();
+      return ObjectUtils.nullSafeEquals(match, prstatus);
+    } catch(Exception e) {
+      log.warn("Cannot get price: {}", e.getLocalizedMessage());
+      return false;
+    }
     // log.debug("ActivatedGuard productStatus: {}, match: {}", prstatus, match);
-    return ObjectUtils.nullSafeEquals(match, prstatus);
   }
   
 }

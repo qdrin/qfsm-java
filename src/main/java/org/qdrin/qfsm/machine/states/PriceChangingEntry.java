@@ -23,7 +23,7 @@ public class PriceChangingEntry implements Action<String, String> {
     int tPeriod = product.getTarificationPeriod();
     if (tPeriod == 0) {
       ProductPrice price = PriceHelper.getProductPrice(context);
-      PriceHelper.setNextPrice(context, price);
+      context.getStateMachine().getExtendedState().getVariables().put("nextPrice", price);
       SignalAction changePrice = new SignalAction("change_price");
       changePrice.execute(context);
       if(price.getProductStatus().equals("ACTIVE_TRIAL")) {
@@ -33,7 +33,7 @@ public class PriceChangingEntry implements Action<String, String> {
       }
     } else {
       ProductPrice nextPrice = ExternalData.RequestProductPrice();
-      PriceHelper.setNextPrice(context, nextPrice);
+      context.getStateMachine().getExtendedState().getVariables().put("nextPrice", nextPrice);
     }
   }
 }
