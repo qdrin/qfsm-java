@@ -3,6 +3,8 @@ package org.qdrin.qfsm;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.qdrin.qfsm.model.TestEntity;
+import org.qdrin.qfsm.repository.TestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -28,6 +30,9 @@ public class FsmApp {
 
 	// @Autowired
 	// ProductRepository productRepository;
+
+	@Autowired
+	TestRepository testRepository;
 
   // get stringified full-state
   public String getMachineState(State<String, String> state) {
@@ -81,11 +86,14 @@ public class FsmApp {
     sendEvent(machine, event);
     String machineState = getMachineState(machine.getState());
     Map<Object, Object> variables = machine.getExtendedState().getVariables();
+		TestEntity te = new TestEntity();
+		te.setMachineId(machineId);
+		te.setStatus(variables.get("status").toString());
+		testRepository.save(te);
     log.info("new state: {}, variables: {}", machineState, variables);
   }
 
   public void sendEvent(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {
-    // StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 		Map<Object, Object> variables = machine.getExtendedState().getVariables();
 		variables.put("transitionCount", 0);
 
