@@ -14,7 +14,7 @@ public class PriceChangedEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
     log.debug("PriceChangedEntry started. event: {}, message: {}", context.getEvent());
-    ProductPrice nextPrice = PriceHelper.getNextPrice(context);
+    ProductPrice nextPrice = (ProductPrice) context.getStateMachine().getExtendedState().getVariables().get("nextPrice");
     nextPrice.setPeriod(1);
     PriceHelper.setProductPrice(context, nextPrice);
     log.debug("PriceChangedEntry productPrice: {}", PriceHelper.getProductPrice(context));

@@ -1,0 +1,110 @@
+package org.qdrin.qfsm;
+
+import java.util.Map;
+import java.util.Scanner;
+
+import org.qdrin.qfsm.persist.ProductStateMachinePersist;
+import org.qdrin.qfsm.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.persist.DefaultStateMachinePersister;
+import org.springframework.statemachine.persist.StateMachinePersister;
+import org.springframework.statemachine.state.AbstractState;
+import org.springframework.statemachine.state.RegionState;
+import org.springframework.statemachine.state.State;
+
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
+
+@Slf4j
+@Configuration
+public class FsmApp {
+
+	@Autowired
+  StateMachine<String, String> stateMachine;
+
+	@Autowired
+	ProductRepository productRepository;
+	
+	@Autowired
+	private ProductStateMachinePersist stateMachinePersist;
+	
+	@Autowired
+	StateMachinePersister<String, String, String> persister;
+
+  // get stringified full-state
+  public String getMachineState(State<String, String> state) {
+		String mstate = state.getId();
+		if (state.isOrthogonal()) {
+			RegionState<String, String> rstate = (RegionState) state;
+			mstate += "->[";
+			for(var r: rstate.getRegions()) {
+				// log.info("orthogonal region: {}, state: {}", r.getId(), r.getState().getId());
+				mstate += getMachineState(r.getState()) + ",";
+			}
+			mstate = mstate.substring(0, mstate.length()-1) + "]";
+		}
+		if(state.isSubmachineState()) {
+			StateMachine<String, String> submachine = ((AbstractState<String, String>) state).getSubmachine();
+			State<String, String> sstate = submachine.getState();
+			mstate = mstate + "->" + getMachineState(sstate);
+		}
+		return mstate;
+	}
+
+  public void sendUserEvent(String machineId, Scanner scanner) {
+		StateMachine<String, String> machine = stateMachine;
+		try {
+			persister.restore(machine, machineId);
+			log.debug("machine.getId(): {}", machine.getId());
+		} catch(Exception e) {
+			log.error("Cannot restore stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
+			e.printStackTrace();
+			return;
+		}
+    String machineState = getMachineState(machine.getState());
+    var variables = machine.getExtendedState().getVariables();
+    log.info("current state: {}, variables: {}", machineState, variables);
+    System.out.print("input event name:");
+    String event = scanner.nextLine();
+    sendEvent(machine, event);
+    machineState = getMachineState(machine.getState());
+    variables = machine.getExtendedState().getVariables();
+    log.info("new state: {}, variables: {}", machineState, variables);
+		try {
+			persister.persist(machine, machineId);
+		} catch (Exception e) {
+			log.error("Cannot persist stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
+		}
+  }
+
+  public void sendEvent(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {
+    // StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
+		Map<Object, Object> variables = machine.getExtendedState().getVariables();
+		variables.put("transitionCount", 0);
+
+		Message<String> message = MessageBuilder
+			.withPayload(eventName)
+			.setHeader("origin", "user")
+			.build();
+		Mono<Message<String>> monomsg = Mono.just(message);
+		log.info("sending event: {}, message: {}", eventName, message);
+    try {
+		  machine.sendEvent(monomsg).blockLast();
+    } catch(IllegalArgumentException e) {
+      log.error("Event {} not accepted in current state: {}", eventName, e.getMessage());
+    }
+
+		int trcount = (int) machine.getExtendedState().getVariables().get("transitionCount");
+		// Here we can distinguish accepted event from non-accepted
+		if(trcount == 0) {
+			log.error("Not transition triggered. Event vasted");
+		} else {
+			log.info("event processed, transitionCount={}", trcount);
+		}
+	}
+}

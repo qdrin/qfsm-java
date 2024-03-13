@@ -17,13 +17,13 @@ public class PriceChangingEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
     log.debug("PriceChangingEntry started. event: {}, message: {}", context.getEvent(), context.getMessage());
-    Map<Object, Object> cvars = context.getExtendedState().getVariables();
+    Map<Object, Object> variables = context.getExtendedState().getVariables();
     // Emulate external price-calculator request;
-    Product product = (Product) cvars.get("product");
+    Product product = (Product) variables.get("product");
     int tPeriod = product.getTarificationPeriod();
     if (tPeriod == 0) {
       ProductPrice price = PriceHelper.getProductPrice(context);
-      PriceHelper.setNextPrice(context, price);
+      variables.put("nextPrice", price);
       SignalAction changePrice = new SignalAction("change_price");
       changePrice.execute(context);
       if(price.getProductStatus().equals("ACTIVE_TRIAL")) {
@@ -33,7 +33,7 @@ public class PriceChangingEntry implements Action<String, String> {
       }
     } else {
       ProductPrice nextPrice = ExternalData.RequestProductPrice();
-      PriceHelper.setNextPrice(context, nextPrice);
+      variables.put("nextPrice", nextPrice);
     }
   }
 }
