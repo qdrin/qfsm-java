@@ -23,8 +23,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Product {
   @Id String productId;
-  @JdbcTypeCode(SqlTypes.JSON)
-  StateMachineContext<String, String> context;
   String PartyRoleId;
   String productOfferingId;
   String ProductOfferingName;
@@ -47,7 +45,8 @@ public class Product {
   // Map<String, Object> metaInfo;
   // Map<String, Object> quantity;
   // Map<String, Object> extraParams;
-
+  @Lob
+  byte[] context;
   public Product(String productId) {
     this.productId = productId;
   }

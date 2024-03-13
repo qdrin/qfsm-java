@@ -63,6 +63,7 @@ public class FsmApp {
 			log.debug("machine.getId(): {}", machine.getId());
 		} catch(Exception e) {
 			log.error("Cannot restore stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
+			e.printStackTrace();
 			return;
 		}
     String machineState = getMachineState(machine.getState());

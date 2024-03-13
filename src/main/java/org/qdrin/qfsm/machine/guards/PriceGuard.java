@@ -34,7 +34,7 @@ public class PriceGuard implements Guard<String, String> {
   @Override
   public boolean evaluate(StateContext<String, String> context) {
     ProductPrice price =  PriceHelper.getProductPrice(context);
-    ProductPrice nextPrice = PriceHelper.getNextPrice(context);
+    ProductPrice nextPrice = (ProductPrice) context.getStateMachine().getExtendedState().getVariables().get("nextPrice");
     boolean res = true;
     if(fullCompare) {
       boolean isFull = nextPrice.getNextPayDate() != null;
