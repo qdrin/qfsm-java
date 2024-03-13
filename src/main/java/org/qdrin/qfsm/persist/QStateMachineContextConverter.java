@@ -6,6 +6,9 @@ import org.springframework.statemachine.kryo.StateMachineContextSerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.*;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class QStateMachineContextConverter {
   private final int maxBufSize = 1024*2048;
   
@@ -14,17 +17,18 @@ public class QStateMachineContextConverter {
     StateMachineContextSerializer<String, String> serializer = new StateMachineContextSerializer<>();
     kryo.addDefaultSerializer(StateMachineContext.class, serializer);
     Input input = new Input(buffer);
-    return (StateMachineContext<String, String>) kryo.readClassAndObject(input);
+    StateMachineContext<String, String> context = (StateMachineContext<String, String>) kryo.readClassAndObject(input);
+    input.close();
+    return context;
   }
   
   byte[] toBytes(StateMachineContext<String, String> context) {
     Kryo kryo = new Kryo();
     StateMachineContextSerializer<String, String> serializer = new StateMachineContextSerializer<>();
     kryo.addDefaultSerializer(StateMachineContext.class, serializer);
-    byte[] buffer = new byte[maxBufSize];
     Output output = new Output(maxBufSize);
     kryo.writeClassAndObject(output, context);
-    output.close();
-    return buffer;
+    log.debug("output: {}", output);
+    return output.toBytes();
   }
 }

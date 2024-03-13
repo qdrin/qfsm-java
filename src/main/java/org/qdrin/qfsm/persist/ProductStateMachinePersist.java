@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.qdrin.qfsm.model.ContextEntity;
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.repository.ContextRepository;
 import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -29,9 +31,13 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
   Map<String, StateMachineContext<String, String>> contexts = new HashMap<>();
 
   final static int bufferSize = 1024*1024;
+  
   @Autowired
   private ProductRepository productRepository;
 
+  @Autowired
+  private ContextRepository contextRepository;  
+  
   private static QStateMachineContextConverter converter = new QStateMachineContextConverter();
   // private static StateMachineContextSerializer<String, String> serializer = new StateMachineContextSerializer<>();
   // private static Kryo kryo = new Kryo();
@@ -41,24 +47,27 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
     Map<Object, Object> variables = context.getExtendedState().getVariables();
     Product product = (Product) variables.getOrDefault("product", new Product());
     variables.remove("product");
-    product.setContext(converter.toBytes(context));
+    ContextEntity ce = new ContextEntity();
+    ce.setProductId(machineId);
+    ce.setContext(converter.toBytes(context));
     if(product.getProductId() == null) {
       product.setProductId(machineId);
     }
     productRepository.save(product);
+    contextRepository.save(ce);
     log.debug("saving machineId {}, product: {}", machineId, product);
-    contexts.put(machineId, context);
+    // contexts.put(machineId, context);
   }
   
   // @Override
   public StateMachineContext<String, String> read(String machineId) throws Exception {
     Optional<Product> op = productRepository.findById(machineId);
-    if(op.isEmpty()) {
+    Optional<ContextEntity> cep = contextRepository.findById(machineId);
+    if(op.isEmpty() || cep.isEmpty()) {
       return null;
     }
     Product product = op.get();
-    byte[] bcontext = product.getContext();
-    product.setContext(null);
+    byte[] bcontext = cep.get().getContext();
     StateMachineContext<String, String> context = converter.toContext(bcontext);
     log.debug("read context: {}", context);
     context.getExtendedState().getVariables().put("product", product);

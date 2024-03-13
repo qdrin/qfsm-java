@@ -31,6 +31,7 @@ public class Product {
   String ProductSpecificationVersion;
   boolean isBundle;
   String status;
+  String machineState;
   int productClass;
   int tarificationPeriod;
   OffsetDateTime trialEndDate;
@@ -45,8 +46,6 @@ public class Product {
   // Map<String, Object> metaInfo;
   // Map<String, Object> quantity;
   // Map<String, Object> extraParams;
-  @Lob
-  byte[] context;
   public Product(String productId) {
     this.productId = productId;
   }
