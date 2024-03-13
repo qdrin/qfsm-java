@@ -46,7 +46,7 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
   public void write(StateMachineContext<String, String> context, String machineId) throws Exception {
     Map<Object, Object> variables = context.getExtendedState().getVariables();
     Product product = (Product) variables.getOrDefault("product", new Product());
-    variables.remove("product");
+    context.getExtendedState().getVariables().remove("product");
     ContextEntity ce = new ContextEntity();
     ce.setProductId(machineId);
     ce.setContext(converter.toBytes(context));

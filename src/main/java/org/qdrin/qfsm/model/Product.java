@@ -38,7 +38,7 @@ public class Product {
   OffsetDateTime activeEndDate;
   OffsetDateTime productStartDate;
   @JdbcTypeCode(SqlTypes.JSON)
-  List<ProductPrice> productPrices;
+  ProductPrice productPrices;
   // List<ProductRelationship> productRelationships;
   // List<FabricRef> fabricRefs;
   // List<ProductCharacteristic> characteristics;

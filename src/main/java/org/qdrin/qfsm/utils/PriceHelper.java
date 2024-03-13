@@ -14,16 +14,17 @@ import org.qdrin.qfsm.model.*;
 public class PriceHelper {
   public static ProductPrice getProductPrice(StateContext<String, String> context) {
     Product product = (Product) context.getExtendedState().getVariables().get("product");
-    List<ProductPrice> priceList = product.getProductPrices();
-    if(priceList == null) {return null;}
-    return priceList.get(0);
+    // List<ProductPrice> priceList = product.getProductPrices();
+    // if(priceList == null) {return null;}
+    // return priceList.get(0);
+    return product.getProductPrices();
   }
 
   public static void setProductPrice(StateContext<String, String> context, ProductPrice price) {
     Map<Object, Object> cvars = context.getExtendedState().getVariables();
     Product product = (Product) cvars.get("product");
-    List<ProductPrice> priceList = Arrays.asList(price);
-    product.setProductPrices(priceList);
+    // List<ProductPrice> priceList = Arrays.asList(price);
+    product.setProductPrices(price);
     // context.getExtendedState().getVariables().put("product", product);
     log.info("setProductPrice result product: {}", cvars.get("product"));
   }
