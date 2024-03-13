@@ -1,5 +1,7 @@
 package org.qdrin.qfsm.persist;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +19,8 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
+import org.qdrin.qfsm.persist.QStateMachineContextConverter;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -28,21 +32,16 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
   @Autowired
   private ProductRepository productRepository;
 
+  private static QStateMachineContextConverter converter = new QStateMachineContextConverter();
   // private static StateMachineContextSerializer<String, String> serializer = new StateMachineContextSerializer<>();
   // private static Kryo kryo = new Kryo();
 
   // @Override
   public void write(StateMachineContext<String, String> context, String machineId) throws Exception {
-    Kryo kryo = new Kryo();
-    StateMachineContextSerializer<String, String> serializer = new StateMachineContextSerializer<>();
-    kryo.addDefaultSerializer(StateMachineContext.class, serializer);
     Map<Object, Object> variables = context.getExtendedState().getVariables();
     Product product = (Product) variables.getOrDefault("product", new Product());
-    Output output = new Output(bufferSize);
     variables.remove("product");
-    kryo.writeClassAndObject(output, context);
-    product.setContext(output.toBytes());
-    output.close();
+    product.setContext(converter.toBytes(context));
     if(product.getProductId() == null) {
       product.setProductId(machineId);
     }
@@ -53,18 +52,14 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
   
   // @Override
   public StateMachineContext<String, String> read(String machineId) throws Exception {
-    Kryo kryo = new Kryo();
-    StateMachineContextSerializer<String, String> serializer = new StateMachineContextSerializer<>();
-    kryo.addDefaultSerializer(StateMachineContext.class, serializer);
-
     Optional<Product> op = productRepository.findById(machineId);
     if(op.isEmpty()) {
       return null;
     }
     Product product = op.get();
-    Input input = new Input(product.getContext());
+    byte[] bcontext = product.getContext();
     product.setContext(null);
-    StateMachineContext<String, String> context = (StateMachineContext<String, String>) kryo.readClassAndObject(input);
+    StateMachineContext<String, String> context = converter.toContext(bcontext);
     log.debug("read context: {}", context);
     context.getExtendedState().getVariables().put("product", product);
     if(product.getProductId() == null) {
