@@ -3,6 +3,7 @@ package org.qdrin.qfsm.persist;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.qdrin.qfsm.model.ContextEntity;
 import org.qdrin.qfsm.model.Product;
@@ -67,16 +68,22 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
   // @Override
   public StateMachineContext<String, String> read(String machineId) throws Exception {
     Product product = productRepository.findById(machineId).orElse(new Product());
-    ContextEntity ce = contextRepository.findById(machineId).orElse(new ContextEntity());
-    Input input = new Input(ce.getContext());
-    StateMachineContext<String, String> ctx = serializer.read(kryo, input, );
-    StateMachineContext<String, String> context;
-    log.debug("read contextEntity: {}", ce);
+    Optional<ContextEntity> ce = contextRepository.findById(machineId);
+    if(ce.isEmpty()) {
+      return null;
+    }
+    Input input = new Input(ce.get().getContext());
+    // StateMachineContext<String, String> ctx = serializer.read(kryo, input, Class<StateMachineContext<String, String>>.class);
+    StateMachineContext<String, String> context = (StateMachineContext<String, String>) kryo.readClassAndObject(input);
+    log.debug("read context: {}", context);
+    // context = context == null ? new StateMachineContext<String, String>() : context;
     if(product.getProductId() == null) {
       log.debug("new product, set productId to '{}'", machineId);
       product.setProductId(machineId);
     }
     log.debug("read product: {}", product);
+    // return context;
+    log.debug("context: {}", contexts.get(machineId));
     return contexts.get(machineId);
   }
 }
