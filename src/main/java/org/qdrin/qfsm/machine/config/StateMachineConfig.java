@@ -12,11 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
-import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
-import org.springframework.statemachine.data.jpa.JpaRepositoryStateMachinePersist;
-import org.springframework.statemachine.data.jpa.JpaStateMachineRepository;
 import org.springframework.statemachine.guard.Guard;
 import org.springframework.statemachine.persist.DefaultStateMachinePersister;
 import org.springframework.statemachine.persist.StateMachinePersister;
@@ -28,14 +25,6 @@ public class StateMachineConfig {
 
 	@Autowired
 	ProductRepository productRepository;
-
-  @Autowired
-  JpaStateMachineRepository jpaStateMachineRepository;
-
-  @Bean
-  JpaRepositoryStateMachinePersist<String, String> jpaStateMachineRePersist() {
-    return new JpaRepositoryStateMachinePersist<>(jpaStateMachineRepository);
-  }
 
 	@Bean
 	ProductStateMachinePersist stateMachinePersist() {

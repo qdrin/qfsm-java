@@ -1,7 +1,5 @@
 package org.qdrin.qfsm.persist;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -12,18 +10,8 @@ import org.qdrin.qfsm.repository.ContextRepository;
 import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.StateMachinePersist;
-
-import org.springframework.statemachine.kryo.*;
-import org.springframework.statemachine.support.AbstractStateMachine;
-
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-
-import org.qdrin.qfsm.persist.QStateMachineContextConverter;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductStateMachinePersist implements StateMachinePersist<String, String, String> {
   Map<String, StateMachineContext<String, String>> contexts = new HashMap<>();
 
-  final static int bufferSize = 1024*1024;
+  final static int bufferSize = 1024*1024*1024;
   
   @Autowired
   private ProductRepository productRepository;
@@ -41,8 +29,6 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
   private ContextRepository contextRepository;
   
   private static QStateMachineContextConverter converter = new QStateMachineContextConverter();
-  // private static StateMachineContextSerializer<String, String> serializer = new StateMachineContextSerializer<>();
-  // private static Kryo kryo = new Kryo();
 
   private void clearVariables(StateMachineContext<String, String> context, boolean clearSelf) {
     if(clearSelf) {
@@ -67,8 +53,6 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
     }
     productRepository.save(product);
     contextRepository.save(ce);
-    // log.debug("saving machineId {}, product: {}", machineId, product);
-    // contexts.put(machineId, context);
   }
   
   // @Override

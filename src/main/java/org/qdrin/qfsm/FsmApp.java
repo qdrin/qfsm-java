@@ -3,15 +3,11 @@ package org.qdrin.qfsm;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.qdrin.qfsm.persist.ProductStateMachinePersist;
-import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.persist.DefaultStateMachinePersister;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
@@ -26,12 +22,6 @@ public class FsmApp {
 
 	@Autowired
   StateMachine<String, String> stateMachine;
-
-	@Autowired
-	ProductRepository productRepository;
-	
-	@Autowired
-	private ProductStateMachinePersist stateMachinePersist;
 	
 	@Autowired
 	StateMachinePersister<String, String, String> persister;

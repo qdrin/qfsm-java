@@ -14,5 +14,6 @@ public class PriceActiveEntry implements Action<String, String> {
   public void execute(StateContext<String, String> context) {
     log.debug("PriceActiveEntry started. event: {}", context.getEvent());
     new SignalAction("prolong").execute(context);
+    context.getStateMachine().getExtendedState().getVariables().remove("nextPrice");
   }
 }

@@ -90,11 +90,6 @@
 			<version>${spring-statemachine.version}</version>
 			<scope>test</scope>
 		</dependency>
-       <dependency>
-            <groupId>de.javakaffee</groupId>
-            <artifactId>kryo-serializers</artifactId>
-            <version>0.41</version>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
