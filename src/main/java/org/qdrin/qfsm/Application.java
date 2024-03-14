@@ -11,14 +11,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.statemachine.data.StateMachineRepository;
 
 import com.zaxxer.hikari.HikariDataSource;
 
 
 @Slf4j
 @SpringBootApplication
-@EntityScan
+@EntityScan(basePackages={"org.qdrin.qfsm.model.*"})
 public class Application implements CommandLineRunner {
 
 	@Autowired
