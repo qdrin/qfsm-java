@@ -14,7 +14,7 @@ public class ProlongGuard implements Guard<String, String> {
   @Override
   public boolean evaluate(StateContext<String, String> context) {
     boolean res = new ActiveStatesGuard(Arrays.asList("Paid", "PriceActive")).evaluate(context);
-    Product product = (Product) context.getExtendedState().getVariables().get("product");
+    Product product = context.getExtendedState().get("product", Product.class);
     int tPeriod = product.getTarificationPeriod();
     // log.debug("ProlongGuard res: {}, tarificationPeriod: {}", res, tPeriod);
     return res && (tPeriod > 1);

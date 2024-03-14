@@ -12,10 +12,12 @@ import org.qdrin.qfsm.repository.ContextRepository;
 import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.StateMachinePersist;
 
 import org.springframework.statemachine.kryo.*;
+import org.springframework.statemachine.support.AbstractStateMachine;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -36,7 +38,7 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
   private ProductRepository productRepository;
 
   @Autowired
-  private ContextRepository contextRepository;  
+  private ContextRepository contextRepository;
   
   private static QStateMachineContextConverter converter = new QStateMachineContextConverter();
   // private static StateMachineContextSerializer<String, String> serializer = new StateMachineContextSerializer<>();
@@ -46,7 +48,8 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
   public void write(StateMachineContext<String, String> context, String machineId) throws Exception {
     Map<Object, Object> variables = context.getExtendedState().getVariables();
     Product product = (Product) variables.getOrDefault("product", new Product());
-    context.getExtendedState().getVariables().remove("product");
+    variables.put("product", "");
+    // variables.remove("product");
     ContextEntity ce = new ContextEntity();
     ce.setProductId(machineId);
     ce.setContext(converter.toBytes(context));

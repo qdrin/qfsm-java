@@ -19,7 +19,7 @@ public class EntryExit implements Action<String, String> {
     ProductPrice price = ExternalData.RequestProductPrice();
     // product.setProductPrices(Arrays.asList(price));
     product.setProductPrices(price);
-    context.getStateMachine().getExtendedState().getVariables().put("product", product);
+    context.getExtendedState().getVariables().put("product", product);
     log.debug("EntryExit product: {}", product);
   }
 }

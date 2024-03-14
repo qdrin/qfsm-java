@@ -17,9 +17,8 @@ public class PriceChangingEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
     log.debug("PriceChangingEntry started. event: {}, message: {}", context.getEvent(), context.getMessage());
+    Product product = context.getExtendedState().get("product", Product.class);
     Map<Object, Object> variables = context.getExtendedState().getVariables();
-    // Emulate external price-calculator request;
-    Product product = (Product) variables.get("product");
     int tPeriod = product.getTarificationPeriod();
     if (tPeriod == 0) {
       ProductPrice price = PriceHelper.getProductPrice(context);
