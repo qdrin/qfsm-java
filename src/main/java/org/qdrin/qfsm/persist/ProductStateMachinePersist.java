@@ -44,12 +44,21 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
   // private static StateMachineContextSerializer<String, String> serializer = new StateMachineContextSerializer<>();
   // private static Kryo kryo = new Kryo();
 
+  private void clearVariables(StateMachineContext<String, String> context, boolean clearSelf) {
+    if(clearSelf) {
+      context.getExtendedState().getVariables().clear();
+    }
+    for(StateMachineContext<String, String> child: context.getChilds()) {
+      clearVariables(child, true);
+    }
+  }
+
   // @Override
   public void write(StateMachineContext<String, String> context, String machineId) throws Exception {
     Map<Object, Object> variables = context.getExtendedState().getVariables();
+    clearVariables(context, false);
     Product product = (Product) variables.getOrDefault("product", new Product());
-    variables.put("product", "");
-    // variables.remove("product");
+    variables.remove("product");
     ContextEntity ce = new ContextEntity();
     ce.setProductId(machineId);
     ce.setContext(converter.toBytes(context));
@@ -58,7 +67,7 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
     }
     productRepository.save(product);
     contextRepository.save(ce);
-    log.debug("saving machineId {}, product: {}", machineId, product);
+    // log.debug("saving machineId {}, product: {}", machineId, product);
     // contexts.put(machineId, context);
   }
   
@@ -72,7 +81,6 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
     Product product = op.get();
     byte[] bcontext = cep.get().getContext();
     StateMachineContext<String, String> context = converter.toContext(bcontext);
-    log.debug("read context: {}", context);
     context.getExtendedState().getVariables().put("product", product);
     if(product.getProductId() == null) {
       log.debug("new product, set productId to '{}'", machineId);

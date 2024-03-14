@@ -28,7 +28,6 @@ public class QStateMachineContextConverter {
     kryo.addDefaultSerializer(StateMachineContext.class, serializer);
     Output output = new Output(maxBufSize);
     kryo.writeClassAndObject(output, context);
-    log.debug("output: {}", output);
     return output.toBytes();
   }
 }
