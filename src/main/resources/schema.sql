@@ -1,4 +1,4 @@
-create table scheduled_tasks (
+create table if not exists scheduled_tasks (
   task_name text not null,
   task_instance text not null,
   task_data bytea,
@@ -13,5 +13,5 @@ create table scheduled_tasks (
   PRIMARY KEY (task_name, task_instance)
 );
 
-CREATE INDEX execution_time_idx ON scheduled_tasks (execution_time);
-CREATE INDEX last_heartbeat_idx ON scheduled_tasks (last_heartbeat);
+CREATE INDEX if not exists execution_time_idx ON scheduled_tasks (execution_time);
+CREATE INDEX if not exists last_heartbeat_idx ON scheduled_tasks (last_heartbeat);

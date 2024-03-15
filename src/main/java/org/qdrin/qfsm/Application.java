@@ -17,7 +17,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 @Slf4j
 @SpringBootApplication
-@EntityScan  // (basePackages={"org.qdrin.qfsm.model"})
+@EntityScan
 public class Application implements CommandLineRunner {
 
 	@Autowired
