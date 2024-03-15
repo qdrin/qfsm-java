@@ -13,6 +13,7 @@ spring:
       enabled: true
   jpa:
     show-sql: true
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
     properties:
@@ -24,7 +25,9 @@ spring:
     console:
       enabled: true
       path: /console/
-
+  sql:
+    init:
+      mode: always
   datasource:
     # url: jdbc:h2:mem:test
     url: jdbc:h2:file:./tmp/psi_db
@@ -40,3 +43,6 @@ spring:
     enabled: false
   environment:
     istio-host: ${ISTIO_HOST:localhost}
+# db-scheduler:
+#   threads: 3
+#   polling-interval: 5s

@@ -1,7 +1,5 @@
 package org.qdrin.qfsm.model;
 
-import java.util.Map;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
@@ -18,7 +16,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ContextEntity {
   @Id String productId;
-  // @Id String machineId;
   @Lob
   byte[] context;
 }
