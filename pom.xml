@@ -50,7 +50,8 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.statemachine</groupId>
-            <artifactId>spring-statemachine-data-jpa</artifactId>
+            <artifactId>spring-statemachine-kryo</artifactId>
+            <!-- <artifactId>spring-statemachine-data-jpa</artifactId> -->
             <version>${spring-statemachine.version}</version>
         </dependency>
         <dependency>

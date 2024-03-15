@@ -6,8 +6,6 @@ import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
 import org.qdrin.qfsm.persist.ProductStateMachinePersist;
-import org.qdrin.qfsm.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.config.EnableStateMachine;
@@ -23,9 +21,6 @@ import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
 @Configuration
 public class StateMachineConfig {
 
-	@Autowired
-	ProductRepository productRepository;
-
 	@Bean
 	ProductStateMachinePersist stateMachinePersist() {
 		return new ProductStateMachinePersist();
@@ -38,7 +33,6 @@ public class StateMachineConfig {
 
   @Configuration
   @EnableStateMachine
-  // @EnableStateMachineFactory
   public static class MachineConfig extends StateMachineConfigurerAdapter<String, String> {
 
     @Override
