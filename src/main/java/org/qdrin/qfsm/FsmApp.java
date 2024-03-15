@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -61,6 +62,30 @@ public class FsmApp {
     log.info("current state: {}, variables: {}", machineState, variables);
     System.out.print("input event name:");
     String event = scanner.nextLine();
+    sendEvent(machine, event);
+    machineState = getMachineState(machine.getState());
+    variables = machine.getExtendedState().getVariables();
+    log.info("new state: {}, variables: {}", machineState, variables);
+		try {
+			persister.persist(machine, machineId);
+		} catch (Exception e) {
+			log.error("Cannot persist stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
+		}
+  }
+
+	public void sendEvent(String machineId, String event) {
+		StateMachine<String, String> machine = stateMachine;
+		try {
+			persister.restore(machine, machineId);
+			log.debug("machine.getId(): {}", machine.getId());
+		} catch(Exception e) {
+			log.error("Cannot restore stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
+			e.printStackTrace();
+			return;
+		}
+    String machineState = getMachineState(machine.getState());
+    var variables = machine.getExtendedState().getVariables();
+    log.info("current state: {}, variables: {}", machineState, variables);
     sendEvent(machine, event);
     machineState = getMachineState(machine.getState());
     variables = machine.getExtendedState().getVariables();

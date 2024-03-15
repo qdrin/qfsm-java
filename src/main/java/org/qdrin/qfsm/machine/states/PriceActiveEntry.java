@@ -14,6 +14,7 @@ import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay;
 import org.qdrin.qfsm.tasks.ScheduledTasks;
 import org.qdrin.qfsm.tasks.ScheduledTasks.TaskContext;
 
+import java.time.Instant;
 import java.util.function.Consumer;
 
 import javax.sql.DataSource;
@@ -39,13 +40,11 @@ public class PriceActiveEntry implements Action<String, String> {
     if(! context.getEvent().equals("complete_price")) {
       product.setActiveEndDate(nextPrice.getNextPayDate());
       Consumer<TaskContext> priceEndedFunc = ScheduledTasks::startPriceEndedTask;
-      Consumer<TaskContext> changePriceFunc = ScheduledTasks::startChangePriceTask;
       TaskContext ctx = new TaskContext();
       ctx.id = product.getProductId();
       ctx.schedulerClient = schedulerClient;
-      ctx.wakeAt = product.getActiveEndDate().toInstant();
+      ctx.wakeAt = Instant.now().plusSeconds(90);  // product.getActiveEndDate().toInstant();
       priceEndedFunc.accept(ctx);
-      changePriceFunc.accept(ctx);
       context.getStateMachine().getExtendedState().getVariables().remove("nextPrice");
     }
   }
