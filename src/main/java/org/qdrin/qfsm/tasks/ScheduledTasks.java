@@ -18,17 +18,23 @@ import com.github.kagkarlsson.scheduler.task.helper.OneTimeTask;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
 import com.github.kagkarlsson.scheduler.task.schedule.Schedule;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Slf4j
 public class ScheduledTasks {
+  @AllArgsConstructor
+  @NoArgsConstructor
   public static class TaskContext {
     public SchedulerClient schedulerClient;
     public String id;
     public Instant wakeAt;
   }
 
+  @Autowired
+  FsmApp fsmApp;
 
   public static final TaskWithoutDataDescriptor price_ended_TASK = new TaskWithoutDataDescriptor("price_ended");
   public static final TaskWithoutDataDescriptor change_price_TASK = new TaskWithoutDataDescriptor("change_price");
@@ -38,13 +44,13 @@ public class ScheduledTasks {
     taskContext.schedulerClient.schedule(price_ended_TASK.instance(taskContext.id), taskContext.wakeAt);
   }
 
-  public static void startChangePriceTask(TaskContext taskContext) {
-    taskContext.schedulerClient.schedule(change_price_TASK.instance(taskContext.id), taskContext.wakeAt);
-  }
+  // public static void startChangePriceTask(TaskContext taskContext) {
+  //   schedulerClient.schedule(change_price_TASK.instance(taskContext.id), taskContext.wakeAt);
+  // }
 
-  public static void startDisconnectTask(TaskContext taskContext) {
-    taskContext.schedulerClient.schedule(disconnect_TASK.instance(taskContext.id), taskContext.wakeAt);
-  }
+  // public static void startDisconnectTask(TaskContext taskContext) {
+  //   schedulerClient.schedule(disconnect_TASK.instance(taskContext.id), taskContext.wakeAt);
+  // }
 
   @Bean
   Task<Void> disconnectTask() {

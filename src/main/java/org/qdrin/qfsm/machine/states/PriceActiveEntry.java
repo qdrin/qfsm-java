@@ -6,6 +6,7 @@ import org.springframework.statemachine.action.Action;
 
 import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
+import com.github.kagkarlsson.scheduler.serializer.JacksonSerializer;
 import com.github.kagkarlsson.scheduler.task.Task;
 import com.github.kagkarlsson.scheduler.task.helper.OneTimeTask;
 import com.github.kagkarlsson.scheduler.task.helper.RecurringTask;
@@ -29,8 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 public class PriceActiveEntry implements Action<String, String> {
 
   @Autowired
-  SchedulerClient schedulerClient;
-  
+  DataSource dataSource;
+
   @Override
   public void execute(StateContext<String, String> context) {
     log.debug("PriceActiveEntry started. event: {}", context.getEvent());
@@ -39,11 +40,12 @@ public class PriceActiveEntry implements Action<String, String> {
     ProductPrice nextPrice = context.getStateMachine().getExtendedState().get("nextPrice", ProductPrice.class);
     if(! context.getEvent().equals("complete_price")) {
       product.setActiveEndDate(nextPrice.getNextPayDate());
+      final SchedulerClient schedulerClient =
+        SchedulerClient.Builder.create(dataSource)
+            .serializer(new JacksonSerializer())
+            .build();
       Consumer<TaskContext> priceEndedFunc = ScheduledTasks::startPriceEndedTask;
-      TaskContext ctx = new TaskContext();
-      ctx.id = product.getProductId();
-      ctx.schedulerClient = schedulerClient;
-      ctx.wakeAt = Instant.now().plusSeconds(90);  // product.getActiveEndDate().toInstant();
+      TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), Instant.now().plusSeconds(90));
       priceEndedFunc.accept(ctx);
       context.getStateMachine().getExtendedState().getVariables().remove("nextPrice");
     }
