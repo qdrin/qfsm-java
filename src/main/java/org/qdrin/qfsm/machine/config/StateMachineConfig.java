@@ -2,6 +2,7 @@ package org.qdrin.qfsm.machine.config;
 
 import java.util.Optional;
 
+import org.qdrin.qfsm.machine.actions.DeleteTaskAction;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
@@ -59,8 +60,8 @@ public class StateMachineConfig {
     }
 
     @Bean
-    EntryExit entryExit() {
-      return new EntryExit();
+    CreateProduct createProduct() {
+      return new CreateProduct();
     }
 
     @Bean
@@ -71,6 +72,11 @@ public class StateMachineConfig {
     @Bean
     PaidEntry paidEntry() {
       return new PaidEntry();
+    }
+
+    @Bean
+    DeleteTaskAction deleteWaitingPayEnded() {
+      return new DeleteTaskAction("waiting_pay_ended");
     }
 
     @Bean

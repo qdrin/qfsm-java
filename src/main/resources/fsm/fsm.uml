@@ -170,9 +170,9 @@
                   <language>bean</language>
                   <body>waitingPaymentEntry</body>
                 </entry>
-                <exit xmi:type="uml:FunctionBehavior" xmi:id="_cWKn8ONvEe697snvjqqg5w">
-                  <language>spel</language>
-                  <body>extendedState.getVariables().put(&quot;deleteTask&quot;, &quot;waiting_pay_ended&quot;)</body>
+                <exit xmi:type="uml:OpaqueBehavior" xmi:id="_aGW88ON5Ee6YxOpG5EP8Tw">
+                  <language>bean</language>
+                  <body>deleteWaitingPayEnded</body>
                 </exit>
               </subvertex>
               <subvertex xmi:type="uml:State" xmi:id="_feRXAL9BEe65db1_bM-TwQ" name="NotPaid"/>
@@ -285,9 +285,9 @@
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_lUS-kLoEEe6yNs2FzguhlQ" name="ProvisionJoin" kind="join"/>
       <subvertex xmi:type="uml:State" xmi:id="__Z-08LzsEe6WIIctFrkbQg" name="Disconnect"/>
       <subvertex xmi:type="uml:State" xmi:id="_mBTgYMlsEe6D_qDhyLHyWw" name="Entry">
-        <exit xmi:type="uml:OpaqueBehavior" xmi:id="_NRilkMltEe6D_qDhyLHyWw" visibility="private">
+        <exit xmi:type="uml:OpaqueBehavior" xmi:id="_MSF0cON8Ee6jrIJXmDVxqg">
           <language>bean</language>
-          <body>entryExit</body>
+          <body>createProduct</body>
         </exit>
       </subvertex>
     </region>

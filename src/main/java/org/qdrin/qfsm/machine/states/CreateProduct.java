@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class EntryExit implements Action<String, String> {
+public class CreateProduct implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
     Product product = new Product();
@@ -20,6 +20,6 @@ public class EntryExit implements Action<String, String> {
     // product.setProductPrices(Arrays.asList(price));
     product.setProductPrices(price);
     context.getExtendedState().getVariables().put("product", product);
-    log.debug("EntryExit product: {}", product);
+    log.debug("created product: {}", product);
   }
 }
