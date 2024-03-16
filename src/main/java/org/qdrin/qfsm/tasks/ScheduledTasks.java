@@ -39,18 +39,23 @@ public class ScheduledTasks {
   public static final TaskWithoutDataDescriptor price_ended_TASK = new TaskWithoutDataDescriptor("price_ended");
   public static final TaskWithoutDataDescriptor change_price_TASK = new TaskWithoutDataDescriptor("change_price");
   public static final TaskWithoutDataDescriptor disconnect_TASK = new TaskWithoutDataDescriptor("disconnect");
+  public static final TaskWithoutDataDescriptor waiting_pay_ended_TASK = new TaskWithoutDataDescriptor("waiting_pay_ended");
 
   public static void startPriceEndedTask(TaskContext taskContext) {
     taskContext.schedulerClient.schedule(price_ended_TASK.instance(taskContext.id), taskContext.wakeAt);
   }
 
-  // public static void startChangePriceTask(TaskContext taskContext) {
-  //   schedulerClient.schedule(change_price_TASK.instance(taskContext.id), taskContext.wakeAt);
-  // }
+  public static void startChangePriceTask(TaskContext taskContext) {
+    taskContext.schedulerClient.schedule(change_price_TASK.instance(taskContext.id), taskContext.wakeAt);
+  }
 
-  // public static void startDisconnectTask(TaskContext taskContext) {
-  //   schedulerClient.schedule(disconnect_TASK.instance(taskContext.id), taskContext.wakeAt);
-  // }
+  public static void startDisconnectTask(TaskContext taskContext) {
+    taskContext.schedulerClient.schedule(disconnect_TASK.instance(taskContext.id), taskContext.wakeAt);
+  }
+
+  public static void startWaitingPayEndedTask(TaskContext taskContext) {
+    taskContext.schedulerClient.schedule(waiting_pay_ended_TASK.instance(taskContext.id), taskContext.wakeAt);
+  }
 
   @Bean
   Task<Void> disconnectTask() {
@@ -71,6 +76,13 @@ public class ScheduledTasks {
     return Tasks
         .oneTime(change_price_TASK)
         .execute(getTaskInstance(change_price_TASK));
+  }
+
+  @Bean
+  Task<Void> waitingPayEndedTask() {
+    return Tasks
+        .oneTime(waiting_pay_ended_TASK)
+        .execute(getTaskInstance(waiting_pay_ended_TASK));
   }
 
   private VoidExecutionHandler<Void> getTaskInstance(TaskWithoutDataDescriptor descriptor) {

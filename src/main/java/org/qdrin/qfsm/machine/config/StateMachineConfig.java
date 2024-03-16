@@ -52,6 +52,12 @@ public class StateMachineConfig {
   public static class SchemeBeans {
     // ------------------------------------------------------------------------------------------
     // actions
+    // TODO: Remove after debug
+    @Bean
+    DebugAction debugAction() {
+      return new DebugAction();
+    }
+
     @Bean
     EntryExit entryExit() {
       return new EntryExit();
@@ -65,6 +71,16 @@ public class StateMachineConfig {
     @Bean
     PaidEntry paidEntry() {
       return new PaidEntry();
+    }
+
+    @Bean
+    WaitingPaymentEntry waitingPaymentEntry() {
+      return new WaitingPaymentEntry();
+    }
+
+    @Bean
+    WaitingPaymentExit waitingPaymentExit() {
+      return new WaitingPaymentExit();
     }
 
     @Bean

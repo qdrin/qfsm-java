@@ -45,7 +45,7 @@ public class PriceActiveEntry implements Action<String, String> {
             .serializer(new JacksonSerializer())
             .build();
       Consumer<TaskContext> priceEndedFunc = ScheduledTasks::startPriceEndedTask;
-      TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), Instant.now().plusSeconds(90));
+      TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), product.getActiveEndDate().toInstant());
       priceEndedFunc.accept(ctx);
       context.getStateMachine().getExtendedState().getVariables().remove("nextPrice");
     }

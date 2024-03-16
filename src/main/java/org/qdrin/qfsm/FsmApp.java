@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -51,7 +50,6 @@ public class FsmApp {
 		StateMachine<String, String> machine = stateMachine;
 		try {
 			persister.restore(machine, machineId);
-			log.debug("machine.getId(): {}", machine.getId());
 		} catch(Exception e) {
 			log.error("Cannot restore stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
 			e.printStackTrace();
