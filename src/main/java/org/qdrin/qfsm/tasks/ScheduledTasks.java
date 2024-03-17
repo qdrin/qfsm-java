@@ -40,6 +40,7 @@ public class ScheduledTasks {
   public static final TaskWithoutDataDescriptor change_price_TASK = new TaskWithoutDataDescriptor("change_price");
   public static final TaskWithoutDataDescriptor disconnect_TASK = new TaskWithoutDataDescriptor("disconnect");
   public static final TaskWithoutDataDescriptor waiting_pay_ended_TASK = new TaskWithoutDataDescriptor("waiting_pay_ended");
+  public static final TaskWithoutDataDescriptor suspend_ended_TASK = new TaskWithoutDataDescriptor("suspend_ended");
 
   public static void startPriceEndedTask(TaskContext taskContext) {
     taskContext.schedulerClient.schedule(price_ended_TASK.instance(taskContext.id), taskContext.wakeAt);
@@ -55,6 +56,10 @@ public class ScheduledTasks {
 
   public static void startWaitingPayEndedTask(TaskContext taskContext) {
     taskContext.schedulerClient.schedule(waiting_pay_ended_TASK.instance(taskContext.id), taskContext.wakeAt);
+  }
+
+  public static void startSuspendEndedTask(TaskContext taskContext) {
+    taskContext.schedulerClient.schedule(suspend_ended_TASK.instance(taskContext.id), taskContext.wakeAt);
   }
 
   @Bean
@@ -83,6 +88,13 @@ public class ScheduledTasks {
     return Tasks
         .oneTime(waiting_pay_ended_TASK)
         .execute(getTaskInstance(waiting_pay_ended_TASK));
+  }
+
+  @Bean
+  Task<Void> suspendEndedTask() {
+    return Tasks
+        .oneTime(suspend_ended_TASK)
+        .execute(getTaskInstance(suspend_ended_TASK));
   }
 
   private VoidExecutionHandler<Void> getTaskInstance(TaskWithoutDataDescriptor descriptor) {

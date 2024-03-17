@@ -20,21 +20,22 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class WaitingPaymentEntry implements Action<String, String> {
+public class SuspendedEntry implements Action<String, String> {
 
   @Autowired
   DataSource dataSource;
 
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("WaitingPaymentEntry started. event: {}", context.getEvent());
+    log.debug("SuspendedEntry started. event: {}", context.getEvent());
     Product product = context.getExtendedState().get("product", Product.class);
     final SchedulerClient schedulerClient =
       SchedulerClient.Builder.create(dataSource)
           .serializer(new JacksonSerializer())
           .build();
-    Consumer<TaskContext> waitingPayEndedFunc = ScheduledTasks::startWaitingPayEndedTask;
-    TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), Instant.now().plusSeconds(7200));
-    waitingPayEndedFunc.accept(ctx);
+    Consumer<TaskContext> suspendEndedFunc = ScheduledTasks::startSuspendEndedTask;
+    // TODO: substitube wakeAt with configurable Instant value
+    TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), Instant.now().plusSeconds(30*86400));
+    suspendEndedFunc.accept(ctx);
   }
 }

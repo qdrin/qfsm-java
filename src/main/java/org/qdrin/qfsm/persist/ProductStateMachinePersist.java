@@ -71,7 +71,6 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
       product.setProductId(machineId);
     }
     return context;
-    // return contexts.get(machineId);
   }
 }
 

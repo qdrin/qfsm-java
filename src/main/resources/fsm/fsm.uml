@@ -94,7 +94,16 @@
                 </region>
               </subvertex>
               <subvertex xmi:type="uml:Pseudostate" xmi:id="_zsHvYL9MEe65db1_bM-TwQ" name=""/>
-              <subvertex xmi:type="uml:State" xmi:id="_KhfkoL9NEe65db1_bM-TwQ" name="Suspended"/>
+              <subvertex xmi:type="uml:State" xmi:id="_KhfkoL9NEe65db1_bM-TwQ" name="Suspended">
+                <entry xmi:type="uml:OpaqueBehavior" xmi:id="_VykIcORpEe67v-ZZRTSIIQ">
+                  <language>bean</language>
+                  <body>suspendedEntry</body>
+                </entry>
+                <exit xmi:type="uml:OpaqueBehavior" xmi:id="_YqQHQORpEe67v-ZZRTSIIQ">
+                  <language>bean</language>
+                  <body>suspendedExit</body>
+                </exit>
+              </subvertex>
               <subvertex xmi:type="uml:State" xmi:id="_UnhUQL9fEe65db1_bM-TwQ" name="Suspending">
                 <entry xmi:type="uml:OpaqueBehavior" xmi:id="_gDlN8MM7Ee6X9syf-CmCRw">
                   <language>bean</language>
@@ -175,7 +184,12 @@
                   <body>waitingPaymentExit</body>
                 </exit>
               </subvertex>
-              <subvertex xmi:type="uml:State" xmi:id="_feRXAL9BEe65db1_bM-TwQ" name="NotPaid"/>
+              <subvertex xmi:type="uml:State" xmi:id="_feRXAL9BEe65db1_bM-TwQ" name="NotPaid">
+                <entry xmi:type="uml:OpaqueBehavior" xmi:id="_tTnlsORuEe67v-ZZRTSIIQ">
+                  <language>bean</language>
+                  <body>notPaidEntry</body>
+                </entry>
+              </subvertex>
               <subvertex xmi:type="uml:Pseudostate" xmi:id="_jJ1NUL9CEe65db1_bM-TwQ"/>
             </region>
           </subvertex>

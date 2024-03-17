@@ -2,8 +2,6 @@ package org.qdrin.qfsm.machine.config;
 
 import java.util.Optional;
 
-import javax.sql.DataSource;
-
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
@@ -76,6 +74,11 @@ public class StateMachineConfig {
     }
 
     @Bean
+    NotPaidEntry notPaidEntry() {
+      return new NotPaidEntry();
+    }
+
+    @Bean
     WaitingPaymentEntry waitingPaymentEntry() {
       return new WaitingPaymentEntry();
     }
@@ -108,6 +111,16 @@ public class StateMachineConfig {
     @Bean
     SuspendingEntry suspendingEntry() {
       return new SuspendingEntry();
+    }
+
+    @Bean
+    SuspendedEntry suspendedEntry() {
+      return new SuspendedEntry();
+    }
+
+    @Bean
+    SuspendedExit suspendedExit() {
+      return new SuspendedExit();
     }
 
     @Bean
