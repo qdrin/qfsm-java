@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.annotation.OnStateEntry;
+import org.springframework.statemachine.annotation.OnStateExit;
 import org.springframework.statemachine.annotation.WithStateMachine;
 import org.springframework.statemachine.state.State;
 import org.qdrin.qfsm.model.Product;
@@ -27,6 +28,7 @@ public class StateStatus {
   @OnStateEntry
   public void setStatus(StateContext<String, String> context) {
     State<String, String> state = context.getTarget();
+    log.debug("entry state '{}'", state.getId());
     var extendedState = context.getExtendedState();
     String status = statusMap.getOrDefault(state.getId(), null);
     if(status != null) {

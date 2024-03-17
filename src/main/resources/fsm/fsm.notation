@@ -364,9 +364,9 @@
                               <element xmi:type="uml:OpaqueBehavior" href="fsm.uml#_Vp1vUONuEe697snvjqqg5w"/>
                               <layoutConstraint xmi:type="notation:Location" xmi:id="_Vp6n0eNuEe697snvjqqg5w" x="-10" y="-10"/>
                             </children>
-                            <children xmi:type="notation:Shape" xmi:id="_aIVS4ON5Ee6YxOpG5EP8Tw" type="Behavior_ExitBehaviorLabel">
-                              <element xmi:type="uml:OpaqueBehavior" href="fsm.uml#_aGW88ON5Ee6YxOpG5EP8Tw"/>
-                              <layoutConstraint xmi:type="notation:Location" xmi:id="_aIVS4eN5Ee6YxOpG5EP8Tw" x="-10" y="-10"/>
+                            <children xmi:type="notation:Shape" xmi:id="_b4jSgOOpEe6QYJFzFaBM1w" type="Behavior_ExitBehaviorLabel">
+                              <element xmi:type="uml:OpaqueBehavior" href="fsm.uml#_b4eaAOOpEe6QYJFzFaBM1w"/>
+                              <layoutConstraint xmi:type="notation:Location" xmi:id="_b4jSgeOpEe6QYJFzFaBM1w" x="-10" y="-10"/>
                             </children>
                             <element xmi:type="uml:State" href="fsm.uml#_cx3bIL9BEe65db1_bM-TwQ"/>
                             <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cyUHEb9BEe65db1_bM-TwQ" x="414" y="118"/>

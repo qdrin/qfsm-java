@@ -1,8 +1,5 @@
 package org.qdrin.qfsm.machine.states;
 
-import org.qdrin.qfsm.model.Product;
-import org.qdrin.qfsm.model.ProductPrice;
-import org.qdrin.qfsm.tasks.ExternalData;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 

@@ -5,8 +5,10 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 public class SignalAction implements Action<String, String> {
   private String signal;
   public SignalAction(String signal) {
@@ -14,7 +16,7 @@ public class SignalAction implements Action<String, String> {
   }
   @Override
   public void execute(StateContext<String, String> context) {
-    // log.debug("SignalAction.execute signal: {}", signal);
+    log.debug("SignalAction.execute signal: {}", signal);
     Mono<Message<String>> msg = Mono.just(MessageBuilder
       .withPayload(signal).build());
     var res = context.getStateMachine().sendEvent(msg).collectList();

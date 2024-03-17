@@ -170,9 +170,9 @@
                   <language>bean</language>
                   <body>waitingPaymentEntry</body>
                 </entry>
-                <exit xmi:type="uml:OpaqueBehavior" xmi:id="_aGW88ON5Ee6YxOpG5EP8Tw">
+                <exit xmi:type="uml:OpaqueBehavior" xmi:id="_b4eaAOOpEe6QYJFzFaBM1w">
                   <language>bean</language>
-                  <body>deleteWaitingPayEnded</body>
+                  <body>debugAction</body>
                 </exit>
               </subvertex>
               <subvertex xmi:type="uml:State" xmi:id="_feRXAL9BEe65db1_bM-TwQ" name="NotPaid"/>
