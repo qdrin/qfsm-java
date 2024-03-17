@@ -51,7 +51,7 @@ public class StateMachineConfig {
   }
 
   @Configuration
-  public static class SchemeBeans {
+  public class SchemeBeans {
     // ------------------------------------------------------------------------------------------
     // actions
     // TODO: Remove after debug
