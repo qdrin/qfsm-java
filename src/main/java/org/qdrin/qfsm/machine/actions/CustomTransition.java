@@ -5,7 +5,10 @@ import java.util.function.Function;
 
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.annotation.*;
+import org.springframework.statemachine.state.AbstractState;
+import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,15 +24,20 @@ public class CustomTransition {
         StateContext<String, String> context
         ) {
     State<String, String> state = context.getSource();
+    StateMachine<String, String> machine = context.getStateMachine();
+    AbstractState<String, String> mstate = (AbstractState<String, String>) machine.getState();
     ExtendedState extendedState = context.getExtendedState();
     int count = (int) extendedState.getVariables().getOrDefault("transitionCount", 0) + 1;
     extendedState.getVariables().put("transitionCount", count);
     log.debug("registerTransition state: {}, transitionCount: {}", state.getId(), count);
     
-    Collection<Function<StateContext<String, String>, Mono<Void>>> exitActions = state.getExitActions();
-    for(Function<StateContext<String, String>, Mono<Void>> action: exitActions) {
-      log.debug("registerTransition run exitAction: {}", action.getClass().getSimpleName());
-      action.apply(context).block();
+    // TODO: Check condition function for it may cause double action call
+    if(mstate.isComposite()) { 
+      Collection<Function<StateContext<String, String>, Mono<Void>>> exitActions = state.getExitActions();
+      for(Function<StateContext<String, String>, Mono<Void>> action: exitActions) {
+        log.debug("registerTransition run exitAction: {}", action.getClass().getSimpleName());
+        action.apply(context).block();
+      }
     }
   }
 }

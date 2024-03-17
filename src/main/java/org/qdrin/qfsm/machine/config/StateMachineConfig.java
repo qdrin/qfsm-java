@@ -2,7 +2,8 @@ package org.qdrin.qfsm.machine.config;
 
 import java.util.Optional;
 
-import org.qdrin.qfsm.machine.actions.DeleteTaskAction;
+import javax.sql.DataSource;
+
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
@@ -43,8 +44,8 @@ public class StateMachineConfig {
 
     @Bean
     public StateMachineModelFactory<String, String> modelFactory() {
-      // UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
-      UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm.simple/fsm.uml");
+      UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
+      // UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm.simple/fsm.uml");
       return factory;
     }
   }
@@ -72,11 +73,6 @@ public class StateMachineConfig {
     @Bean
     PaidEntry paidEntry() {
       return new PaidEntry();
-    }
-
-    @Bean
-    DeleteTaskAction deleteWaitingPayEnded() {
-      return new DeleteTaskAction("waiting_pay_ended");
     }
 
     @Bean

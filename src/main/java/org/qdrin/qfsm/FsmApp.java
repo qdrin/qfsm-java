@@ -30,7 +30,7 @@ public class FsmApp {
   public String getMachineState(State<String, String> state) {
 		String mstate = state.getId();
 		if (state.isOrthogonal()) {
-			RegionState<String, String> rstate = (RegionState) state;
+			RegionState<String, String> rstate = (RegionState<String, String>) state;
 			mstate += "->[";
 			for(var r: rstate.getRegions()) {
 				// log.info("orthogonal region: {}, state: {}", r.getId(), r.getState().getId());
