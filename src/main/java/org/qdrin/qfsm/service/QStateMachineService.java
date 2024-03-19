@@ -19,6 +19,7 @@ import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.service.StateMachineService;
+import org.springframework.statemachine.support.AbstractStateMachine;
 import org.springframework.util.Assert;
 
 import lombok.extern.slf4j.Slf4j;
@@ -84,9 +85,9 @@ public class QStateMachineService<S, E> implements StateMachineService<S, E>, Di
 				stateMachine = stateMachineFactory.getStateMachine(machineId);
 				try {
 					stateMachinePersister.restore(stateMachine, machineId);
+					((AbstractStateMachine<S, E>) stateMachine).setId(machineId);
 				} catch (Exception e) {
 					log.error("Cannot restore stateMachineId: '{}': {}", machineId, e.getLocalizedMessage());
-					e.printStackTrace();
 					return null;
 				}
 				machines.put(machineId, stateMachine);
