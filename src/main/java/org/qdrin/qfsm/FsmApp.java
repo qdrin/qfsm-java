@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.persist.StateMachinePersister;
+import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
@@ -20,8 +22,11 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class FsmApp {
 
+	// @Autowired
+	// StateMachineFactory<String, String> stateMachineFactory;
+
 	@Autowired
-  StateMachine<String, String> stateMachine;
+  StateMachineService<String, String> stateMachineService;
 	
 	@Autowired
 	StateMachinePersister<String, String, String> persister;
@@ -46,15 +51,13 @@ public class FsmApp {
 		return mstate;
 	}
 
+	public Object getVariable(String machineId, String varname) {
+		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
+		return machine.getExtendedState().get(varname, Object.class);
+	}
+
   public void sendUserEvent(String machineId, Scanner scanner) {
-		StateMachine<String, String> machine = stateMachine;
-		try {
-			persister.restore(machine, machineId);
-		} catch(Exception e) {
-			log.error("Cannot restore stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
-			e.printStackTrace();
-			return;
-		}
+		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
     String machineState = getMachineState(machine.getState());
     var variables = machine.getExtendedState().getVariables();
     log.info("current state: {}, variables: {}", machineState, variables);
@@ -64,15 +67,11 @@ public class FsmApp {
     machineState = getMachineState(machine.getState());
     variables = machine.getExtendedState().getVariables();
     log.info("new state: {}, variables: {}", machineState, variables);
-		try {
-			persister.persist(machine, machineId);
-		} catch (Exception e) {
-			log.error("Cannot persist stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
-		}
+		// stateMachineService.releaseStateMachine(machineId);
   }
 
 	public void sendEvent(String machineId, String event) {
-		StateMachine<String, String> machine = stateMachine;
+		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 		try {
 			persister.restore(machine, machineId);
 			log.debug("machine.getId(): {}", machine.getId());
@@ -88,15 +87,10 @@ public class FsmApp {
     machineState = getMachineState(machine.getState());
     variables = machine.getExtendedState().getVariables();
     log.info("new state: {}, variables: {}", machineState, variables);
-		try {
-			persister.persist(machine, machineId);
-		} catch (Exception e) {
-			log.error("Cannot persist stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
-		}
+		stateMachineService.releaseStateMachine(machineId);
   }
 
   public void sendEvent(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {
-    // StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 		Map<Object, Object> variables = machine.getExtendedState().getVariables();
 		variables.put("transitionCount", 0);
 
@@ -114,10 +108,6 @@ public class FsmApp {
 
 		int trcount = (int) machine.getExtendedState().getVariables().get("transitionCount");
 		// Here we can distinguish accepted event from non-accepted
-		if(trcount == 0) {
-			log.error("Not transition triggered. Event vasted");
-		} else {
-			log.info("event processed, transitionCount={}", trcount);
-		}
+		stateMachineService.releaseStateMachine(machine.getId());
 	}
 }

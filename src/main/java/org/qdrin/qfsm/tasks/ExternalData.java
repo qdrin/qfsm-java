@@ -1,8 +1,5 @@
 package org.qdrin.qfsm.tasks;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Scanner;
 
 import org.qdrin.qfsm.model.ProductPrice;
@@ -10,7 +7,6 @@ import org.qdrin.qfsm.model.ProductPrice;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.OffsetDateTime;
-import java.time.LocalDateTime;
 
 @Slf4j
 public class ExternalData {
@@ -43,6 +39,7 @@ public class ExternalData {
     } else {
       price.setNextPayDate(OffsetDateTime.now().plusDays(30));
     }
+    // in.close();
 		return price;
   }
 }

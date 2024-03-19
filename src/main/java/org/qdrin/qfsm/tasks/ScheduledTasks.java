@@ -1,22 +1,19 @@
 package org.qdrin.qfsm.tasks;
 
-import java.time.Duration;
 import java.time.Instant;
 
-import javax.sql.DataSource;
 
 import org.qdrin.qfsm.FsmApp;
-import org.slf4j.LoggerFactory;
+import org.qdrin.qfsm.model.*;
+import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.StateMachine;
 
-import com.github.kagkarlsson.scheduler.Scheduler;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.*;
-import com.github.kagkarlsson.scheduler.task.helper.OneTimeTask;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
-import com.github.kagkarlsson.scheduler.task.schedule.Schedule;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -32,6 +29,9 @@ public class ScheduledTasks {
     public String id;
     public Instant wakeAt;
   }
+
+  @Autowired
+  ProductRepository productRepository;
 
   @Autowired
   FsmApp fsmApp;
@@ -80,7 +80,16 @@ public class ScheduledTasks {
   Task<Void> changePriceTask() {
     return Tasks
         .oneTime(change_price_TASK)
-        .execute(getTaskInstance(change_price_TASK));
+        .execute((instance, ctx) -> {
+          String productId = instance.getId();
+          String eventType = instance.getTaskName();
+          log.info("task instance run. productId: {}, taskName: {}", productId, eventType);
+          Product product = productRepository.findById(productId).get();
+          if(product == null) {
+            return;
+          }
+          ProductPrice nextPrice = ExternalData.RequestProductPrice();
+          });
   }
 
   @Bean

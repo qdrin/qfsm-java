@@ -8,6 +8,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.Lifecycle;
 import org.springframework.statemachine.StateMachine;
@@ -16,8 +17,11 @@ import org.springframework.statemachine.StateMachineException;
 import org.springframework.statemachine.StateMachinePersist;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
+import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.util.Assert;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Default implementation of a {@link StateMachineService}.
@@ -27,19 +31,21 @@ import org.springframework.util.Assert;
  * @param <S> the type of state
  * @param <E> the type of event
  */
-public class QDefaultStateMachineService<S, E> implements StateMachineService<S, E>, DisposableBean {
 
-	private final static Log log = LogFactory.getLog(QDefaultStateMachineService.class);
+@Slf4j
+public class QStateMachineService<S, E> implements StateMachineService<S, E>, DisposableBean {
+
+	// private final static Log log = LogFactory.getLog(QStateMachineService.class);
 	private final StateMachineFactory<S, E> stateMachineFactory;
 	private final Map<String, StateMachine<S, E>> machines = new HashMap<String, StateMachine<S, E>>();
-	private StateMachinePersist<S, E, String> stateMachinePersist;
+	private StateMachinePersister<S, E, String> stateMachinePersister;
 
 	/**
 	 * Instantiates a new default state machine service.
 	 *
 	 * @param stateMachineFactory the state machine factory
 	 */
-	public QDefaultStateMachineService(StateMachineFactory<S, E> stateMachineFactory) {
+	public QStateMachineService(StateMachineFactory<S, E> stateMachineFactory) {
 		this(stateMachineFactory, null);
 	}
 
@@ -49,11 +55,11 @@ public class QDefaultStateMachineService<S, E> implements StateMachineService<S,
 	 * @param stateMachineFactory the state machine factory
 	 * @param stateMachinePersist the state machine persist
 	 */
-	public QDefaultStateMachineService(StateMachineFactory<S, E> stateMachineFactory,
-			StateMachinePersist<S, E, String> stateMachinePersist) {
+	public QStateMachineService(StateMachineFactory<S, E> stateMachineFactory,
+		StateMachinePersister<S, E, String> stateMachinePersister) {
 		Assert.notNull(stateMachineFactory, "'stateMachineFactory' must be set");
 		this.stateMachineFactory = stateMachineFactory;
-		this.stateMachinePersist = stateMachinePersist;
+		this.stateMachinePersister = stateMachinePersister;
 	}
 
 	@Override
@@ -68,22 +74,20 @@ public class QDefaultStateMachineService<S, E> implements StateMachineService<S,
 
 	@Override
 	public StateMachine<S, E> acquireStateMachine(String machineId, boolean start) {
-		log.info("Acquiring machine with id " + machineId);
+		log.debug("Acquiring machine with id " + machineId);
 		StateMachine<S, E> stateMachine;
 		// naive sync to handle concurrency with release
 		synchronized (machines) {
 			stateMachine = machines.get(machineId);
 			if (stateMachine == null) {
-				log.info("Getting new machine from factory with id " + machineId);
+				log.debug("Getting new machine from factory with id " + machineId);
 				stateMachine = stateMachineFactory.getStateMachine(machineId);
-				if (stateMachinePersist != null) {
-					try {
-						StateMachineContext<S, E> stateMachineContext = stateMachinePersist.read(machineId);
-						stateMachine = restoreStateMachine(stateMachine, stateMachineContext);
-					} catch (Exception e) {
-						log.error("Error handling context", e);
-						throw new StateMachineException("Unable to read context from store", e);
-					}
+				try {
+					stateMachinePersister.restore(stateMachine, machineId);
+				} catch (Exception e) {
+					log.error("Cannot restore stateMachineId: '{}': {}", machineId, e.getLocalizedMessage());
+					e.printStackTrace();
+					return null;
 				}
 				machines.put(machineId, stateMachine);
 			}
@@ -94,14 +98,7 @@ public class QDefaultStateMachineService<S, E> implements StateMachineService<S,
 
 	@Override
 	public void releaseStateMachine(String machineId) {
-		log.info("Releasing machine with id " + machineId);
-		synchronized (machines) {
-			StateMachine<S, E> stateMachine = machines.remove(machineId);
-			if (stateMachine != null) {
-				log.info("Found machine with id " + machineId);
-				stateMachine.stopReactively().block();
-			}
-		}
+		releaseStateMachine(machineId, true);
 	}
 
 	@Override
@@ -111,6 +108,12 @@ public class QDefaultStateMachineService<S, E> implements StateMachineService<S,
 			StateMachine<S, E> stateMachine = machines.remove(machineId);
 			if (stateMachine != null) {
 				log.info("Found machine with id " + machineId);
+				try {
+					stateMachinePersister.persist(stateMachine, machineId);
+				} catch (Exception e) {
+					log.error("Cannot persist stateMachineId: '{}': {}", machineId, e.getLocalizedMessage());
+					e.printStackTrace();
+				}
 				handleStop(stateMachine, stop);
 			}
 		}
@@ -133,8 +136,8 @@ public class QDefaultStateMachineService<S, E> implements StateMachineService<S,
 	 *
 	 * @param stateMachinePersist the state machine persist
 	 */
-	public void setStateMachinePersist(StateMachinePersist<S, E, String> stateMachinePersist) {
-		this.stateMachinePersist = stateMachinePersist;
+	public void setStateMachinePersist(StateMachinePersister<S, E, String> stateMachinePersister) {
+		this.stateMachinePersister = stateMachinePersister;
 	}
 
 	protected void doStop() {

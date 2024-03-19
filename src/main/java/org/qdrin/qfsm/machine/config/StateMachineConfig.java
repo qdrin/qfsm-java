@@ -6,15 +6,18 @@ import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
 import org.qdrin.qfsm.persist.ProductStateMachinePersist;
+import org.qdrin.qfsm.service.QStateMachineService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.statemachine.config.EnableStateMachine;
+import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
+import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
 import org.springframework.statemachine.guard.Guard;
 import org.springframework.statemachine.persist.DefaultStateMachinePersister;
 import org.springframework.statemachine.persist.StateMachinePersister;
+import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
 
 // @Slf4j
@@ -31,8 +34,16 @@ public class StateMachineConfig {
     return new DefaultStateMachinePersister<>(stateMachinePersist());
   }
 
+  @Bean 
+  StateMachineService<String, String> stateMachineService(
+      StateMachineFactory<String, String> factory
+  ) {
+    return new QStateMachineService<>(factory, stateMachinePersister());
+  }
+
   @Configuration
-  @EnableStateMachine
+  // @EnableStateMachine
+  @EnableStateMachineFactory
   public static class MachineConfig extends StateMachineConfigurerAdapter<String, String> {
 
     @Override
