@@ -89,6 +89,7 @@ public class ScheduledTasks {
             return;
           }
           ProductPrice nextPrice = ExternalData.RequestProductPrice();
+          fsmApp.setVariable(productId, "nextPrice", nextPrice);
           });
   }
 

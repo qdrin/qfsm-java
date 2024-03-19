@@ -1,14 +1,12 @@
 package org.qdrin.qfsm;
 
 import java.util.Map;
-import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.state.AbstractState;
@@ -51,18 +49,26 @@ public class FsmApp {
 		return mstate;
 	}
 
-	public Object getVariable(String machineId, String varname) {
+	public <T> T getVariable(String machineId, String varname, Class<T> clazz) {
 		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
-		return machine.getExtendedState().get(varname, Object.class);
+		T var = machine.getExtendedState().get(varname, clazz);
+		stateMachineService.releaseStateMachine(machineId);
+		return var;
 	}
 
-  public void sendUserEvent(String machineId, Scanner scanner) {
+	public void setVariable(String machineId, String varname, Object var) {
+		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
+		machine.getExtendedState().getVariables().put(varname, var);
+		stateMachineService.releaseStateMachine(machineId);
+	}
+
+  public void sendUserEvent(String machineId) {
 		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
     String machineState = getMachineState(machine.getState());
     var variables = machine.getExtendedState().getVariables();
     log.info("current state: {}, variables: {}", machineState, variables);
     System.out.print("input event name:");
-    String event = scanner.nextLine();
+    String event = Application.scanner.nextLine();
     sendEvent(machine, event);
     machineState = getMachineState(machine.getState());
     variables = machine.getExtendedState().getVariables();

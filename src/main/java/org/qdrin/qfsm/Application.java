@@ -26,6 +26,8 @@ public class Application implements CommandLineRunner {
 	@Autowired
 	FsmApp fsmApp;
 
+	static public final Scanner scanner = new Scanner(System.in);
+
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
@@ -34,14 +36,14 @@ public class Application implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		HikariDataSource hds = (HikariDataSource) dataSource;
 		log.info("database: {}", hds.getJdbcUrl());
-		Scanner in = new Scanner(System.in);
 		String mid = "m1";
 		while(! mid.equals("exit")) {
 			System.out.print("input machineId:");
-			mid = in.nextLine();
-			fsmApp.sendUserEvent(mid, in);
+			mid = scanner.nextLine();
+			if(mid.isEmpty()) {continue;}
+			fsmApp.sendUserEvent(mid);
 		}
+		scanner.close();
 		log.info("exiting...");
-		in.close();
 	}
 }
