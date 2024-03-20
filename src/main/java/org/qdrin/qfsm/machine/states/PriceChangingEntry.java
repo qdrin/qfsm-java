@@ -55,9 +55,9 @@ public class PriceChangingEntry implements Action<String, String> {
         SchedulerClient.Builder.create(dataSource)
             .serializer(new JacksonSerializer())
             .build();
-      Consumer<TaskContext> changPriceFunc = ScheduledTasks::startChangePriceTask;
+      Consumer<TaskContext> taskFunc = ScheduledTasks::startChangePriceTask;
       TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), Instant.now());
-      changPriceFunc.accept(ctx);
+      taskFunc.accept(ctx);
       // ProductPrice nextPrice = ExternalData.RequestProductPrice();
       // variables.put("nextPrice", nextPrice);
     }

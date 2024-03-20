@@ -145,6 +145,11 @@ public class StateMachineConfig {
     }
 
     @Bean
+    ResumingEntry resumingEntry() {
+      return new ResumingEntry();
+    }
+
+    @Bean
     SignalAction sendSuspend() {
       return new SignalAction("suspend");
     }

@@ -7,6 +7,7 @@ import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 
 import com.github.kagkarlsson.scheduler.SchedulerClient;
+import com.github.kagkarlsson.scheduler.exceptions.TaskInstanceNotFoundException;
 import com.github.kagkarlsson.scheduler.serializer.JacksonSerializer;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 
@@ -30,6 +31,10 @@ public class DeleteTaskAction implements Action<String, String> {
         .serializer(new JacksonSerializer())
         .build();
     log.debug("DeleteTaskAction cancelling taskId: {}", TaskInstanceId.of(taskName, machineId));
-    schedulerClient.cancel(TaskInstanceId.of(taskName, machineId));
+    try {
+      schedulerClient.cancel(TaskInstanceId.of(taskName, machineId));
+    } catch(TaskInstanceNotFoundException e) {
+      log.warn("productId: {}, not found task: {}, continue", machineId, taskName);
+    }
   }
 }

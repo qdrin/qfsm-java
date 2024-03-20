@@ -41,6 +41,7 @@ public class ScheduledTasks {
   public static final TaskWithoutDataDescriptor disconnect_TASK = new TaskWithoutDataDescriptor("disconnect");
   public static final TaskWithoutDataDescriptor waiting_pay_ended_TASK = new TaskWithoutDataDescriptor("waiting_pay_ended");
   public static final TaskWithoutDataDescriptor suspend_ended_TASK = new TaskWithoutDataDescriptor("suspend_ended");
+  public static final TaskWithoutDataDescriptor resume_external_TASK = new TaskWithoutDataDescriptor("RESUME");
 
   public static void startPriceEndedTask(TaskContext taskContext) {
     taskContext.schedulerClient.schedule(price_ended_TASK.instance(taskContext.id), taskContext.wakeAt);
@@ -60,6 +61,10 @@ public class ScheduledTasks {
 
   public static void startSuspendEndedTask(TaskContext taskContext) {
     taskContext.schedulerClient.schedule(suspend_ended_TASK.instance(taskContext.id), taskContext.wakeAt);
+  }
+
+  public static void startResumeExternalTask(TaskContext taskContext) {
+    taskContext.schedulerClient.schedule(resume_external_TASK.instance(taskContext.id), taskContext.wakeAt);
   }
 
   @Bean
@@ -112,10 +117,24 @@ public class ScheduledTasks {
         .execute(getTaskInstance(suspend_ended_TASK));
   }
 
+  @Bean
+  Task<Void> resumeExternalTask() {
+    return Tasks
+        .oneTime(resume_external_TASK)
+        .execute(getExternalTaskInstance(resume_external_TASK));
+  }
+
   private VoidExecutionHandler<Void> getTaskInstance(TaskWithoutDataDescriptor descriptor) {
     return (instance, ctx) -> {
       log.info("task instance run. productId: {}, taskName: {}", instance.getId(), instance.getTaskName());
       fsmApp.sendEvent(instance.getId(), instance.getTaskName());
+    };
+  }
+
+  private VoidExecutionHandler<Void> getExternalTaskInstance(TaskWithoutDataDescriptor descriptor) {
+    return (instance, ctx) -> {
+      log.info("external task instance run. productId: {}, taskName: {}", instance.getId(), instance.getTaskName());
+      // TODO: send request to OE
     };
   }
 }

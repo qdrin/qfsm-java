@@ -110,7 +110,12 @@
                   <body>suspendingEntry</body>
                 </entry>
               </subvertex>
-              <subvertex xmi:type="uml:State" xmi:id="_1sOrUL9fEe65db1_bM-TwQ" name="Resuming"/>
+              <subvertex xmi:type="uml:State" xmi:id="_1sOrUL9fEe65db1_bM-TwQ" name="Resuming">
+                <entry xmi:type="uml:OpaqueBehavior" xmi:id="_qWHB0ObWEe6-apfH_YPhCw">
+                  <language>bean</language>
+                  <body>resumingEntry</body>
+                </entry>
+              </subvertex>
               <subvertex xmi:type="uml:State" xmi:id="_9e_dAL9fEe65db1_bM-TwQ" name="Prolongation"/>
             </region>
           </subvertex>
