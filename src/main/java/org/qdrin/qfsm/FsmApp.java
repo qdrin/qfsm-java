@@ -56,6 +56,12 @@ public class FsmApp {
 		return var;
 	}
 
+	public void removeVariable(String machineId, String varname) {
+		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
+		machine.getExtendedState().getVariables().remove(varname);
+		stateMachineService.releaseStateMachine(machineId);
+	}
+
 	public void setVariable(String machineId, String varname, Object var) {
 		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 		machine.getExtendedState().getVariables().put(varname, var);

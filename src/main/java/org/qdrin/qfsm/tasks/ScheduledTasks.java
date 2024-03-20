@@ -88,8 +88,10 @@ public class ScheduledTasks {
           if(product == null) {
             return;
           }
-          ProductPrice nextPrice = ExternalData.RequestProductPrice();
+          ProductPrice nextPrice = fsmApp.getVariable(productId, "plannedPrice", ProductPrice.class);
           fsmApp.setVariable(productId, "nextPrice", nextPrice);
+          fsmApp.removeVariable(productId, "plannedPrice");
+          fsmApp.sendEvent(instance.getId(), "change_price");
           });
   }
 

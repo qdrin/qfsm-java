@@ -46,6 +46,11 @@ public class PriceChangingEntry implements Action<String, String> {
         paymentProcessed.execute(context);
       }
     } else {
+      // TODO: This is emulator of price-calculator request. Remove after develop
+      ProductPrice plannedPrice = ExternalData.RequestProductPrice();
+      variables.put("plannedPrice", plannedPrice);
+      ///////////////////////////////////////////////////////////////////////////
+      
       final SchedulerClient schedulerClient =
         SchedulerClient.Builder.create(dataSource)
             .serializer(new JacksonSerializer())
