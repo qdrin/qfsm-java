@@ -88,9 +88,12 @@ public class ScheduledTasks {
           if(product == null) {
             return;
           }
+          // TODO: Change plannedPrice to price-calc request
           ProductPrice nextPrice = fsmApp.getVariable(productId, "plannedPrice", ProductPrice.class);
-          fsmApp.setVariable(productId, "nextPrice", nextPrice);
           fsmApp.removeVariable(productId, "plannedPrice");
+          /////////////////////////////////////////////////////
+          
+          fsmApp.setVariable(productId, "nextPrice", nextPrice);
           fsmApp.sendEvent(instance.getId(), "change_price");
           });
   }

@@ -220,6 +220,10 @@
                 <trigger xmi:type="uml:Trigger" xmi:id="_N3or8L9LEe65db1_bM-TwQ" event="_c8Qc4LXjEe6PAs2TUsdVsw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_I39AkMNWEe6X9syf-CmCRw" source="_eYu8ML9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ">
+                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_mys6MOaOEe6RjZW16x2Liw">
+                  <language>bean</language>
+                  <body>clearProductPrice</body>
+                </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_VOxMQMNWEe6X9syf-CmCRw" event="_a_mX4MNVEe6X9syf-CmCRw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_R4k8cMNqEe6X9syf-CmCRw" source="_YsCfJr9KEe65db1_bM-TwQ" target="_QYmEgMN3Ee6X9syf-CmCRw">
@@ -256,9 +260,17 @@
                 <trigger xmi:type="uml:Trigger" xmi:id="_hM4u0MN8Ee6X9syf-CmCRw" event="_2k0noMN6Ee6X9syf-CmCRw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_YdnSMMWYEe63LKnRBmMiFw" source="_aiBJUL9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ">
+                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_hsCiYOaOEe6RjZW16x2Liw">
+                  <language>bean</language>
+                  <body>clearProductPrice</body>
+                </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_caSjIMWYEe63LKnRBmMiFw" event="_a_mX4MNVEe6X9syf-CmCRw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_rBhScMW9Ee63LKnRBmMiFw" source="_YsCfJr9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ">
+                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_qdNdEOaOEe6RjZW16x2Liw">
+                  <language>bean</language>
+                  <body>clearProductPrice</body>
+                </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_xksrkMW9Ee63LKnRBmMiFw" event="_a_mX4MNVEe6X9syf-CmCRw"/>
               </transition>
               <subvertex xmi:type="uml:State" xmi:id="_YsCfJr9KEe65db1_bM-TwQ" name="PriceChanging">
@@ -266,6 +278,10 @@
                   <language>bean</language>
                   <body>priceChangingEntry</body>
                 </entry>
+                <exit xmi:type="uml:OpaqueBehavior" xmi:id="_z7C0AOaPEe6RjZW16x2Liw">
+                  <language>bean</language>
+                  <body>priceChangingExit</body>
+                </exit>
               </subvertex>
               <subvertex xmi:type="uml:State" xmi:id="_aiBJUL9KEe65db1_bM-TwQ" name="PriceChanged">
                 <entry xmi:type="uml:OpaqueBehavior" xmi:id="_WBmLoMM7Ee6X9syf-CmCRw">

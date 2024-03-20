@@ -5,10 +5,13 @@ import java.util.Optional;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
+import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.qdrin.qfsm.service.QStateMachineService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.StateContext;
+import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.StateMachineFactory;
@@ -20,7 +23,9 @@ import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
 
-// @Slf4j
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 public class StateMachineConfig {
 
@@ -110,6 +115,11 @@ public class StateMachineConfig {
     }
 
     @Bean
+    PriceChangingExit priceChangingExit() {
+      return new PriceChangingExit();
+    }
+
+    @Bean
     PriceChangedEntry priceChangedEntry() {
       return new PriceChangedEntry();
     }
@@ -182,6 +192,17 @@ public class StateMachineConfig {
     @Bean
     SignalAction sendPaymentProcessed() {
       return new SignalAction("payment_processed");
+    }
+
+    @Bean
+    Action<String, String> clearProductPrice() {
+      return new Action<String, String>() {
+        public void execute(StateContext<String, String> context) {
+          Product product = context.getExtendedState().get("product", Product.class);
+          log.info("Clear product price. productId: {}", product.getProductId());
+          product.setProductPrices(null);
+        }
+      };
     }
 
     // -----------------------------------------------------------------
