@@ -41,7 +41,13 @@ public class ScheduledTasks {
   public static final TaskWithoutDataDescriptor disconnect_TASK = new TaskWithoutDataDescriptor("disconnect");
   public static final TaskWithoutDataDescriptor waiting_pay_ended_TASK = new TaskWithoutDataDescriptor("waiting_pay_ended");
   public static final TaskWithoutDataDescriptor suspend_ended_TASK = new TaskWithoutDataDescriptor("suspend_ended");
+  public static final TaskWithoutDataDescriptor suspend_external_TASK = new TaskWithoutDataDescriptor("SUSPEND");
   public static final TaskWithoutDataDescriptor resume_external_TASK = new TaskWithoutDataDescriptor("RESUME");
+  public static final TaskWithoutDataDescriptor disconnect_external_TASK = new TaskWithoutDataDescriptor("DISCONNECT");
+  public static final TaskWithoutDataDescriptor change_price_external_TASK = new TaskWithoutDataDescriptor("CHANGE_PRICE");
+  public static final TaskWithoutDataDescriptor disconnect_external_external_TASK = new TaskWithoutDataDescriptor("DISCONNECT_EXTERNAL");
+
+  
 
   public static void startPriceEndedTask(TaskContext taskContext) {
     taskContext.schedulerClient.schedule(price_ended_TASK.instance(taskContext.id), taskContext.wakeAt);
@@ -63,8 +69,24 @@ public class ScheduledTasks {
     taskContext.schedulerClient.schedule(suspend_ended_TASK.instance(taskContext.id), taskContext.wakeAt);
   }
 
+  public static void startSuspendExternalTask(TaskContext taskContext) {
+    taskContext.schedulerClient.schedule(suspend_external_TASK.instance(taskContext.id), taskContext.wakeAt);
+  }
+
   public static void startResumeExternalTask(TaskContext taskContext) {
     taskContext.schedulerClient.schedule(resume_external_TASK.instance(taskContext.id), taskContext.wakeAt);
+  }
+
+  public static void startDisconnectExternalTask(TaskContext taskContext) {
+    taskContext.schedulerClient.schedule(disconnect_external_TASK.instance(taskContext.id), taskContext.wakeAt);
+  }
+
+  public static void startChangePriceExternalTask(TaskContext taskContext) {
+    taskContext.schedulerClient.schedule(change_price_external_TASK.instance(taskContext.id), taskContext.wakeAt);
+  }
+
+  public static void startDisconnectExternalExternalTask(TaskContext taskContext) {
+    taskContext.schedulerClient.schedule(disconnect_external_external_TASK.instance(taskContext.id), taskContext.wakeAt);
   }
 
   @Bean
@@ -118,10 +140,38 @@ public class ScheduledTasks {
   }
 
   @Bean
+  Task<Void> suspendExternalTask() {
+    return Tasks
+        .oneTime(suspend_external_TASK)
+        .execute(getExternalTaskInstance(suspend_external_TASK));
+  }
+
+  @Bean
   Task<Void> resumeExternalTask() {
     return Tasks
         .oneTime(resume_external_TASK)
         .execute(getExternalTaskInstance(resume_external_TASK));
+  }
+
+  @Bean
+  Task<Void> disconnectExternalTask() {
+    return Tasks
+        .oneTime(disconnect_external_TASK)
+        .execute(getExternalTaskInstance(disconnect_external_TASK));
+  }
+
+  @Bean
+  Task<Void> disconnectExternalExternalTask() {
+    return Tasks
+        .oneTime(disconnect_external_external_TASK)
+        .execute(getExternalTaskInstance(disconnect_external_external_TASK));
+  }
+
+  @Bean
+  Task<Void> changePriceExternalTask() {
+    return Tasks
+        .oneTime(change_price_external_TASK)
+        .execute(getExternalTaskInstance(change_price_external_TASK));
   }
 
   private VoidExecutionHandler<Void> getTaskInstance(TaskWithoutDataDescriptor descriptor) {

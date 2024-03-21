@@ -85,6 +85,16 @@ public class StateMachineConfig {
     }
 
     @Bean
+    DisconnectionEntry disconnectionEntry() {
+      return new DisconnectionEntry();
+    }
+
+    @Bean
+    PaymentStoppingEntry paymentStoppingEntry() {
+      return new PaymentStoppingEntry();
+    }
+
+    @Bean
     PaidEntry paidEntry() {
       return new PaidEntry();
     }

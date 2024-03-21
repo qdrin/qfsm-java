@@ -1,15 +1,18 @@
 package org.qdrin.qfsm.machine.states;
 import java.time.Instant;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 import javax.sql.DataSource;
 
-import org.qdrin.qfsm.model.ProductPrice;
+import org.qdrin.qfsm.machine.actions.DeleteTaskAction;
+import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.tasks.ScheduledTasks;
 import org.qdrin.qfsm.tasks.ScheduledTasks.TaskContext;
-import org.qdrin.qfsm.utils.PriceHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 
@@ -17,28 +20,26 @@ import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.serializer.JacksonSerializer;
 
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 
 @Slf4j
-public class SuspendingEntry implements Action<String, String> {
+public class PaymentStoppingEntry implements Action<String, String> {
 
   @Autowired
   DataSource dataSource;
 
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("SuspendingEntry started. event: {}, message: {}", context.getEvent());
-    ProductPrice price = PriceHelper.getProductPrice(context);
-    price.setPeriod(0);
-    log.debug("SuspendingEntry productPrice: {}", price);
-    PriceHelper.setProductPrice(context, price);
+    Product product = context.getExtendedState().get("product", Product.class);
+    log.debug("PaymentStoppingEntry started. event: {}, message: {}", context.getEvent());
     final SchedulerClient schedulerClient =
       SchedulerClient.Builder.create(dataSource)
           .serializer(new JacksonSerializer())
           .build();
-    Consumer<TaskContext> taskFunc = ScheduledTasks::startSuspendExternalTask;
+    Consumer<TaskContext> taskFunc = ScheduledTasks::startDisconnectExternalExternalTask;
     // TODO: Add characteristics analysis
-    TaskContext ctx = new TaskContext(schedulerClient, context.getStateMachine().getId(), Instant.now());
+    TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), Instant.now());
     taskFunc.accept(ctx);
   }
 }
