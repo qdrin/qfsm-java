@@ -16,7 +16,7 @@ public class CreateProduct implements Action<String, String> {
   public void execute(StateContext<String, String> context) {
     Product product = new Product();
     product.setProductId(context.getStateMachine().getId());
-    ProductPrice price = ExternalData.RequestProductPrice();
+    ProductPrice price = ExternalData.requestProductPrice();
     // product.setProductPrices(Arrays.asList(price));
     product.setProductPrices(price);
     context.getExtendedState().getVariables().put("product", product);

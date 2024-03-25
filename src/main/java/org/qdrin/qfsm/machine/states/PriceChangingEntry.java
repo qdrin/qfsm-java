@@ -47,7 +47,7 @@ public class PriceChangingEntry implements Action<String, String> {
       }
     } else {
       // TODO: This is emulator of price-calculator request. Remove after develop
-      ProductPrice plannedPrice = ExternalData.RequestProductPrice();
+      ProductPrice plannedPrice = ExternalData.requestProductPrice();
       variables.put("plannedPrice", plannedPrice);
       ///////////////////////////////////////////////////////////////////////////
       

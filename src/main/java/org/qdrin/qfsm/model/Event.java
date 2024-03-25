@@ -2,26 +2,29 @@ package org.qdrin.qfsm.model;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import org.springframework.statemachine.StateMachineContext;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+@Entity
 @Data
-@ToString
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Event {
-  String eventId;
-  String sourceCode;
-  String refId;
-  String refIdType;
-  String eventType;
-  OffsetDateTime eventDate;
-  String refItemId;
-  String refItemIdType;
+  Event event;
+  ClientInfo clientInfo;
+  List<Product> products;
+  List<ProductOrderItem> productOrderItems;
+  List<EventCharacteristic> characteristics;
+  List<EventProperties> eventProperties;
 }

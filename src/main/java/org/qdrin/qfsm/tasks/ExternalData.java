@@ -1,8 +1,11 @@
 package org.qdrin.qfsm.tasks;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.qdrin.qfsm.Application;
+import org.qdrin.qfsm.model.ProductCharacteristic;
 import org.qdrin.qfsm.model.ProductPrice;
 
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +14,7 @@ import java.time.OffsetDateTime;
 
 @Slf4j
 public class ExternalData {
-  public static ProductPrice RequestProductPrice() {
+  public static ProductPrice requestProductPrice() {
     String input;
     Application.scanner.reset();
 		ProductPrice price = new ProductPrice();
@@ -41,5 +44,53 @@ public class ExternalData {
       price.setNextPayDate(OffsetDateTime.now().plusDays(30));
     }
 		return price;
+  }
+
+  public static List<ProductCharacteristic> requestProductCharacteristics() {
+    String input;
+    Application.scanner.reset();
+    ArrayList<ProductCharacteristic> characteristics = new ArrayList<>();
+    while(true) {
+      ProductCharacteristic characteristic = new ProductCharacteristic();
+      System.out.println("Input product characterisctic");
+      System.out.print("name('nothing to exit'):");
+      input = Application.scanner.nextLine();
+      input = input.length() > 0 ? input : null;
+      if(input == null) {
+        break;
+      }
+      characteristic.setRefName(input);
+      System.out.print("value:");
+      input = Application.scanner.nextLine();
+      input = input.length() > 0 ? input : "";
+      characteristic.setValue(input);
+      characteristic.setValueType("string");
+      characteristics.add(characteristic);
+    }
+		return characteristics;
+  }
+
+  public static ProductCharacteristic requestEventProperties() {
+    String input;
+    Application.scanner.reset();
+    var properties = new ArrayList<>();
+    while(true) {
+      ProductCharacteristic characteristic = new ProductCharacteristic();
+      System.out.println("Input product characterisctic");
+      System.out.print("name('nothing to exit'):");
+      input = Application.scanner.nextLine();
+      input = input.length() > 0 ? input : null;
+      if(input == null) {
+        break;
+      }
+      characteristic.setRefName(input);
+      System.out.print("value:");
+      input = Application.scanner.nextLine();
+      input = input.length() > 0 ? input : "";
+      characteristic.setValue(input);
+      characteristic.setValueType("string");
+      characteristics.add(characteristic);
+    }
+		return characteristics;
   }
 }

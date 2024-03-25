@@ -41,7 +41,8 @@ public class Product {
   ProductPrice productPrices;
   // List<ProductRelationship> productRelationships;
   // List<FabricRef> fabricRefs;
-  // List<ProductCharacteristic> characteristics;
+  @JdbcTypeCode(SqlTypes.JSON)
+  List<ProductCharacteristic> characteristics;
   // List<Label> labels;
   // Map<String, Object> metaInfo;
   // Map<String, Object> quantity;
