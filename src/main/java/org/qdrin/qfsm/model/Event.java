@@ -21,10 +21,14 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Event {
-  Event event;
+  String sourceCode;
+  String refId;
+  String refIdType;
+  String eventType;
+  OffsetDateTime eventDate;
   ClientInfo clientInfo;
   List<Product> products;
   List<ProductOrderItem> productOrderItems;
-  List<EventCharacteristic> characteristics;
-  List<EventProperties> eventProperties;
+  List<Characteristic> characteristics;
+  EventProperties eventProperties;
 }
