@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
-import org.qdrin.qfsm.model.*;
 
 @Data
 @ToString
@@ -15,5 +14,5 @@ import org.qdrin.qfsm.model.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ResponseEventDto {
     String refId;
-    List<Product> products;
+    List<ProductResponseDto> products;
 }

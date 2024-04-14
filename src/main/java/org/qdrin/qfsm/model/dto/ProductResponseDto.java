@@ -1,12 +1,9 @@
-package org.qdrin.qfsm.model;
+package org.qdrin.qfsm.model.dto;
 
 import java.util.List;
-import java.util.Map;
 
 import org.qdrin.qfsm.model.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -15,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductOrderItemDto {
+public class ProductResponseDto {
   @NonNull String productId;
   @NonNull String productOfferingId;
   @NonNull String status;

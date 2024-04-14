@@ -15,8 +15,7 @@ import org.qdrin.qfsm.model.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RequestEventDto {
     EventDto event;
-    ClientInfo clientInfo;
-    List<Product> products;
+    List<ProductRequestDto> products;
     List<Characteristic> characteristics;
     EventProperties eventProperties;
 }

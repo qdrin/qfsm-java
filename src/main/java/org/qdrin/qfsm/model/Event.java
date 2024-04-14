@@ -6,6 +6,7 @@ import java.util.List;
 import jakarta.persistence.Entity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.qdrin.qfsm.model.dto.*;
 
 @Entity
 @Data
@@ -21,7 +22,7 @@ public class Event {
   OffsetDateTime eventDate;
   ClientInfo clientInfo;
   List<Product> products;
-  List<ProductOrderItem> productOrderItems;
+  List<ProductResponseDto> productOrderItems;
   List<Characteristic> characteristics;
   EventProperties eventProperties;
 }

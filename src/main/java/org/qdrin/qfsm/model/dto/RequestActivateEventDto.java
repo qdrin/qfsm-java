@@ -16,7 +16,5 @@ import org.qdrin.qfsm.model.*;
 public class RequestActivateEventDto {
     EventDto event;
     ClientInfo clientInfo;
-    List<ProductOrderItem> productOrderItems;
-    List<Characteristic> characteristics;
-    EventProperties eventProperties;
+    List<ProductActivateRequestDto> productOrderItems;
 }
