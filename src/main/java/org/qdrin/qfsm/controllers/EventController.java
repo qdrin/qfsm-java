@@ -12,15 +12,10 @@ import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.model.dto.ResponseEventDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
-
-import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.HikariPoolMXBean;
-
 
 import jakarta.validation.Valid;
 
@@ -38,7 +33,7 @@ public class EventController {
     @Autowired
     DataSource dataSource;
 
-    private void sendEvent(RequestActivateEventDto activateEvent) {
+    // private void sendEvent(RequestActivateEventDto activateEvent) {
         // String machineId = UUID.randomUUID().toString();
 		// StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 		// try {
@@ -57,18 +52,18 @@ public class EventController {
 		// variables = machine.getExtendedState().getVariables();
 		// log.info("new state: {}, variables: {}", machineState, variables);
 		// 	stateMachineService.releaseStateMachine(machineId);
-	}
+	// }
 
     @PostMapping("/event")
-    public ResponseEntity<ResponseEventDto> startSyncProcessInstance(@RequestBody @Valid RequestActivateEventDto activateEvent) {
+    public ResponseEntity<ResponseEventDto> eventHandler(@RequestBody @Valid RequestActivateEventDto activateEvent) {
         ResponseEventDto response = new ResponseEventDto();
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/event")
-    public ResponseEntity<ResponseEventDto> startAsyncProcessInstance(@RequestBody @Valid RequestEventDto event) {
-        ResponseEventDto response = new ResponseEventDto();
-        return ResponseEntity.ok(response);
-    }
+    // @PostMapping("/event")
+    // public ResponseEntity<ResponseEventDto> eventHandler(@RequestBody @Valid RequestEventDto event) {
+    //     ResponseEventDto response = new ResponseEventDto();
+    //     return ResponseEntity.ok(response);
+    // }
 }
 

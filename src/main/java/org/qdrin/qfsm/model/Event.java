@@ -5,6 +5,9 @@ import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.qdrin.qfsm.model.dto.*;
@@ -21,9 +24,14 @@ public class Event {
   String refIdType;
   String eventType;
   OffsetDateTime eventDate;
+  @JdbcTypeCode(SqlTypes.JSON)
   ClientInfo clientInfo;
+  @JdbcTypeCode(SqlTypes.JSON)
   List<Product> products;
+  @JdbcTypeCode(SqlTypes.JSON)
   List<ProductResponseDto> productOrderItems;
+  @JdbcTypeCode(SqlTypes.JSON)
   List<Characteristic> characteristics;
+  @JdbcTypeCode(SqlTypes.JSON)
   EventProperties eventProperties;
 }
