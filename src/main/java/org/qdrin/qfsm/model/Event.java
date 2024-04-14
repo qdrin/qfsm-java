@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.qdrin.qfsm.model.dto.*;
@@ -15,8 +16,8 @@ import org.qdrin.qfsm.model.dto.*;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Event {
+  @Id String refId;
   String sourceCode;
-  String refId;
   String refIdType;
   String eventType;
   OffsetDateTime eventDate;

@@ -24,7 +24,7 @@ public class FsmApp {
 	// StateMachineFactory<String, String> stateMachineFactory;
 
 	@Autowired
-  StateMachineService<String, String> stateMachineService;
+  	StateMachineService<String, String> stateMachineService;
 	
 	@Autowired
 	StateMachinePersister<String, String, String> persister;
@@ -68,19 +68,19 @@ public class FsmApp {
 		stateMachineService.releaseStateMachine(machineId);
 	}
 
-  public void sendUserEvent(String machineId) {
-		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
-    String machineState = getMachineState(machine.getState());
-    var variables = machine.getExtendedState().getVariables();
-    log.info("current state: {}, variables: {}", machineState, variables);
-    System.out.print("input event name:");
-    String event = Application.scanner.nextLine();
-    sendEvent(machine, event);
-    machineState = getMachineState(machine.getState());
-    variables = machine.getExtendedState().getVariables();
-    log.info("new state: {}, variables: {}", machineState, variables);
-		// stateMachineService.releaseStateMachine(machineId);
-  }
+//   public void sendUserEvent(String machineId) {
+// 		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
+//     String machineState = getMachineState(machine.getState());
+//     var variables = machine.getExtendedState().getVariables();
+//     log.info("current state: {}, variables: {}", machineState, variables);
+//     System.out.print("input event name:");
+//     String event = Application.scanner.nextLine();
+//     sendEvent(machine, event);
+//     machineState = getMachineState(machine.getState());
+//     variables = machine.getExtendedState().getVariables();
+//     log.info("new state: {}, variables: {}", machineState, variables);
+// 		// stateMachineService.releaseStateMachine(machineId);
+//   }
 
 	public void sendEvent(String machineId, String event) {
 		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
@@ -92,15 +92,15 @@ public class FsmApp {
 			e.printStackTrace();
 			return;
 		}
-    String machineState = getMachineState(machine.getState());
-    var variables = machine.getExtendedState().getVariables();
-    log.info("current state: {}, variables: {}", machineState, variables);
-    sendEvent(machine, event);
-    machineState = getMachineState(machine.getState());
-    variables = machine.getExtendedState().getVariables();
-    log.info("new state: {}, variables: {}", machineState, variables);
-		stateMachineService.releaseStateMachine(machineId);
-  }
+		String machineState = getMachineState(machine.getState());
+		var variables = machine.getExtendedState().getVariables();
+		log.info("current state: {}, variables: {}", machineState, variables);
+		sendEvent(machine, event);
+		machineState = getMachineState(machine.getState());
+		variables = machine.getExtendedState().getVariables();
+		log.info("new state: {}, variables: {}", machineState, variables);
+			stateMachineService.releaseStateMachine(machineId);
+	}
 
   public void sendEvent(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {
 		Map<Object, Object> variables = machine.getExtendedState().getVariables();

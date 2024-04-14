@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.qdrin.qfsm.model.*;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,7 +15,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductRequestDto {
-  @NonNull String productId;
+  @NotNull String productId;
   List<ProductCharacteristic> characteristic;
   List<ProductPrice> productPrice;
   List<ProductRelationship> productRelationship;

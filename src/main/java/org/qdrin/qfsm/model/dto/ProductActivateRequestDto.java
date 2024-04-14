@@ -7,6 +7,7 @@ import org.qdrin.qfsm.model.Characteristic;
 import org.qdrin.qfsm.model.FabricRef;
 import org.qdrin.qfsm.model.ProductPrice;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -16,8 +17,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductActivateRequestDto {
-  @NonNull String productOrderItemId;  // Must present in activation_started response only
-  @NonNull String productOfferingId;
+  @NotNull String productOrderItemId;  // Must present in activation_started response only
+  @NotNull String productOfferingId;
   List<ProductPrice> productPrice;
   boolean isBundle;
   boolean isCustom;
