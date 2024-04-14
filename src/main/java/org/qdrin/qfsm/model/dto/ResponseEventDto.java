@@ -1,15 +1,19 @@
-package org.qdrin.qfsm.model;
+package org.qdrin.qfsm.model.dto;
+
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import org.qdrin.qfsm.model.*;
 
 @Data
 @ToString
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductOrderItemRelationship {
-  String productOrderItemId;
-  String relationshipType;
+public class ResponseEventDto {
+    String refId;
+    List<Product> products;
 }

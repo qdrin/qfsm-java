@@ -1,5 +1,4 @@
-package org.qdrin.qfsm.model;
-
+package org.qdrin.qfsm.model.dto;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,8 +9,7 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductRelationship {
-  String productId;
-  String productOfferingId;
+public class ProductOrderItemRelationshipDto {
+  String productOrderItemId;
   String relationshipType;
 }

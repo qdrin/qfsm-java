@@ -1,0 +1,4477 @@
+openapi: 3.0.1
+info:
+  title: API NG PSI
+  description: API для взаимодействия с Next generation Product and Service Inventory
+  contact:
+    name: of developer Kudrin Dmitry
+    email: Dmitry.Kudrin@nexign.com
+  version: 1.1.8
+externalDocs:
+  description: Analytic note
+  url: https://confluence.nexign.com/pages/viewpage.action?pageId=668531521
+servers:
+  - url: https://openapi.megafon.ru/api/product/product-inventory-cache/v1
+  - url: >-
+      https://test-openapi.megafon.ru:2045/api/product/product-inventory-cache/v1
+  - url: >-
+      https://test-openapi.megafon.ru:2040/api/product/product-inventory-cache/v1
+  - url: >-
+      https://test-openapi.megafon.ru:2042/api/product/product-inventory-cache/v1
+  - url: >-
+      https://test-openapi.megafon.ru:2043/api/product/product-inventory-cache/v1
+  - url: >-
+      https://test-openapi.megafon.ru:2047/api/product/product-inventory-cache/v1
+  - url: >-
+      https://test-openapi.megafon.ru:2044/api/product/product-inventory-cache/v1
+  - url: >-
+      https://test-openapi.megafon.ru:2046/api/product/product-inventory-cache/v1
+  - url: >-
+      https://test-openapi.megafon.ru:2048/api/product/product-inventory-cache/v1
+  - url: >-
+      http://sep-in-scc-ns.megafon.ru:47555/api/product/product-inventory-cache/v1
+paths:
+  /event:
+    post:
+      tags:
+        - Прием события по продукту
+      summary: Инициализация события
+      requestBody:
+        content:
+          application/JSON:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/event_activation_started'
+                - $ref: '#/components/schemas/event_activation_started_custom_bundles'
+                - $ref: '#/components/schemas/other_event'
+            examples:
+              activation_started (Bundled):
+                $ref: '#/components/examples/activation_started_bundle'
+              activation_started (Single):
+                $ref: '#/components/examples/activation_started_single'
+              activation_started (Custom_Bundles):
+                $ref: '#/components/examples/activation_started_custom_bundle'
+              activation_started (Custom_Bundles_No_Content):
+                $ref: >-
+                  #/components/examples/activation_started_custom_bundle_no_content
+              activation_started (Custom_Bundles_Leg):
+                $ref: '#/components/examples/activation_started_custom_bundle_single'
+              activation_aborted:
+                $ref: '#/components/examples/activation_aborted'
+              activation_completed:
+                $ref: '#/components/examples/activation_completed'
+              activation_completed (Custom_Bundles):
+                $ref: '#/components/examples/activation_completed_custom_bundle'
+              activation_completed (Custom_Bundles_No_Content):
+                $ref: >-
+                  #/components/examples/activation_completed_custom_bundle_no_content
+              activation_completed (Custom_Bundles_Leg):
+                $ref: >-
+                  #/components/examples/activation_completed_custom_bundle_single
+              change_price_completed:
+                $ref: '#/components/examples/change_price_completed'
+              prolong_completed:
+                $ref: '#/components/examples/prolong_completed'
+              resume_completed:
+                $ref: '#/components/examples/resume_completed'
+              suspend_completed:
+                $ref: '#/components/examples/suspend_completed'
+              deactivation_started:
+                $ref: '#/components/examples/deactivation_started'
+              deactivation_started (Custom_Bundles):
+                $ref: '#/components/examples/deactivation_started_custom_bundle'
+              deactivation_completed:
+                $ref: '#/components/examples/deactivation_completed'
+              deactivation_external:
+                $ref: '#/components/examples/deactivation_external'
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/event_activation_started_Response'
+                  - $ref: '#/components/schemas/other_event_Response'
+              examples:
+                activation_started (Bundled):
+                  $ref: '#/components/examples/activation_started_Response_bundle'
+                activation_started (Single):
+                  $ref: '#/components/examples/activation_started_Response_single'
+                activation_started (Custom_Bundles):
+                  $ref: >-
+                    #/components/examples/activation_started_Response_custom_bundle
+                activation_started (Custom_Bundles_No_Content):
+                  $ref: >-
+                    #/components/examples/activation_started_Response_custom_bundle_no_content
+                activation_started (Custom_Bundles_Leg):
+                  $ref: >-
+                    #/components/examples/activation_started_Response_custom_bundle_simple
+                activation_aborted:
+                  $ref: '#/components/examples/activation_aborted_Response'
+                activation_completed:
+                  $ref: '#/components/examples/activation_completed_Response'
+                activation_completed (Custom_Bundles):
+                  $ref: >-
+                    #/components/examples/activation_completed_Response_custom_bundle
+                activation_completed (Custom_Bundles_No_Content):
+                  $ref: >-
+                    #/components/examples/activation_completed_Response_custom_bundle_no_content
+                change_price_completed:
+                  $ref: '#/components/examples/change_price_completed_Response'
+                prolong_completed:
+                  $ref: '#/components/examples/prolong_completed_Response'
+                resume_completed:
+                  $ref: '#/components/examples/resume_completed_Response'
+                suspend_completed:
+                  $ref: '#/components/examples/suspend_completed_Response'
+                deactivation_started:
+                  $ref: '#/components/examples/deactivation_started_Response'
+                deactivation_completed:
+                  $ref: '#/components/examples/deactivation_completed_Response'
+                deactivation_external:
+                  $ref: '#/components/examples/deactivation_external_Response'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                forbidden:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                conflict:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: InternalServerError
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                internalServerError:
+                  $ref: '#/components/examples/500'
+  /product/{id}:
+    get:
+      tags:
+        - Поиск продукта
+      summary: Поиск конкретного продукта
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор инстанса продукта
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/productSearch_Response'
+              examples:
+                Bundle:
+                  $ref: '#/components/examples/productSearch_Response'
+                Custom_Bundles:
+                  $ref: '#/components/examples/productSearch_Response_custom_bundle'
+                Custom_Bundles_Leg:
+                  $ref: >-
+                    #/components/examples/productSearch_Response_custom_bundle_leg
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                forbidden:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                conflict:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: InternalServerError
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                internalServerError:
+                  $ref: '#/components/examples/500'
+  /product:
+    post:
+      tags:
+        - Поиск продукта
+      summary: Балковый поиск продуктов
+      description: >-
+        Поиск продукта по связке partyRoleId + список productOfferingId, по
+        списку productId и по partyRoleId.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/productSearch_PRI_POI'
+                - $ref: '#/components/schemas/productSearch_PI'
+                - $ref: '#/components/schemas/productSearch_PRI'
+            examples:
+              partyRoleId+productOfferingIdList:
+                $ref: '#/components/examples/PRI_POI'
+              productIdList:
+                $ref: '#/components/examples/PI'
+              partyRoleId:
+                $ref: '#/components/examples/PRI'
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/productSearch_Response'
+              examples:
+                partyRoleId+productOfferingIdList:
+                  $ref: '#/components/examples/productSearch_Response'
+                productIdList:
+                  $ref: '#/components/examples/productSearch_Response'
+                partyRoleId:
+                  $ref: '#/components/examples/productSearch_Response'
+                Custom_Bundles:
+                  $ref: '#/components/examples/productSearch_Response_custom_bundle'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                forbidden:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                conflict:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: InternalServerError
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                internalServerError:
+                  $ref: '#/components/examples/500'
+  /product/history:
+    post:
+      tags:
+        - Поиск истории продукта
+      summary: Поиск истории продуктов
+      description: >-
+        Поиск истории изменений продуктов по связке partyRoleId + список
+        productOfferingId.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/productHistorySearch'
+            examples:
+              partyRoleId+productOfferingIdList:
+                $ref: '#/components/examples/productHistorySearch'
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/productHistorySearch_Response'
+              examples:
+                partyRoleId+productOfferingIdList:
+                  $ref: '#/components/examples/productHistorySearch_Response'
+        '204':
+          description: NoContent
+        '400':
+          description: BadRequest
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                forbidden:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                conflict:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: InternalServerError
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                internalServerError:
+                  $ref: '#/components/examples/500'
+  /spaces/events:
+    get:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Поиск событий по индексам
+      description: >-
+        При вызове функции без параметров возвращается массив всех событий в NG
+        PSI. Query-параметры, описанные в контракте позволяют найти необходимые
+        события. Поиск событий осуществляется по индексу ind_refItemId
+        (идентификатор инстанса проудкта) и индексу
+        ind_refId_refIdType_eventType (ключ идемпотентности, тип ключа, тип
+        события.
+      parameters:
+        - name: index
+          in: query
+          description: Индекс в таблице events
+          schema:
+            type: string
+          examples:
+            ind_refItemId:
+              value: ind_refItemId
+              summary: ind_refItemId
+            ind_refId_refIdType_eventType:
+              value: ind_refId_refIdType_eventType
+              summary: ind_refId_refIdType_eventType
+        - name: searchValue
+          in: query
+          description: Значение индекса
+          schema:
+            type: string
+          examples:
+            ind_refItemId:
+              value: c9bb4099-289c-4c2b-a493-64aadcaf3291
+              summary: ind_refItemId
+            ind_refId_refIdType_eventType:
+              value: 523071,orderId,trial_activation_completed
+              summary: ind_refId_refIdType_eventType
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/events_extended'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+    post:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Создание записи о событии
+      description: >-
+        Если необходимо создать событие с конкретным идентификатором, в тело
+        запроса добавляется параметр eventId. Если eventId не передан, он будет
+        сгенерирован автоматически.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create_events'
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/events_extended'
+        '400':
+          description: BadRequest
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                forbidden:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                conflict:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: InternalServerError
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                internalServerError:
+                  $ref: '#/components/examples/500'
+  /spaces/events/{id}:
+    get:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Поиск конкретного события
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор события в таблице events
+          schema:
+            type: string
+            example: 70f4a239-ec95-4fac-b9c3-75b138c3dff7
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/events_extended'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+    delete:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Удаление конкретного события
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор события в таблице events
+          schema:
+            type: string
+            example: 70f4a239-ec95-4fac-b9c3-75b138c3dff7
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/events_extended'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+  /spaces/products:
+    get:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Поиск продуктов по индексам
+      description: >-
+        При вызове функции без параметров возвращается массив всех продуктов в
+        NG PSI. Query-параметры, описанные в контракте позволяют найти
+        необходимые события. Поиск событий осуществляется по индексу
+        ind_partyRoleId (идентификатор роли абонента
+        "partyRole.name"="Customer").
+      parameters:
+        - name: index
+          in: query
+          description: Индекс в таблице events
+          schema:
+            type: string
+          examples:
+            ind_partyRoleId:
+              value: ind_partyRoleId
+              summary: ind_partyRoleId
+        - name: searchValue
+          in: query
+          description: Значение индекса
+          schema:
+            type: string
+          examples:
+            ind_partyRoleId:
+              value: e828d311-843d-4b9b-98a8-9bcd8158a3f3
+              summary: ind_partyRoleId
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/products_extended'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+    post:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Создание записи о продукте
+      description: >-
+        Если необходимо создать продукт с конкретным идентификатором, в тело
+        запроса добавляется параметр productId. Если productId не передан, он
+        будет сгенерирован автоматически.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create_products_extended'
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/products_extended'
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+  /spaces/products/{id}:
+    get:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Поиск конкретного продукта
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор продукта в таблице products
+          schema:
+            type: string
+            example: 0b14e478-2669-40a1-b5d1-8986859cb755
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/products_extended'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+    delete:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Удаление конкретного продукта
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор продукта в таблице products
+          schema:
+            type: string
+            example: 0b14e478-2669-40a1-b5d1-8986859cb755
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/products_extended'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+    patch:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Обновление записи конкретного продукта
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор продукта в таблице products
+          schema:
+            type: string
+            example: 0b14e478-2669-40a1-b5d1-8986859cb755
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update_products_extended'
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              examples:
+                update_products_extended_example:
+                  $ref: '#/components/examples/update_products_extended_example'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+  /spaces/tasks:
+    get:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Поиск внутренних заданий по индексам
+      description: >-
+        При вызове функции без параметров возвращается массив всех продуктов в
+        NG PSI. Query-параметры, описанные в контракте позволяют найти
+        необходимые события. Поиск событий осуществляется по индексу
+        ind_productId.
+      parameters:
+        - name: index
+          in: query
+          description: Индекс в таблице tasks
+          schema:
+            type: string
+          examples:
+            ind_productId:
+              value: ind_productId
+              summary: ind_productId
+        - name: searchValue
+          in: query
+          description: Значение индекса
+          schema:
+            type: string
+          examples:
+            ind_productId:
+              value: 0b14e478-2669-40a1-b5d1-8986859cb755
+              summary: ind_productId
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/tasks_extended'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+    post:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Создание записи о внутреннем задании
+      description: >-
+        Если необходимо создать задание с конкретным идентификатором, в тело
+        запроса добавляется параметр uuid. Если uuid не передан, он будет
+        сгенерирован автоматически.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create_tasks_extended'
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/tasks_extended'
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+  /spaces/tasks/{id}:
+    get:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Поиск конкретного внутреннего задания
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор внутреннего задания в таблице tasks
+          schema:
+            type: string
+            example: e0a186f4-03a2-4cb8-8680-988fa6d627a1
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/tasks_extended'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+    delete:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Удаление конкретного внутреннего задания
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор внутреннего задания в таблице tasks
+          schema:
+            type: string
+            example: e0a186f4-03a2-4cb8-8680-988fa6d627a1
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/tasks_extended'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+    patch:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Обновление записи конкретного внутреннего задания
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор продукта в таблице products
+          schema:
+            type: string
+            example: e0a186f4-03a2-4cb8-8680-988fa6d627a1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update_tasks_extended'
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              examples:
+                update_products_extended_example:
+                  $ref: '#/components/examples/update_tasks_extended_example'
+        '204':
+          description: No content
+        '400':
+          description: Bad Request
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: Internal Server Error
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+  /spaces/completed_tasks:
+    get:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Поиск выполненных заданий по индексам
+      description: >-
+        При вызове функции без параметров возвращается массив всех продуктов в
+        NG PSI. Query-параметры, описанные в контракте позволяют найти
+        необходимые события. Поиск событий осуществляется по индексу
+        ind_productId.
+      parameters:
+        - name: index
+          in: query
+          description: Индекс в таблице tasks
+          schema:
+            type: string
+          examples:
+            ind_productId:
+              value: ind_productId
+              summary: ind_productId
+        - name: searchValue
+          in: query
+          description: Значение индекса
+          schema:
+            type: string
+          examples:
+            ind_productId:
+              value: 0b14e478-2669-40a1-b5d1-8986859cb755
+              summary: ind_productId
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/completed_tasks_extended'
+        '204':
+          description: NoContent
+        '400':
+          description: BadRequest
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: InternalServerError
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+  /spaces/completed_tasks/{id}:
+    get:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Поиск конкретного выполненного задания
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор внутреннего задания в таблице tasks
+          schema:
+            type: string
+            example: d6d834a1-d8b6-4880-9aa0-1aa74976b7c9
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/completed_tasks_extended'
+        '204':
+          description: NoContent
+        '400':
+          description: BadRequest
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: InternalServerError
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+    patch:
+      tags:
+        - Расширенные методы по базе NG PSI
+      summary: Обновление записи конкретного выполненного задания
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор продукта в таблице products
+          schema:
+            type: string
+            example: d6d834a1-d8b6-4880-9aa0-1aa74976b7c9
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update_completed_tasks_extended'
+      responses:
+        '200':
+          description: 'OK: Успешное выполнение запроса'
+          content:
+            application/JSON:
+              examples:
+                update_products_extended_example:
+                  $ref: >-
+                    #/components/examples/update_completed_tasks_extended_example
+        '204':
+          description: NoContent
+        '400':
+          description: BadRequest
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/400'
+        '401':
+          description: Unauthorized
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/401'
+        '403':
+          description: Forbidden
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/403'
+        '409':
+          description: Conflict
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/409'
+        '500':
+          description: InternalServerError
+          content:
+            application/JSON:
+              schema:
+                $ref: '#/components/schemas/errorDescription'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/500'
+components:
+  schemas:
+    errorDescription:
+      type: object
+      properties:
+        serviceName:
+          type: string
+        errorCode:
+          type: string
+        userMessage:
+          type: string
+        developerMessage:
+          type: string
+        internalErrors:
+          type: string
+          example: InternalErrorDescription[]
+        errorDetail:
+          type: string
+          example: ErrorDetail
+    event:
+      type: object
+      properties:
+        refId:
+          type: string
+          description: Ключ идемпотентности
+        refIdType:
+          type: string
+          description: В связке с refId обеспечивает уникальность передаваемого события
+        eventType:
+          type: string
+          description: Тип события NG PSI
+          enum:
+            - activation_started
+            - activation_aborted
+            - activation_completed
+            - prolong_completed
+            - resume_completed
+            - suspend_completed
+            - deactivation_started
+            - deactivation_completed
+            - deactivation_external
+            - change_price_completed
+            - change_product_info
+        eventDate:
+          type: string
+          description: Дата и время возникновения события
+          example: '2005-08-09T18:31:42.000Z'
+        sourceCode:
+          type: string
+          description: Система-инициатор запроса
+      required:
+        - refId
+        - refIdType
+        - eventType
+        - sourceCode
+    event_activation_started:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/event'
+        clientInfo:
+          $ref: '#/components/schemas/clientInfo'
+        productOrderItems:
+          $ref: '#/components/schemas/productOrderItems_activation_start'
+    event_activation_started_custom_bundles:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/event'
+        clientInfo:
+          $ref: '#/components/schemas/clientInfo'
+        productOrderItems:
+          $ref: >-
+            #/components/schemas/productOrderItems_activation_start_custom_bundles
+    other_event:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/event'
+        products:
+          $ref: '#/components/schemas/products'
+        characteristics:
+          $ref: '#/components/schemas/extraParam'
+    extraParam:
+      type: array
+      items:
+        type: object
+        properties:
+          valueType:
+            type: string
+            description: Тип характеристики
+          name:
+            type: string
+            description: Наименование характеристики
+          value:
+            type: string
+            description: Значение характиристики
+    productOrderItems_activation_start:
+      type: array
+      items:
+        type: object
+        properties:
+          productOrderItemId:
+            type: string
+            description: Идентификатор элемента подключаемого продукта
+          isBundle:
+            type: boolean
+            description: Признак бандла
+            enum:
+              - true
+              - false
+          isCustom:
+            type: boolean
+            description: Признак продукта CUSTOM BUNDLE
+            enum:
+              - true
+              - false
+          productOfferingId:
+            type: string
+            description: Идентификатор продуктового предложения NG FPC
+          productOfferingName:
+            type: string
+            description: Название продуктового предложения NG FPC
+          characteristic:
+            type: array
+            description: Характеристики продукта
+            items:
+              $ref: '#/components/schemas/characteristics'
+          productPrice:
+            $ref: '#/components/schemas/price'
+          productOrderItemRelationship:
+            type: array
+            description: Связи между элементами подключаемого продукта
+            items:
+              $ref: '#/components/schemas/productOrderItemRelationship'
+          fabricRef:
+            $ref: '#/components/schemas/fabricRef'
+          metaInfo:
+            $ref: '#/components/schemas/metaInfo'
+          label:
+            $ref: '#/components/schemas/label'
+        required:
+          - productOrderItemId
+          - isBundle
+          - productOfferingId
+          - productPrice
+          - productOrderItemRelationship
+    productOrderItems_activation_start_custom_bundles:
+      type: array
+      items:
+        type: object
+        properties:
+          productOrderItemId:
+            type: string
+            description: Идентификатор элемента подключаемого продукта
+          isBundle:
+            type: boolean
+            description: Признак бандла
+            enum:
+              - true
+              - false
+          isCustom:
+            type: boolean
+            description: Признака продукта CUSTOM BUNDLE
+            enum:
+              - true
+              - false
+          productOfferingId:
+            type: string
+            description: Идентификатор продуктового предложения NG FPC
+          productOfferingName:
+            type: string
+            description: Название продуктового предложения NG FPC
+          characteristic:
+            type: array
+            description: Характеристики продукта
+            items:
+              $ref: '#/components/schemas/characteristics'
+          productPrice:
+            $ref: '#/components/schemas/price'
+          productOrderItemRelationship:
+            type: object
+            properties:
+              productd:
+                type: string
+                description: Идентификатор инстанцированного продукта(голова CUSTOM BUNDLE)
+              relationshipType:
+                type: string
+                description: Тип отношения
+            required:
+              - productId
+              - relationshipType
+          fabricRef:
+            $ref: '#/components/schemas/fabricRef'
+          metaInfo:
+            $ref: '#/components/schemas/metaInfo'
+          label:
+            $ref: '#/components/schemas/label'
+        required:
+          - productOrderItemId
+          - isBundle
+          - productOfferingId
+          - productPrice
+          - productOrderItemRelationship
+    products:
+      type: array
+      items:
+        type: object
+        properties:
+          productId:
+            type: string
+            description: Идентификатор инстанса продукта
+          characteristic:
+            type: array
+            description: Характеристики продукта
+            items:
+              $ref: '#/components/schemas/characteristics'
+          productPrice:
+            $ref: '#/components/schemas/price'
+          productRelationship:
+            $ref: '#/components/schemas/productRelationship'
+          fabricRef:
+            $ref: '#/components/schemas/fabricRef'
+          metaInfo:
+            $ref: '#/components/schemas/metaInfo'
+          label:
+            $ref: '#/components/schemas/label'
+        required:
+          - productId
+    productOrderItemRelationship:
+      type: object
+      properties:
+        productOrderItemId:
+          type: string
+          description: Идентификатор связанного элемента подключаемого продукта
+        relationshipType:
+          type: string
+          description: Тип отношения. BUNDLES - по умолчанию
+      required:
+        - productOrderItemId
+        - relationshipType
+    characteristics:
+      type: object
+      description: Характеристики продукта
+      properties:
+        refName:
+          type: string
+          description: Название характеристики FPC
+          example: TrialDeactivationMode
+        value:
+          type: string
+          description: Значение характеристики
+          example: Postponed
+        valueType:
+          type: string
+          description: Тип данных характеристики
+          example: string
+    price:
+      type: array
+      description: Цена продукта
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            description: Идентификатор цены
+            example: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+          name:
+            type: string
+            description: Наименование цены
+            example: МегаФон Плюс с промокодом
+          priceType:
+            type: string
+            description: Тип цены
+            example: RecurringCharge
+          productStatus:
+            type: string
+            description: Статус продукта, применяемый по данной цене
+            enum:
+              - ACTIVE_TRIAL
+              - ACTIVE
+          price:
+            type: object
+            properties:
+              unit:
+                type: string
+                description: Единицы измерения цены
+                example: Рубль
+              value:
+                type: integer
+                description: Значение цены
+                example: 0
+          period:
+            type: number
+            description: Количество периодов использования текущей цены (вычисление)
+            example: 1
+          duration:
+            type: number
+            description: Количество периодов применения длительности цены (конфигурация)
+            example: 0
+          recurringChargePeriodType:
+            type: string
+            description: Тип длительности цены
+            enum:
+              - hour
+              - day
+              - month
+              - year
+            example: day
+          recurringChargePeriodLength:
+            type: number
+            description: Длительность цены
+            example: 30
+          tax:
+            type: array
+            items:
+              type: object
+              properties:
+                taxAmount:
+                  type: integer
+                  example: 0
+                priceTaxExcluded:
+                  type: integer
+                  example: 0
+                taxCategory:
+                  type: string
+                  example: VAT
+          unitOfMeasure:
+            type: object
+            properties:
+              units:
+                type: string
+              amount:
+                type: integer
+          validFor:
+            type: object
+            properties:
+              startDateTime:
+                type: string
+                example: '2021-05-25T00:00:00Z'
+              endDateTime:
+                type: string
+                example: '9999-12-31T23:59:59.999Z'
+          nextPayDate:
+            type: string
+            description: >-
+              Дата следующего списания платы за какой-либо продукт c
+              тарификацией BSS-RP
+            example: '2023-02-19T09:13:35.000Z'
+          tarificationTag:
+            type: string
+            description: >-
+              Способ тарификации, перечень возможных значений - VASP, BSS-ST,
+              BSS-RP
+          priceAlterations:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Идентификатор цены
+                  example: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name:
+                  type: string
+                  description: Наименование цены
+                  example: МегаФон Плюс с промокодом
+                priceType:
+                  type: string
+                  description: Тип цены
+                  example: RecurringCharge
+                period:
+                  type: number
+                  description: Количество периодов использования текущей цены (вычисление)
+                  example: 1
+                duration:
+                  type: number
+                  description: >-
+                    Количество периодов применения длительности цены
+                    (конфигурация)
+                  example: 3
+                recurringChargePeriodType:
+                  type: string
+                  description: Тип длительности цены
+                  enum:
+                    - hour
+                    - day
+                    - month
+                    - year
+                  example: day
+                recurringChargePeriodLength:
+                  type: number
+                  description: Длительность цены
+                  example: 30
+          nextEntity:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Идентификатор следующей цены
+                example: 920bb99b-1ad9-446b-b589-b6c825770aad
+    productRelationship:
+      description: Связи между инстансами продуктов
+      type: array
+      items:
+        type: object
+        properties:
+          productId:
+            type: string
+            description: Идентификатор связанного инстанса
+          productOfferingId:
+            type: string
+            description: Идентификатор продуктового предложения связанного инстанса
+            example: f0dc81d9-957c-4344-8a9d-1b54df9f96f1
+          relationshipType:
+            type: string
+            description: Тип связи
+            enum:
+              - BUNDLES
+              - CUSTOM_BUNDLES
+    fabricRef:
+      type: array
+      items:
+        description: Референсы на Фабрики и объекты Фабрик, на которых управляется продукт
+        properties:
+          fabricRefId:
+            type: string
+            description: Идентификатор Фабрики
+            example: VASP_CHARGING
+          fabricProductOfferingId:
+            type: string
+            description: Идентификатор продуктового предложения Фабрики
+            example: megafon_plus_399_trial
+          fabricProductId:
+            type: string
+            description: Идентификатор инстанса продукта Фабрики
+            example: 0bffddc8-14be-4fc7-8aa5-6d0e6210fe4e
+    metaInfo:
+      type: object
+      description: Мета-информация по продукту
+      properties:
+        channel:
+          type: string
+          description: Канал подключения
+          example: MLK
+        campaign:
+          type: string
+          description: Маркетинговая кампания
+          example: campaign
+        statusReason:
+          type: string
+          description: Причина изменения статуса
+          example: status reason
+    label:
+      type: array
+      description: Метка на продукте
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+            description: Название метки
+            example: Double Billing
+          valueType:
+            type: string
+            description: Тип данных метки
+            example: boolean
+          value:
+            type: string
+            description: Значение метки
+            example: false
+    clientInfo:
+      type: object
+      description: Клиентская информация
+      properties:
+        partyRoleId:
+          type: string
+          description: Идентификатор роли лица
+          example: 3c52db51-50d5-49c3-a5ca-3da51aea78a4
+        partyId:
+          type: string
+          description: Идентификатор лица
+          example: c40c3daf-199c-4184-bf5d-db274c1b70a3
+      required:
+        - partyRoleId
+        - partyId
+    event_activation_started_Response:
+      type: object
+      properties:
+        refId:
+          type: string
+          description: Ключ идемпотентности
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              productOrderItemId:
+                type: string
+                description: Идентификатор элемента подключаемого продукта
+              productId:
+                type: string
+                description: Инденитификатор инстанса продукта
+              isBundle:
+                type: boolean
+                description: Признак бандла
+                enum:
+                  - true
+                  - false
+              isCustom:
+                type: boolean
+                description: Признак продукта CUSTOM BUNDLE
+                enum:
+                  - true
+                  - false
+              status:
+                type: string
+                description: Статус продукта
+                enum:
+                  - PENDING_ACTIVATE
+                  - ABORTED
+                  - ACTIVE
+                  - ACTIVE_TRIAL
+                  - SUSPENDED
+                  - PENDING_DISCONNECT
+                  - DISCONNECT
+              productOfferingId:
+                type: string
+                description: Идентификатор продуктового предложения NG FPC
+              productOfferingName:
+                type: string
+                description: Название продуктового предложения NG FPC
+              productRelationship:
+                $ref: '#/components/schemas/productRelationship'
+    other_event_Response:
+      type: object
+      properties:
+        refId:
+          type: string
+          description: Ключ идемпотентности
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+                description: Инденитификатор инстанса продукта
+              isBundle:
+                type: boolean
+                description: Признак бандла
+                enum:
+                  - true
+                  - false
+              isCustom:
+                type: boolean
+                description: Признак продукта CUSTOM BUNDLE
+                enum:
+                  - true
+                  - false
+              status:
+                type: string
+                description: Статус продукта
+                enum:
+                  - PENDING_ACTIVATE
+                  - ABORTED
+                  - ACTIVE
+                  - ACTIVE_TRIAL
+                  - SUSPENDED
+                  - PENDING_DISCONNECT
+                  - DISCONNECT
+              productOfferingId:
+                type: string
+                description: Идентификатор продуктового предложения NG FPC
+              productOfferingName:
+                type: string
+                description: Название продуктового предложения NG FPC
+              productRelationship:
+                $ref: '#/components/schemas/productRelationship'
+    productSearch_PRI_POI:
+      type: object
+      properties:
+        partyRoleId:
+          type: string
+          description: Идентификатор роли лица
+        productOfferingIdList:
+          type: array
+          description: Список идентификаторов продуктовых предложений NG FPC
+          items:
+            type: string
+        searchStatusList:
+          type: array
+          description: >-
+            Список статусов продукта. По дефолту поиск осуществляется по всем
+            статусам кроме ABORTED, DISCONNECT
+          items:
+            type: string
+            example:
+              - PENDING_ACTIVATE
+              - ABORTED
+              - ACTIVE_TRIAL
+              - ACTIVE
+              - SUSPENDED
+              - PENDING_DISCONNECT
+              - DISCONNECT
+      required:
+        - partyRoleId
+        - productOfferingIdList
+    productSearch_PI:
+      type: object
+      properties:
+        productIdList:
+          type: array
+          description: Список идентификаторов продуктов
+          items:
+            type: string
+        searchStatusList:
+          type: array
+          description: >-
+            Список статусов продукта. По дефолту поиск осуществляется по всем
+            статусам кроме ABORTED, DISCONNECT
+          items:
+            type: string
+            example:
+              - PENDING_ACTIVATE
+              - ABORTED
+              - ACTIVE_TRIAL
+              - ACTIVE
+              - SUSPENDED
+              - PENDING_DISCONNECT
+              - DISCONNECT
+      required:
+        - productIdList
+    productSearch_PRI:
+      type: object
+      properties:
+        partyRoleId:
+          type: string
+          description: Идентификатор роли лица
+        searchStatusList:
+          type: array
+          description: >-
+            Список статусов продукта. По дефолту поиск осуществляется по всем
+            статусам кроме ABORTED, DISCONNECT
+          items:
+            type: string
+            example:
+              - PENDING_ACTIVATE
+              - ABORTED
+              - ACTIVE_TRIAL
+              - ACTIVE
+              - SUSPENDED
+              - PENDING_DISCONNECT
+              - DISCONNECT
+      required:
+        - partyRoleId
+    productSearch_Response:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Инденитификатор инстанса продукта
+          example: 1fc77b99-01e9-45c4-b1ec-bbb61e779734
+        isBundle:
+          type: boolean
+          description: Признак бандла
+          example: true
+        isCustom:
+          type: boolean
+          description: Признак продукта CUSTOM BUNDLE
+          example: true
+        status:
+          type: string
+          description: Статус продукта
+          enum:
+            - PENDING_ACTIVATE
+            - ABORTED
+            - ACTIVE
+            - ACTIVE_TRIAL
+            - SUSPENDED
+            - PENDING_DISCONNECT
+            - DISCONNECT
+          example: ACTIVE_TRIAL
+        productOfferingId:
+          type: string
+          description: Идентификатор продуктового предложения NG FPC
+          example: 0a79d9ea-93fe-483b-8995-4804f747e5d4
+        productOfferingName:
+          type: string
+          description: Название продуктового предложения NG FPC
+          example: megafon_plus_399_trial
+        productOfferingVersion:
+          type: string
+          description: Версия продуктового предложения NG FPC
+          example: null
+        productSpecificationId:
+          type: string
+          description: Идентификатор продуктовой спецификации NG FPC
+          example: 89b3e779-e43d-4fde-87a3-be3a7d902ade
+        productSpecificationVersion:
+          type: string
+          description: Версия продуктовой спецификации NG FPC
+          example: null
+        trialEndDate:
+          type: string
+          description: Дата окончания триального периода. Формат - ISO 8601
+          example: '2022-02-22T07:00:00.000Z'
+        activeEndDate:
+          type: string
+          description: Дата окончания оплаченного периода. Формат - ISO 8601
+          example: '2022-02-22T07:00:00.000Z'
+        productStartDate:
+          type: string
+          description: >-
+            Дата создания нового инстанса. Продукт в статусе
+            ACTIVE\ACTIVE_TRIAL. Формат - ISO 8601
+          example: '2022-01-22T07:00:00.000Z'
+        clientInfo:
+          $ref: '#/components/schemas/clientInfo'
+        characteristic:
+          type: array
+          items:
+            $ref: '#/components/schemas/characteristics'
+        productPrice:
+          $ref: '#/components/schemas/price'
+        productRelationship:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+                description: Идентификатор связанного инстанса
+                example: 72bf1070-5092-41ba-a100-199501e68f85
+              productOfferingId:
+                type: string
+                description: Индентификатор продуктового предложения NG FPC
+                example: aecc47bf-46a9-4a3b-956d-d09fa8b71256
+              relationshipType:
+                type: string
+                description: Тип связи
+                example: BUNDLES
+        fabricRef:
+          $ref: '#/components/schemas/fabricRef'
+        metaInfo:
+          $ref: '#/components/schemas/metaInfo'
+        label:
+          $ref: '#/components/schemas/label'
+    productHistorySearch:
+      type: object
+      properties:
+        partyRoleId:
+          type: string
+          description: Идентификатор роли лица
+        productOfferingIdList:
+          type: array
+          description: Список идентификаторов продуктовых предложений NG FPC
+          items:
+            type: string
+        searchPeriod:
+          type: string
+          description: >-
+            Период времени, за который необходимо осуществить поиск, начиная с
+            текущей даты (ISO 8061)
+        searchStatusList:
+          type: array
+          description: >-
+            Список статусов продукта. По дефолту поиск осуществляется по статусу
+            DISCONNECT
+          items:
+            type: string
+            example:
+              - PENDING_ACTIVATE
+              - ABORTED
+              - ACTIVE_TRIAL
+              - ACTIVE
+              - SUSPENDED
+              - PENDING_DISCONNECT
+              - DISCONNECT
+      required:
+        - partyRoleId
+        - productOfferingIdList
+    productHistorySearch_Response:
+      type: object
+      properties:
+        detailResponse:
+          type: array
+          description: Детали поиска
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+                description: Идентификатор инстанса продукта
+                example: c37d70a4-501f-40fa-a8ae-14430894a441
+              productOfferingId:
+                type: string
+                description: Индентификатор продуктового предложения NG FPC
+                example: aecc47bf-46a9-4a3b-956d-d09fa8b71256
+              statuses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      description: Последний статус продукта
+                      enum:
+                        - PENDING_ACTIVATE
+                        - ABORTED
+                        - ACTIVE_TRIAL
+                        - ACTIVE
+                        - SUSPENDED
+                        - PENDING_DISCONNECT
+                        - DISCONNECT
+                    statusDate:
+                      type: string
+                      description: Дата установки статуса продукта. Формат - ISO 8601
+    events_extended:
+      type: object
+      description: Поля таблицы events NG PSI
+      properties:
+        eventId:
+          type: string
+          description: Уникальный идентификатор события в таблице events
+          example: 70f4a239-ec95-4fac-b9c3-75b138c3dff7
+        sourceCode:
+          type: string
+          description: Система-источник запроса
+          example: ORDER_MANAGEMENT
+        refId:
+          type: string
+          description: Ключ идемпотентности
+          example: '523071'
+        refIdType:
+          type: string
+          description: В связке с refId обеспечивает уникальность передаеваемого event'a
+          example: orderId
+        eventType:
+          type: string
+          description: Тип event'a
+          example: activation_started
+          enum:
+            - activation_started
+            - activation_aborted
+            - trial_activation_completed
+            - activation_completed
+            - activate_completed
+            - prolong_completed
+            - resume_completed
+            - suspend_completed
+            - deactivation_started
+            - deactivation_completed
+            - deactivation_external
+            - price_commercial
+            - change_product_info
+        eventDate:
+          type: string
+          description: Дата и время возникновения event'a
+          example: '2021-10-20T14:50:55.091Z'
+        refItemId:
+          type: string
+          description: Ссылка на инстанс продукта (идентификатор инстанса продукта)
+          example: c9bb4099-289c-4c2b-a493-64aadcaf3291
+        refItemIdType:
+          type: string
+          description: Тип ссылки refItemId. По умолчанию "productId"
+          example: productId
+        bucket_id:
+          type: integer
+          description: Технический параметр
+          example: 29073
+    create_events:
+      type: object
+      description: Поля таблицы events NG PSI
+      properties:
+        sourceCode:
+          type: string
+          description: Система-источник запроса
+          example: ORDER_MANAGEMENT
+        refId:
+          type: string
+          description: Ключ идемпотентности
+          example: '523071'
+        refIdType:
+          type: string
+          description: В связке с refId обеспечивает уникальность передаеваемого event'a
+          example: orderId
+        eventType:
+          type: string
+          description: Тип event'a
+          example: activation_started
+          enum:
+            - activation_started
+            - activation_aborted
+            - trial_activation_completed
+            - activation_completed
+            - activate_completed
+            - prolong_completed
+            - resume_completed
+            - suspend_completed
+            - deactivation_started
+            - deactivation_completed
+            - deactivation_external
+            - price_commercial
+            - change_product_info
+        eventDate:
+          type: string
+          description: Дата и время возникновения event'a
+          example: '2021-10-20T14:50:55.091Z'
+        refItemId:
+          type: string
+          description: Ссылка на инстанс продукта (идентификатор инстанса продукта)
+          example: c9bb4099-289c-4c2b-a493-64aadcaf3291
+        refItemIdType:
+          type: string
+          description: Тип ссылки refItemId. По умолчанию "productId"
+          example: productId
+    products_extended:
+      type: object
+      description: Поля таблицы products NG PSI
+      properties:
+        eventId:
+          type: string
+          description: >-
+            Идентификатор события, сменившего состояние стейт-машины и статус
+            продукта
+          example: 7174dc58-825f-4289-af09-40e767b45d89
+        productId:
+          type: string
+          description: Идентификатор инстанса продукта
+          example: 0b14e478-2669-40a1-b5d1-8986859cb755
+        partyRoleId:
+          type: string
+          description: Технический идентификатор роли лица
+          example: 919d5d7a-8d2f-47b5-9385-2fb02df552e1
+        productOfferingId:
+          type: string
+          description: Идентификатор продуктового предложения NG FPC
+          example: 6bc5c279-2fd7-4123-aba4-4f7e3cb81924
+        productOfferingName:
+          type: string
+          description: Название продуктового предложения NG FPC
+          example: multiSubscriptionApple
+        productOfferingVersion:
+          type: string
+          description: Версия продуктового предложения NG FPC
+          example: null
+        productSpecificationId:
+          type: string
+          description: Идентификатор продуктовой спецификации NG FPC
+          example: null
+        productSpecificationVersion:
+          type: string
+          description: Версия продуктовой спецификации NG FPC
+          example: null
+        isBundle:
+          type: boolean
+          description: Признак бандла
+          example: false
+        isCustom:
+          type: boolean
+          description: Признак продукта CUSTOM BUNDLE
+          example: true
+        class:
+          type: integer
+          description: >-
+            Класс продукта: 1 - для simple, 2 - для головы бандла, 3 для ноги
+            бандла
+          example: 2
+        status:
+          type: string
+          description: Статус продукта
+          example: ACTIVE
+          enum:
+            - PENDING_ACTIVATE
+            - PENDING_DISCONNECT
+            - ABORTED
+            - ACTIVE
+            - ACTIVE_TRIAL
+            - DISCONNECT
+            - SUSPENDED
+        trialEndDate:
+          type: string
+          description: Дата и время окончания триального периода
+          example: '2021-10-27T13:44:01.000Z'
+        activeEndDate:
+          type: string
+          description: Дата и время окончания оплаченного периода
+          example: '2021-12-26T13:44:01.000Z'
+        characteristic:
+          type: array
+          items:
+            $ref: '#/components/schemas/characteristics'
+        productPrice:
+          $ref: '#/components/schemas/price'
+        metaInfo:
+          $ref: '#/components/schemas/metaInfo'
+        fabricRef:
+          $ref: '#/components/schemas/fabricRef'
+        label:
+          type: array
+          items:
+            $ref: '#/components/schemas/label'
+        productRelationship:
+          $ref: '#/components/schemas/productRelationship'
+        tarificationPeriod:
+          type: integer
+          description: Текущий период тарификации
+          example: 3
+        machineState:
+          type: object
+          description: Срез текущей стейт-машины NG PSI у продукта
+          properties:
+            productProvision:
+              type: object
+              properties:
+                payment:
+                  type: object
+                  properties:
+                    paymentOn:
+                      type: object
+                      properties:
+                        paid:
+                          type: integer
+                          example: 1
+                price:
+                  type: object
+                  properties:
+                    priceOn:
+                      type: object
+                      properties:
+                        commercial:
+                          type: integer
+                          example: 1
+                usage:
+                  type: object
+                  properties:
+                    usageOn:
+                      type: object
+                      properties:
+                        activated:
+                          type: object
+                          properties:
+                            active:
+                              type: integer
+                              example: 1
+        quantity:
+          type: object
+          description: Количество
+          example: null
+        bucket_id:
+          type: integer
+          description: Технический параметр
+          example: 29040
+    create_products_extended:
+      type: object
+      description: Поля таблицы products NG PSI
+      properties:
+        eventId:
+          type: string
+          description: >-
+            Идентификатор события, сменившего состояние стейт-машины и статус
+            продукта
+          example: 7174dc58-825f-4289-af09-40e767b45d89
+        partyRoleId:
+          type: string
+          description: Технический идентификатор роли лица
+          example: 919d5d7a-8d2f-47b5-9385-2fb02df552e1
+        productOfferingId:
+          type: string
+          description: Идентификатор продуктового предложения NG FPC
+          example: 6bc5c279-2fd7-4123-aba4-4f7e3cb81924
+        productOfferingName:
+          type: string
+          description: Название продуктового предложения NG FPC
+          example: multiSubscriptionApple
+        productOfferingVersion:
+          type: string
+          description: Версия продуктового предложения NG FPC
+          example: null
+        productSpecificationId:
+          type: string
+          description: Идентификатор продуктовой спецификации NG FPC
+          example: null
+        productSpecificationVersion:
+          type: string
+          description: Версия продуктовой спецификации NG FPC
+          example: null
+        isBundle:
+          type: boolean
+          description: Признак бандла
+          example: false
+        isCustom:
+          type: boolean
+          description: Признак продукта CUSTOM BUNDLE
+          example: true
+        class:
+          type: integer
+          description: >-
+            Класс продукта: 1 - для simple, 2 - для головы бандла, 3 для ноги
+            бандла
+          example: 2
+        status:
+          type: string
+          description: Статус продукта
+          example: ACTIVE
+          enum:
+            - PENDING_ACTIVATE
+            - PENDING_DISCONNECT
+            - ABORTED
+            - ACTIVE
+            - ACTIVE_TRIAL
+            - DISCONNECT
+            - SUSPENDED
+        trialEndDate:
+          type: string
+          description: Дата и время окончания триального периода
+          example: '2021-10-27T13:44:01.000Z'
+        activeEndDate:
+          type: string
+          description: Дата и время окончания оплаченного периода
+          example: '2021-12-26T13:44:01.000Z'
+        characteristic:
+          type: array
+          items:
+            $ref: '#/components/schemas/characteristics'
+        productPrice:
+          $ref: '#/components/schemas/price'
+        metaInfo:
+          $ref: '#/components/schemas/metaInfo'
+        fabricRef:
+          $ref: '#/components/schemas/fabricRef'
+        label:
+          type: array
+          items:
+            $ref: '#/components/schemas/label'
+        productRelationship:
+          $ref: '#/components/schemas/productRelationship'
+        tarificationPeriod:
+          type: integer
+          description: Текущий период тарификации
+          example: 3
+        machineState:
+          type: object
+          description: Срез текущей стейт-машины NG PSI у продукта
+          properties:
+            productProvision:
+              type: object
+              properties:
+                payment:
+                  type: object
+                  properties:
+                    paymentOn:
+                      type: object
+                      properties:
+                        paid:
+                          type: integer
+                          example: 1
+                price:
+                  type: object
+                  properties:
+                    priceOn:
+                      type: object
+                      properties:
+                        commercial:
+                          type: integer
+                          example: 1
+                usage:
+                  type: object
+                  properties:
+                    usageOn:
+                      type: object
+                      properties:
+                        activated:
+                          type: object
+                          properties:
+                            active:
+                              type: integer
+                              example: 1
+        quantity:
+          type: object
+          description: Количество
+          example: null
+    update_products_extended:
+      type: object
+      description: Поля таблицы products NG PSI
+      properties:
+        status:
+          type: string
+          description: Статус продукта
+          example: SUSPENDED
+          enum:
+            - PENDING_ACTIVATE
+            - PENDING_DISCONNECT
+            - ABORTED
+            - ACTIVE
+            - ACTIVE_TRIAL
+            - DISCONNECT
+            - SUSPENDED
+        machineState:
+          type: object
+          description: Срез текущей стейт-машины NG PSI у продукта
+          properties:
+            productProvision:
+              type: object
+              properties:
+                payment:
+                  type: object
+                  properties:
+                    paymentOn:
+                      type: object
+                      properties:
+                        notPaid:
+                          type: integer
+                          example: 1
+                price:
+                  type: object
+                  properties:
+                    priceOn:
+                      type: object
+                      properties:
+                        commercial:
+                          type: integer
+                          example: 1
+                usage:
+                  type: object
+                  properties:
+                    usageOn:
+                      type: object
+                      properties:
+                        suspended:
+                          type: integer
+                          example: 1
+    tasks_extended:
+      type: object
+      description: Поля таблицы tasks NG PSI
+      properties:
+        uuid:
+          type: string
+          description: Уникальный идентификатор внутреннего задания
+          example: e0a186f4-03a2-4cb8-8680-988fa6d627a1
+        productId:
+          type: string
+          description: Идентификатор инстанса продукта
+          example: 0b14e478-2669-40a1-b5d1-8986859cb755
+        wakeAt:
+          type: string
+          description: Дата и время выполнения задания
+          example: '2022-01-16T09:09:23.000Z'
+        wakeAtFunction:
+          type: string
+          description: Название задания
+          example: send_event
+        extraParams:
+          type: object
+          properties:
+            eventType:
+              type: string
+              description: Тип внутреннего события
+              example: commercial_ended
+        status:
+          type: string
+          description: Статус задания
+          example: PENDING
+        retries:
+          type: integer
+          description: Количество переповторов выполнения задания
+          example: 1
+        bucket_id:
+          type: integer
+          description: Технический параметр
+          example: 5616
+    create_tasks_extended:
+      type: object
+      description: Поля таблицы tasks NG PSI
+      properties:
+        productId:
+          type: string
+          description: Идентификатор инстанса продукта
+          example: 0b14e478-2669-40a1-b5d1-8986859cb755
+        wakeAt:
+          type: string
+          description: Дата и время выполнения задания
+          example: '2022-01-16T09:09:23.000Z'
+        wakeAtFunction:
+          type: string
+          description: Название задания
+          example: send_event
+        extraParams:
+          type: object
+          properties:
+            eventType:
+              type: string
+              description: Тип внутреннего события
+              example: commercial_ended
+        status:
+          type: string
+          description: Статус задания
+          example: PENDING
+        retries:
+          type: integer
+          description: Количество переповторов выполнения задания
+          example: 1
+    update_tasks_extended:
+      type: object
+      description: Поля таблицы tasks NG PSI
+      properties:
+        wakeAt:
+          type: string
+          description: Дата и время выполнения задания
+          example: '2021-12-21T08:00:00.000Z'
+    completed_tasks_extended:
+      type: object
+      description: Поля таблицы completed_tasks NG PSI
+      properties:
+        uuid:
+          type: string
+          description: Уникальный идентификатор внутреннего выполненного задания
+          example: d6d834a1-d8b6-4880-9aa0-1aa74976b7c9
+        productId:
+          type: string
+          description: Идентификатор инстанса продукта
+          example: 0b14e478-2669-40a1-b5d1-8986859cb755
+        wakeAt:
+          type: string
+          description: Дата и время выполнения задания
+          example: '2021-10-27T13:44:01.000Z'
+        wakeAtFunction:
+          type: string
+          description: Название задания
+          example: ACTIVATE
+        extraParams:
+          type: object
+          properties:
+            eventType:
+              type: string
+              description: Тип внутреннего события
+              example: null
+        status:
+          type: string
+          description: Статус задания
+          example: WAITING
+        retries:
+          type: integer
+          description: Количество переповторов выполнения задания
+          example: 1
+        historyTimestamp:
+          type: string
+          description: Дата и время обновления записи
+          example: '2021-10-27T13:44:01.000Z'
+        bucket_id:
+          type: integer
+          description: Технический параметр
+          example: 5616
+    update_completed_tasks_extended:
+      type: object
+      description: Поля таблицы completed_tasks NG PSI
+      properties:
+        status:
+          type: string
+          description: Статус задания
+          example: DONE
+  examples:
+    '204':
+      value:
+        serviceName: ng-psi
+        errorCode: DataNotFoundError
+        userMessage: Продукт не найден
+        developerMessage: Cannot found productId=<value>
+    '400':
+      value:
+        serviceName: ng-psi
+        errorCode: BadRequest
+        userMessage: 'Ошибка во входном параметре: <parameter> - <value or diagnostic>'
+        developerMessage: 'Ошибка во входном параметре: <parameter> - <value or diagnostic>'
+    '401':
+      value:
+        serviceName: ng-psi
+        errorCode: Unauthorized
+        userMessage: Требуется аутентификация для доступа к функции
+    '403':
+      value:
+        serviceName: ng-psi
+        errorCode: Forbidden
+        userMessage: Для вызова метода необходима роль в FedSSO
+    '409':
+      value:
+        serviceName: ng-psi
+        errorCode: Conflict
+        userMessage: Запрос нельзя обработать из-за конфликта в текущем состоянии ресурса
+    '500':
+      value:
+        serviceName: ng-psi
+        errorCode: InternalServerError
+        userMessage: Внутренняя ошибка сервиса
+    PRI_POI:
+      value:
+        partyRoleId: 3c52db51-50d5-49c3-a5ca-3da51aea78a4
+        productOfferingIdList:
+          - 0a79d9ea-93fe-483b-8995-4804f747e5d4
+          - 752943d0-e76e-4dc2-afe8-329a21711096
+        searchStatusList:
+          - ACTIVE_TRIAL
+    PI:
+      value:
+        productId:
+          - 1fc77b99-01e9-45c4-b1ec-bbb61e779734
+          - 928270c1-7c5d-40e5-9992-b565c8713018
+        searchStatusList:
+          - ACTIVE_TRIAL
+    PRI:
+      value:
+        partyRoleId: 3c52db51-50d5-49c3-a5ca-3da51aea78a4
+        searchStatusList:
+          - ACTIVE_TRAIL
+    productSearch_Response:
+      value:
+        - productId: 1fc77b99-01e9-45c4-b1ec-bbb61e779734
+          isBundle: true
+          isCustom: false
+          status: ACTIVE_TRIAL
+          productOfferingId: 0a79d9ea-93fe-483b-8995-4804f747e5d4
+          productOfferingName: megafon_plus_399_trial
+          productOfferingVersion: null
+          productSpecificationId: 89b3e779-e43d-4fde-87a3-be3a7d902ade
+          productSpecificationVersion: null
+          trialEndDate: '2022-02-22T07:00:00.000Z'
+          activeEndDate: '2022-02-22T07:00:00.000Z'
+          productStartDate: '2022-01-22T07:00:00.000Z'
+          clientInfo:
+            partyRoleId: 3c52db51-50d5-49c3-a5ca-3da51aea78a4
+            partyId: c40c3daf-199c-4184-bf5d-db274c1b70a3
+          characteristic:
+            - refName: TrialDeactivationMode
+              value: Postponed
+              valueType: string
+          productPrice:
+            - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+              name: ACTIVE_TRIAL МФ+ с промокодом
+              priceType: RecurringCharge
+              productStatus: ACTIVE_TRIAL
+              price:
+                unit: Рубль
+                value: 0
+              period: 1
+              duration: 1
+              recurringChargePeriodType: day
+              recurringChargePeriodLength: 30
+              tax:
+                taxAmount: Рубль
+                priceTaxAmount: 0
+                taxCategory: VAT
+              unitOfMeasure:
+                units: Рубль
+                amount: 1
+              validFor:
+                startDateTime: '2023-10-25T07:00:00Z'
+                endDateTime: '9999-12-31T23:59:59.999Z'
+              nextPayDate: '2023-11-25T07:00:00Z'
+              tarificationTag: VASP
+              priceAlterations: []
+              nextEntity:
+                - id: 920bb99b-1ad9-446b-b589-b6c825770aad
+          productRelationship:
+            - productId: 72bf1070-5092-41ba-a100-199501e68f85
+              productOfferingId: 4444e607-19ef-439a-967e-fd04e8098c28
+              relationshipType: BUNDLES
+          fabricRef:
+            - fabricRefId: VASP_CHARGING
+              fabricProductOfferingId: megafon_plus_399
+              fabricProductId: megafon_plus_399
+          metaInfo:
+            - chanel: MLK
+              campaign: campaign
+              statusReason: status reason
+          label: null
+        - productId: 928270c1-7c5d-40e5-9992-b565c8713018
+          isBundle: false
+          isCustom: false
+          status: ACTIVE_TRIAL
+          trialEndDate: '2022-02-22T07:00:00.000Z'
+          activeEndDate: '2022-02-22T07:00:00.000Z'
+          productStartDate: '2022-01-22T07:00:00.000Z'
+          productOfferingId: 752943d0-e76e-4dc2-afe8-329a21711096
+          productOfferingName: Apple Music
+          productOfferingVersion: null
+          productSpecificationId: 119a2a66-af2e-4b75-9ab7-4191af77cfac
+          productSpecificationVersion: null
+          clientInfo:
+            partyRoleId: 3c52db51-50d5-49c3-a5ca-3da51aea78a4
+            partyId: c40c3daf-199c-4184-bf5d-db274c1b70a3
+          characteristic:
+            - refName: TrialDeactivationMode
+              value: Postponed
+              valueType: string
+          productPrice:
+            - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+              name: ACTIVE_TRIAL Apple Music
+              priceType: RecurringCharge
+              productStatus: ACTIVE_TRIAL
+              period: 1
+              duration: 1
+              recurringChargePeriodType: month
+              recurringChargePeriodLength: 1
+              value: 399
+              priceAlterations: []
+          productRelationship: []
+          fabricRef:
+            - fabricRefId: VASP_CHARGING
+              fabricProductOfferingId: apple_music_169_trial
+              fabricProductId: apple_music_169_trial
+            - fabricRefId: PARTNER_SERVICE
+              fabricProductOfferingId: 363fbe5d-37e7-454d-8e96-898764e624a4
+              fabricProductId: 996eaf8b-d9b1-45d9-9d2b-0b04555fe35c
+          metaInfo:
+            - chanel: MLK
+              campaign: campaign
+              statusReason: status reason
+          label:
+            - name: Double Billing
+              valueType: boolean
+              value: false
+    productSearch_Response_custom_bundle:
+      value:
+        - productId: d545333c-d229-469d-befe-52f398dad934
+          isBundle: true
+          isCustom: true
+          status: ACTIVE
+          productOfferingId: 05f36c2f-5072-4fd0-88b2-40720edd5b78
+          productOfferingName: kinoman_299
+          productOfferingVersion: null
+          productSpecificationId: 89b3e779-e43d-4fde-87a3-be3a7d902ade
+          productSpecificationVersion: null
+          trialEndDate: '2023-11-01T07:00:00.000Z'
+          activeEndDate: '2023-11-01T07:00:00.000Z'
+          productStartDate: '2023-11-01T07:00:00.000Z'
+          clientInfo:
+            partyRoleId: 3c52db51-50d5-49c3-a5ca-3da51aea78a4
+            partyId: c40c3daf-199c-4184-bf5d-db274c1b70a3
+          characteristic:
+            - refName: ActiveDeactivationMode
+              value: Immediate
+              valueType: string
+          productPrice:
+            - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+              name: kinopoisk_299
+              priceType: RecurringCharge
+              productStatus: Active
+              price:
+                unit: Рубль
+                value: 0
+              duration: 1
+              recurringChargePeriodType: day
+              recurringChargePeriodLength: 30
+              tax:
+                taxAmount: Рубль
+                priceTaxAmount: 0
+                taxCategory: VAT
+              unitOfMeasure:
+                units: Рубль
+                amount: 1
+              validFor:
+                startDateTime: '2023-10-25T07:00:00Z'
+                endDateTime: '9999-12-31T23:59:59.999Z'
+              nextPayDate: '2023-11-25T07:00:00Z'
+              tarificationTag: VASP
+              priceAlteration: []
+              nextEntity:
+                - id: 920bb99b-1ad9-446b-b589-b6c825770aad
+          productRelationship:
+            - productId: 3800539f-a447-43b6-a7ec-aa72434479d3
+              productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+              relationshipType: CUSTOM_BUNDLES
+            - productId: 952bd33d-dc63-46c3-90f6-81ac28e8f9ef
+              productOfferingId: b1b9c0ea-486d-4f88-a38a-97c2cb4794b4
+              relationshipType: CUSTOM_BUNDLES
+          fabricRef:
+            - fabricRefId: VASP_CHARGING
+              fabricProductOfferingId: kinoman_299
+              fabricProductId: kinoman_299
+          label: null
+        - productId: 800539f-a447-43b6-a7ec-aa72434479d3
+          isBundle: false
+          isCustom: true
+          status: ACTIVE
+          trialEndDate: '2023-11-01T07:00:00.000Z'
+          activeEndDate: '2023-11-01T07:00:00.000Z'
+          productStartDate: '2023-11-01T07:00:00.000Z'
+          productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+          productOfferingName: kinoman_OKKO
+          productOfferingVersion: null
+          productSpecificationId: 119a2a66-af2e-4b75-9ab7-4191af77cfac
+          productSpecificationVersion: null
+          clientInfo:
+            partyRoleId: 3c52db51-50d5-49c3-a5ca-3da51aea78a4
+            partyId: c40c3daf-199c-4184-bf5d-db274c1b70a3
+          characteristic:
+            - refName: ActiveDeactivationMode
+              value: Immediate
+              valueType: string
+          productPrice: []
+          productRelationship: []
+          fabricRef:
+            - fabricRefId: VASP_ADAPTER
+              fabricProductOfferingId: kinoman_OKKO
+              fabricProductId: kinoman_OKKO
+          label: null
+        - productId: 952bd33d-dc63-46c3-90f6-81ac28e8f9ef
+          isBundle: false
+          isCustom: true
+          status: ACTIVE
+          trialEndDate: '2023-11-01T07:00:00.000Z'
+          activeEndDate: '2023-11-01T07:00:00.000Z'
+          productStartDate: '2023-11-01T07:00:00.000Z'
+          productOfferingId: b1b9c0ea-486d-4f88-a38a-97c2cb4794b4
+          productOfferingName: kinoman_IVI
+          productOfferingVersion: null
+          productSpecificationId: 119a2a66-af2e-4b75-9ab7-4191af77cfac
+          productSpecificationVersion: null
+          clientInfo:
+            partyRoleId: 3c52db51-50d5-49c3-a5ca-3da51aea78a4
+            partyId: c40c3daf-199c-4184-bf5d-db274c1b70a3
+          characteristic:
+            - refName: ActiveDeactivationMode
+              value: Immediate
+              valueType: string
+          productPrice: []
+          productRelationship: []
+          fabricRef:
+            - fabricRefId: VASP_ADAPTER
+              fabricProductOfferingId: kinoman_IVI
+              fabricProductId: kinoman_IVI
+          label: null
+    productSearch_Response_custom_bundle_leg:
+      value:
+        - productId: 952bd33d-dc63-46c3-90f6-81ac28e8f9ef
+          isBundle: false
+          isCustom: true
+          status: ACTIVE
+          trialEndDate: '2023-11-01T07:00:00.000Z'
+          activeEndDate: '2023-11-01T07:00:00.000Z'
+          productStartDate: '2023-11-01T07:00:00.000Z'
+          productOfferingId: b1b9c0ea-486d-4f88-a38a-97c2cb4794b4
+          productOfferingName: kinoman_IVI
+          productOfferingVersion: null
+          productSpecificationId: 119a2a66-af2e-4b75-9ab7-4191af77cfac
+          productSpecificationVersion: null
+          clientInfo:
+            partyRoleId: 3c52db51-50d5-49c3-a5ca-3da51aea78a4
+            partyId: c40c3daf-199c-4184-bf5d-db274c1b70a3
+          characteristic:
+            - refName: ActiveDeactivationMode
+              value: Immediate
+              valueType: string
+          productPrice: []
+          productRelationship:
+            - productId: 800539f-a447-43b6-a7ec-aa72434479d3
+              productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+              relationshipType: BELONGS
+          fabricRef:
+            - fabricRefId: VASP_ADAPTER
+              fabricProductOfferingId: kinoman_IVI
+              fabricProductId: kinoman_IVI
+          label: null
+    productHistorySearch:
+      value:
+        partyRoleId: 01012c4d-e5dc-46c5-bf1e-9323f9bf8afe
+        productOfferingIdList:
+          - 3c1840f8-2e2c-43d6-90c4-a3b285814f51
+          - 752943d0-e76e-4dc2-afe8-329a21711096
+        searchPeriod: P3Y6M4DT12H30M5S
+        searchStatusList:
+          - ACTIVE_TRIAL
+          - ACTIVE
+          - DISCONNECT
+    productHistorySearch_Response:
+      value:
+        detailResponse:
+          - productOfferingId: 3c1840f8-2e2c-43d6-90c4-a3b285814f51
+            productId: e0a9a885-17c8-446f-ad76-f7289f97e2ff
+            statuses:
+              - status: ACTIVE_TRIAL
+                statusDate: '2021-06-18T00:00:00.000Z'
+          - productOfferingId: 752943d0-e76e-4dc2-afe8-329a21711096
+            productId: fc998cac-ab08-43a0-a06b-dd60978d9e12
+            statuses:
+              - status: DISCONNECT
+                statusDate: '2021-08-20T00:00:00.000Z'
+    activation_started_bundle:
+      value:
+        event:
+          refId: 403cb11d-5604-4484-8c1a-379a0ee301b3
+          refIdType: orderId
+          eventType: activation_started
+          eventDate: '2023-02-22T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        clientInfo:
+          partyRoleId: 3c52db51-50d5-49c3-a5ca-3da51aea78a4
+          partyId: c40c3daf-199c-4184-bf5d-db274c1b70a3
+        productOrderItems:
+          - productOrderItemId: '100'
+            isBundle: true
+            productOfferingId: 9da02d42-5139-4837-b6f6-2b610c05de7c
+            productOfferingName: megafon_plus_399
+            characteristic:
+              - refName: SuspendDuration
+                value: p90d
+              - refName: TrialDeactivationMode
+                value: Postponed
+              - refName: ActiveDeactivationMode
+                value: Postponed
+              - refName: PROMOCODE
+                value:
+                  - relatedPromoActionId: 123e4567-e89b-12d3-a4f6-426655124000
+                    value: promocodeId
+                valueType: Array
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: ACTIVE МФ+ с промокодом
+                priceType: RecurringCharge
+                productStatus: ACTIVE
+                price:
+                  unit: Рубль
+                  value: 199
+                duration: 0
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2023-03-25T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2023-04-25T07:00:00Z'
+                tarificationTag: VASP
+                priceAlterations:
+                  - id: f9e5529a-d1dc-49ac-9e5f-69640180b463
+                    name: Discount МФ+ с промокодом
+                    priceType: Discount
+                    duration: 3
+                    recurringChargePeriodType: day
+                    recurringChargePeriodLength: 30
+            productOrderItemRelationship:
+              - productOrderItemId: '110'
+                relationshipType: BUNDLES
+              - productOrderItemId: '120'
+                relationshipType: BUNDLES
+          - productOrderItemId: '110'
+            isBundle: false
+            productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+            productOfferingName: mybook_mf_plus_399
+          - productOrderItemId: '120'
+            isBundle: false
+            productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+            productOfferingName: zvooq_mf_plus_399
+    activation_started_custom_bundle:
+      value:
+        event:
+          refId: f4c45156-c43e-4ec1-8859-7605d14f761d
+          refIdType: orderId
+          eventType: activation_started
+          eventDate: '2023-10-01T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        clientInfo:
+          partyRoleId: 3c52db51-50d5-49c3-a5ca-3da51aea78a4
+          partyId: c40c3daf-199c-4184-bf5d-db274c1b70a3
+        productOrderItems:
+          - productOrderItemId: '1'
+            isBundle: true
+            isCustom: true
+            productOfferingId: 05f36c2f-5072-4fd0-88b2-40720edd5b78
+            productOfferingName: kinoman_299
+            characteristic:
+              - refName: SuspendDuration
+                value: p90d
+              - refName: ActiveDeactivationMode
+                value: Immediate
+                valueType: null
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: kinopoisk_299
+                priceType: RecurringCharge
+                productStatus: Active
+                price:
+                  unit: Рубль
+                  value: 0
+                duration: 1
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2023-10-25T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2023-11-25T07:00:00Z'
+                tarificationTag: VASP
+                priceAlteration: []
+                nextEntity:
+                  - id: 920bb99b-1ad9-446b-b589-b6c825770aad
+            productOrderItemRelationship:
+              - productOrderItemId: '2'
+                relationshipType: CUSTOM_BUNDLES
+              - productOrderItemId: '3'
+                relationshipType: CUSTOM_BUNDLES
+          - productOrderItemId: '2'
+            isBundle: false
+            isCustom: true
+            productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+            productOfferingName: kinoman_OKKO
+          - productOrderItemId: '3'
+            isBundle: false
+            isCustom: true
+            productOfferingId: b1b9c0ea-486d-4f88-a38a-97c2cb4794b4
+            productOfferingName: kinoman_IVI
+    activation_started_custom_bundle_no_content:
+      value:
+        event:
+          refId: f4c45156-c43e-4ec1-8859-7605d14f761d
+          refIdType: orderId
+          eventType: activation_started
+          eventDate: '2024-04-20T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        clientInfo:
+          partyRoleId: 3c52db51-50d5-49c3-a5ca-3da51aea78a4
+          partyId: c40c3daf-199c-4184-bf5d-db274c1b70a3
+        productOrderItems:
+          - productOrderItemId: '1'
+            isBundle: true
+            isCustom: true
+            productOfferingId: 05f36c2f-5072-4fd0-88b2-40720edd5b78
+            productOfferingName: kinoman_299
+            characteristic:
+              - refName: SuspendDuration
+                value: p90d
+              - refName: ActiveDeactivationMode
+                value: Immediate
+                valueType: null
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: kinopoisk_299
+                priceType: RecurringCharge
+                productStatus: Active
+                price:
+                  unit: Рубль
+                  value: 0
+                duration: 1
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2023-10-25T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2023-11-25T07:00:00Z'
+                tarificationTag: VASP
+                priceAlteration: []
+                nextEntity:
+                  - id: 920bb99b-1ad9-446b-b589-b6c825770aad
+            productOrderItemRelationship: []
+    activation_started_Response_bundle:
+      value:
+        refId: 403cb11d-5604-4484-8c1a-379a0ee301b3
+        products:
+          - productOrderItemId: '100'
+            productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+            isBundle: true
+            isCustom: false
+            status: PENDING_ACTIVATE
+            productOfferingId: 97de51ee-e129-4731-93fa-aeebab7f3882
+            productOfferingName: megafon_plus_399
+            productRelationship:
+              - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+                productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+                relationshipType: BUNDLES
+              - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+                productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+                relationshipType: BUNDLES
+          - productOrderItemId: '110'
+            productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+            isBundle: false
+            isCustom: false
+            productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+            productOfferingName: mybook_mf_plus_399
+            status: PENDING_ACTIVATE
+            productRelationship: []
+          - productOrderItemId: '120'
+            productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+            isBundle: false
+            isCustom: false
+            productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+            productOfferingName: zvooq_mf_plus_399
+            status: PENDING_ACTIVATE
+            productRelationship: []
+    activation_started_Response_custom_bundle:
+      value:
+        refId: f4c45156-c43e-4ec1-8859-7605d14f761d
+        products:
+          - productOrderItemId: '1'
+            productId: d545333c-d229-469d-befe-52f398dad934
+            isBundle: true
+            isCustom: true
+            status: PENDING_ACTIVATE
+            productOfferingId: 05f36c2f-5072-4fd0-88b2-40720edd5b78
+            productOfferingName: kinoman_299
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: kinopoisk_299
+                priceType: RecurringCharge
+                productStatus: Active
+                price:
+                  unit: Рубль
+                  value: 0
+                duration: 1
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2023-10-25T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2023-11-25T07:00:00Z'
+                tarificationTag: VASP
+                priceAlteration: []
+                nextEntity:
+                  - id: 920bb99b-1ad9-446b-b589-b6c825770aad
+            productRelationship:
+              - productId: 3800539f-a447-43b6-a7ec-aa72434479d3
+                productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+                relationshipType: CUSTOM_BUNDLES
+              - productId: 952bd33d-dc63-46c3-90f6-81ac28e8f9ef
+                productOfferingId: b1b9c0ea-486d-4f88-a38a-97c2cb4794b4
+                relationshipType: CUSTOM_BUNDLES
+          - productOrderItemId: '2'
+            productId: 800539f-a447-43b6-a7ec-aa72434479d3
+            isBundle: false
+            isCustom: true
+            productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+            productOfferingName: kinoman_OKKO
+            status: PENDING_ACTIVATE
+            productRelationship: []
+          - productOrderItemId: '3'
+            productId: 952bd33d-dc63-46c3-90f6-81ac28e8f9ef
+            isBundle: false
+            isCustom: true
+            productOfferingId: b1b9c0ea-486d-4f88-a38a-97c2cb4794b4
+            productOfferingName: kinoman_IVI
+            status: PENDING_ACTIVATE
+            productRelationship: []
+    activation_started_Response_custom_bundle_no_content:
+      value:
+        refId: f4c45156-c43e-4ec1-8859-7605d14f761d
+        products:
+          - productOrderItemId: '1'
+            productId: d545333c-d229-469d-befe-52f398dad934
+            isBundle: true
+            isCustom: true
+            status: PENDING_ACTIVATE
+            productOfferingId: 05f36c2f-5072-4fd0-88b2-40720edd5b78
+            productOfferingName: kinoman_299
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: kinopoisk_299
+                priceType: RecurringCharge
+                productStatus: Active
+                price:
+                  unit: Рубль
+                  value: 0
+                duration: 1
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2024-04-20T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2024-05-20T07:00:00Z'
+                tarificationTag: VASP
+                priceAlteration: []
+                nextEntity:
+                  - id: 920bb99b-1ad9-446b-b589-b6c825770aad
+            productRelationship: []
+    activation_started_single:
+      value:
+        event:
+          refId: 2eb84393-9b62-40bf-8461-74fd5eda7da1
+          refIdType: orderId
+          eventType: activation_started
+          eventDate: '2023-02-22T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        clientInfo:
+          partyRoleId: 1acfd1a0-4504-44fd-97cb-0d6717794389
+          partyId: c40c3daf-199c-4184-bf5d-db274c1b70a3
+        productOrderItems:
+          - productOrderItemId: '100'
+            isBundle: false
+            productOfferingId: c593538c-69f0-4210-9c0b-af61d8474476
+            productOfferingName: Apple music
+            characteristic:
+              - refName: SuspendDuration
+                value: p90d
+              - refName: TrialDeactivationMode
+                value: Postponed
+              - refName: ActiveDeactivationMode
+                value: Postponed
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: ACTIVE_TRIAL Apple Music
+                priceType: RecurringCharge
+                productStatus: ACTIVE_TRIAL
+                price:
+                  unit: Рубль
+                  value: 0
+                duration: 1
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2023-02-22T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2023-03-22T07:00:00Z'
+                tarificationTag: VASP
+                priceAlterations: []
+            productRelationship: []
+            metaInfo:
+              chanel: MLK
+              campaign: campaign
+              statusReason: status reason
+    activation_started_custom_bundle_single:
+      value:
+        event:
+          refId: 2eb84393-9b62-40bf-8461-74fd5eda7da1
+          refIdType: orderId
+          eventType: activation_started
+          eventDate: '2023-11-01T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        clientInfo:
+          partyRoleId: 1acfd1a0-4504-44fd-97cb-0d6717794389
+          partyId: c40c3daf-199c-4184-bf5d-db274c1b70a3
+        productOrderItems:
+          - productOrderItemId: '4'
+            isBundle: false
+            isCustom: true
+            productOfferingId: 86874286-786d-4cb5-b935-8410a064c981
+            productOfferingName: kinonoman_KINOPOISK
+            characteristic:
+              - refName: TrialDeactivationMode
+                value: Postponed
+              - refName: ActiveDeactivationMode
+                value: Postponed
+            productPrice: []
+            productOrderItemRelationship:
+              - productId: d545333c-d229-469d-befe-52f398dad934
+                relationshipType: BELONGS
+    activation_started_Response_single:
+      value:
+        refId: 2eb84393-9b62-40bf-8461-74fd5eda7da1
+        products:
+          - productOrderItemId: '100'
+            productId: 753afbf7-d4f6-4f82-a7fb-da51c11e07a0
+            isBundle: false
+            isCustom: false
+            status: PENDING_ACTIVATE
+            productOfferingId: c593538c-69f0-4210-9c0b-af61d8474476
+            productOfferingName: Apple music
+            productRelationship: []
+    activation_started_Response_custom_bundle_simple:
+      value:
+        refId: 2eb84393-9b62-40bf-8461-74fd5eda7da1
+        products:
+          - productOrderItemId: '4'
+            productId: 753afbf7-d4f6-4f82-a7fb-da51c11e07a0
+            isBundle: false
+            isCustom: false
+            status: PENDING_ACTIVATE
+            productOfferingId: 86874286-786d-4cb5-b935-8410a064c981
+            productOfferingName: kinoman_KINOPOISK
+            productRelationship: []
+    activation_aborted:
+      value:
+        event:
+          refId: 4e26af2c-f91c-4d52-aee4-63c291280592
+          refIdType: orderId
+          eventType: activation_aborted
+          eventDate: '2022-02-22T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+    activation_aborted_Response:
+      value:
+        refId: 4e26af2c-f91c-4d52-aee4-63c291280592
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+            isBundle: true
+            isCutom: false
+            status: ABORTED
+            productOfferingId: 97de51ee-e129-4731-93fa-aeebab7f3882
+            productOfferingName: megafon_plus_399
+            productRelationship:
+              - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+                productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+                relationshipType: BUNDLES
+              - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+                productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+                relationshipType: BUNDLES
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+            isBundle: false
+            isCustom: false
+            productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+            productOfferingName: mybook_mf_plus_399
+            status: ABORTED
+            productRelationship: []
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+            isBundle: false
+            isCustom: false
+            productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+            productOfferingName: zvooq_mf_plus_399
+            status: ABORTED
+            productRelationship: []
+    activation_completed:
+      value:
+        event:
+          refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+          refIdType: orderId
+          eventType: activation_completed
+          eventDate: '2023-02-22T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        products:
+          - productId: 753afbf7-d4f6-4f82-a7fb-da51c11e07a0
+            isBundle: true
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: ACTIVE_TRIAL Apple Music
+                priceType: RecurringCharge
+                productStatus: ACTIVE_TRIAL
+                price:
+                  unit: Рубль
+                  value: 0
+                duration: 1
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2023-02-22T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2023-03-22T07:00:00Z'
+                tarificationTag: VASP
+                priceAlterations: []
+            fabricRef:
+              - fabricRefId: VASP_CHARGING
+                fabricProductOfferingId: apple_music_169_trial
+                fabricProductId: apple_music_169_trial
+              - fabricRefId: PARTNER_SERVICE
+                fabricProductOfferingId: 363fbe5d-37e7-454d-8e96-898764e624a4
+                fabricProductId: 996eaf8b-d9b1-45d9-9d2b-0b04555fe35c
+    activation_completed_custom_bundle:
+      value:
+        event:
+          refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+          refIdType: orderId
+          eventType: activation_completed
+          sourceCode: ORDER_MANAGEMENT
+        products:
+          - productId: 753afbf7-d4f6-4f82-a7fb-da51c11e07a0
+            isBundle: false
+            isCustom: true
+            productPrice: []
+            fabricRef:
+              - fabricRefId: VASP_ADAPTER
+                fabricProductOfferingId: kinoman_OKKO
+                fabricProductId: kinoman_OKKO
+          - productId: 952bd33d-dc63-46c3-90f6-81ac28e8f9ef
+            isBundle: false
+            isCustom: true
+            productPrice: []
+            fabricRef:
+              - fabricRefId: VASP_ADAPTER
+                fabricProductOfferingId: kinoman_IVI
+                fabricProductId: kinoman_IVI
+          - productId: d545333c-d229-469d-befe-52f398dad934
+            isBundle: true
+            isCustom: true
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: kinopoisk_299
+                priceType: RecurringCharge
+                productStatus: Active
+                price:
+                  unit: Рубль
+                  value: 0
+                duration: 1
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2023-10-25T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2023-11-25T07:00:00Z'
+                tarificationTag: VASP
+                priceAlteration: []
+                nextEntity:
+                  - id: 920bb99b-1ad9-446b-b589-b6c825770aad
+            fabricRef:
+              - fabricRefId: VASP_CHARGING
+                fabricProductOfferingId: kinoman_299
+                fabricProductId: kinoman_299
+    activation_completed_custom_bundle_no_content:
+      value:
+        event:
+          refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+          refIdType: orderId
+          eventType: activation_completed
+          sourceCode: ORDER_MANAGEMENT
+        products:
+          - productId: d545333c-d229-469d-befe-52f398dad934
+            isBundle: true
+            isCustom: true
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: kinopoisk_299
+                priceType: RecurringCharge
+                productStatus: Active
+                price:
+                  unit: Рубль
+                  value: 0
+                duration: 1
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2024-04-20T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2024-05-20T07:00:00Z'
+                tarificationTag: VASP
+                priceAlteration: []
+                nextEntity:
+                  - id: 920bb99b-1ad9-446b-b589-b6c825770aad
+            fabricRef:
+              - fabricRefId: VASP_CHARGING
+                fabricProductOfferingId: kinoman_299
+                fabricProductId: kinoman_299
+    activation_completed_custom_bundle_single:
+      value:
+        event:
+          refId: e8056753-e218-4ebe-a2a4-9f84ebaafc07
+          refIdType: orderId
+          eventType: activation_completed
+          sourceCode: ORDER_MANAGEMENT
+        products:
+          - productId: bc54e85f-5cc8-49ef-838f-e512b5ac2821
+            isBundle: false
+            isCustom: true
+            productPrice: []
+            fabricRef:
+              - fabricRefId: VASP_ADAPTER
+                fabricProductOfferingId: kinoman_OKKO
+                fabricProductId: kinoman_OKKO
+          - productId: 0c2e838c-058a-4d56-ac2a-e77459ef5bf7
+            isBundle: false
+            isCustom: true
+            productPrice: []
+            fabricRef:
+              - fabricRefId: VASP_ADAPTER
+                fabricProductOfferingId: kinoman_IVI
+                fabricProductId: kinoman_IVI
+    activation_completed_Response:
+      value:
+        refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+        products:
+          - productId: 753afbf7-d4f6-4f82-a7fb-da51c11e07a0
+            isBundle: false
+            isCustom: false
+            status: ACTIVE_TRIAL
+            productOfferingId: c593538c-69f0-4210-9c0b-af61d8474476
+            productOfferingName: Apple music
+            productRelationship: []
+    activation_completed_Response_custom_bundle:
+      value:
+        refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+        products:
+          - productId: d545333c-d229-469d-befe-52f398dad934
+            isBundle: true
+            isCustom: true
+            status: ACTIVE
+            productOfferingId: 05f36c2f-5072-4fd0-88b2-40720edd5b78
+            productOfferingName: kinoman_299
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: kinopoisk_299
+                priceType: RecurringCharge
+                productStatus: Active
+                price:
+                  unit: Рубль
+                  value: 0
+                duration: 1
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2023-10-25T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2023-11-25T07:00:00Z'
+                tarificationTag: VASP
+                priceAlteration: []
+                nextEntity:
+                  - id: 920bb99b-1ad9-446b-b589-b6c825770aad
+            productRelationship:
+              - productId: 3800539f-a447-43b6-a7ec-aa72434479d3
+                productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+                relationshipType: CUSTOM_BUNDLES
+              - productId: 952bd33d-dc63-46c3-90f6-81ac28e8f9ef
+                productOfferingId: b1b9c0ea-486d-4f88-a38a-97c2cb4794b4
+                relationshipType: CUSTOM_BUNDLES
+          - productId: 800539f-a447-43b6-a7ec-aa72434479d3
+            isBundle: false
+            isCustom: true
+            productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+            productOfferingName: kinoman_OKKO
+            status: ACTIVE
+            productRelationship: []
+          - productId: 952bd33d-dc63-46c3-90f6-81ac28e8f9ef
+            isBundle: false
+            isCustom: true
+            productOfferingId: b1b9c0ea-486d-4f88-a38a-97c2cb4794b4
+            productOfferingName: kinoman_IVI
+            status: ACTIVE
+            productRelationship: []
+    activation_completed_Response_custom_bundle_no_content:
+      value:
+        refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+        products:
+          - productId: d545333c-d229-469d-befe-52f398dad934
+            isBundle: true
+            isCustom: true
+            status: ACTIVE
+            productOfferingId: 05f36c2f-5072-4fd0-88b2-40720edd5b78
+            productOfferingName: kinoman_299
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: kinopoisk_299
+                priceType: RecurringCharge
+                productStatus: Active
+                price:
+                  unit: Рубль
+                  value: 0
+                duration: 1
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2023-10-25T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2023-11-25T07:00:00Z'
+                tarificationTag: VASP
+                priceAlteration: []
+                nextEntity:
+                  - id: 920bb99b-1ad9-446b-b589-b6c825770aad
+            productRelationship: []
+    prolong_completed:
+      value:
+        event:
+          refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+          refIdType: orderId
+          eventType: prolong_completed
+          eventDate: '2023-02-22T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: ACTIVE МФ+ с промокодом
+                priceType: RecurringCharge
+                productStatus: ACTIVE
+                duration: 0
+                price:
+                  unit: Рубль
+                  value: 199
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2023-03-25T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2023-04-25T07:00:00Z'
+                tarificationTag: VASP
+                priceAlterations: []
+            fabricRef:
+              - fabricRefId: VASP_CHARGING
+                fabricProductOfferingId: megafon_plus_399
+                fabricProductId: megafon_plus_399
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+            fabricRef:
+              - fabricRefId: VASP_PARTNER
+                fabricProductOfferingId: mybook_mf_plus_399
+                fabricProductId: mybook_mf_plus_399
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+            fabricRef:
+              - fabricRefId: VASP_PARTNER
+                fabricProductOfferingId: zvooq_mf_plus_399
+                fabricProductId: zvooq_mf_plus_399
+    prolong_completed_Response:
+      value:
+        refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+            isBundle: true
+            status: ACTIVE
+            productOfferingId: 97de51ee-e129-4731-93fa-aeebab7f3882
+            productOfferingName: megafon_plus_399
+            productRelationship:
+              - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+                productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+                relationshipType: BUNDLES
+              - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+                productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+                relationshipType: BUNDLES
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+            isBundle: false
+            productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+            productOfferingName: mybook_mf_plus_399
+            status: ACTIVE
+            productRelationship: []
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+            isBundle: false
+            productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+            productOfferingName: zvooq_mf_plus_399
+            status: ACTIVE
+            productRelationship: []
+    resume_completed:
+      value:
+        event:
+          refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+          refIdType: orderId
+          eventType: resume_completed
+          eventDate: '2022-02-22T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+    resume_completed_Response:
+      value:
+        refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+            isBundle: true
+            status: ACTIVE
+            productOfferingId: 97de51ee-e129-4731-93fa-aeebab7f3882
+            productOfferingName: megafon_plus_399
+            productRelationship:
+              - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+                productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+                relationshipType: BUNDLES
+              - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+                productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+                relationshipType: BUNDLES
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+            isBundle: false
+            productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+            productOfferingName: mybook_mf_plus_399
+            status: ACTIVE
+            productRelationship: []
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+            isBundle: false
+            productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+            productOfferingName: zvooq_mf_plus_399
+            status: ACTIVE
+            productRelationship: []
+    suspend_completed:
+      value:
+        event:
+          refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+          refIdType: orderId
+          eventType: suspend_completed
+          eventDate: '2022-02-22T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+    suspend_completed_Response:
+      value:
+        refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+            isBundle: true
+            status: SUSPENDED
+            productOfferingId: 97de51ee-e129-4731-93fa-aeebab7f3882
+            productOfferingName: megafon_plus_399
+            productRelationship:
+              - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+                productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+                relationshipType: BUNDLES
+              - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+                productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+                relationshipType: BUNDLES
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+            isBundle: false
+            productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+            productOfferingName: mybook_mf_plus_399
+            status: SUSPENDED
+            productRelationship: []
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+            isBundle: false
+            productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+            productOfferingName: zvooq_mf_plus_399
+            status: SUSPENDED
+            productRelationship: []
+    deactivation_started:
+      value:
+        event:
+          refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+          refIdType: orderId
+          eventType: deactivation_started
+          eventDate: '2022-02-22T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+    deactivation_started_custom_bundle:
+      value:
+        event:
+          refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+          refIdType: orderId
+          eventType: deactivation_started
+          eventDate: '2023-12-01T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+        characteristics:
+          - valueType: string
+            name: deactivationMode
+            value: Immediate
+          - valueType: string
+            name: deactivationService
+            value: CRAB_ML
+    deactivation_started_Response:
+      value:
+        refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+            isBundle: true
+            status: PENDING_DISCONNECT
+            productOfferingId: 97de51ee-e129-4731-93fa-aeebab7f3882
+            productOfferingName: megafon_plus_399
+            productRelationship:
+              - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+                productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+                relationshipType: BUNDLES
+              - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+                productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+                relationshipType: BUNDLES
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+            isBundle: false
+            productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+            productOfferingName: mybook_mf_plus_399
+            status: PENDING_DISCONNECT
+            productRelationship: []
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+            isBundle: false
+            productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+            productOfferingName: zvooq_mf_plus_399
+            status: PENDING_DISCONNECT
+            productRelationship: []
+    deactivation_completed:
+      value:
+        event:
+          refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+          refIdType: orderId
+          eventType: deactivation_completed
+          eventDate: '2022-02-22T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+    deactivation_completed_Response:
+      value:
+        refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+            isBundle: true
+            status: DISCONNECT
+            productOfferingId: 97de51ee-e129-4731-93fa-aeebab7f3882
+            productOfferingName: megafon_plus_399
+            productRelationship:
+              - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+                productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+                relationshipType: BUNDLES
+              - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+                productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+                relationshipType: BUNDLES
+    deactivation_external:
+      value:
+        event:
+          refId: 12357690552
+          refIdType: orderId
+          eventType: pack_deactivate
+          eventDate: 2022-07-04T011:30:00.000Z
+          sourceCode: middle_epm
+        products:
+          - productId: aecc47bf-46a9-4a3b-956d-d09fa8b71256
+    deactivation_external_Response:
+      value:
+        refId: 12357690552
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+            isBundle: true
+            status: PENDING_DISCONNECT
+            productOfferingId: 97de51ee-e129-4731-93fa-aeebab7f3882
+            productOfferingName: megafon_plus_499
+            productRelationship:
+              - productId: aecc47bf-46a9-4a3b-956d-d09fa8b71256
+                productOfferingId: 4c36ff27-6435-421d-958c-4c05179c5e43
+                relationshipType: BUNDLES
+          - productId: aecc47bf-46a9-4a3b-956d-d09fa8b71256
+            isBundle: false
+            status: PENDING_DISCONNECT
+            productOfferingId: 4c36ff27-6435-421d-958c-4c05179c5e43
+            productOfferingName: МегаФон Плюс Мегасила (опция)
+            productRelationship: []
+    change_price_completed:
+      value:
+        event:
+          refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+          refIdType: orderId
+          eventType: change_price_completed
+          eventDate: '2022-03-22T07:00:00.000Z'
+          sourceCode: ORDER_MANAGEMENT
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+            productPrice:
+              - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+                name: ACTIVE МФ+ с промокодом
+                priceType: RecurringCharge
+                productStatus: ACTIVE
+                price:
+                  unit: Рубль
+                  value: 199
+                duration: 0
+                recurringChargePeriodType: day
+                recurringChargePeriodLength: 30
+                tax:
+                  taxAmount: Рубль
+                  priceTaxAmount: 0
+                  taxCategory: VAT
+                unitOfMeasure:
+                  units: Рубль
+                  amount: 1
+                validFor:
+                  startDateTime: '2023-03-25T07:00:00Z'
+                  endDateTime: '9999-12-31T23:59:59.999Z'
+                nextPayDate: '2023-04-25T07:00:00Z'
+                tarificationTag: VASP
+                priceAlterations: []
+            fabricRef:
+              - fabricRefId: VASP_CHARGING
+                fabricProductOfferingId: megafon_plus_399
+                fabricProductId: megafon_plus_399
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+    change_price_completed_Response:
+      value:
+        refId: a0549f9e-48d3-496a-80f3-b8965ca1dafe
+        products:
+          - productId: 3f863dcc-6ab1-45af-85f1-6a1502021adf
+            isBundle: true
+            status: ACTIVE_TRIAL
+            productOfferingId: 97de51ee-e129-4731-93fa-aeebab7f3882
+            productOfferingName: megafon_plus_399
+            productRelationship:
+              - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+                productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+                relationshipType: BUNDLES
+              - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+                productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+                relationshipType: BUNDLES
+          - productId: 306510a4-dfcd-44f5-af02-90cb320c3a71
+            isBundle: false
+            productOfferingId: b2f85ed7-a519-4836-9f38-e587fdbf755e
+            productOfferingName: mybook_mf_plus_399
+            status: ACTIVE_TRIAL
+            productRelationship: []
+          - productId: c795240e-7502-44c7-8ef4-7c1b0ad1b8e3
+            isBundle: false
+            productOfferingId: c7405b77-f545-4cb9-bc6c-f0cdf0d5264c
+            productOfferingName: zvooq_mf_plus_399
+            status: ACTIVE_TRIAL
+            productRelationship: []
+    update_products_extended_example:
+      value:
+        eventId: 7174dc58-825f-4289-af09-40e767b45d89
+        productId: 0b14e478-2669-40a1-b5d1-8986859cb755
+        partyRoleId: 919d5d7a-8d2f-47b5-9385-2fb02df552e1
+        productOfferingId: 6bc5c279-2fd7-4123-aba4-4f7e3cb81924
+        productOfferingName: multiSubscriptionApple
+        productOfferingVersion: null
+        productSpecificationId: null
+        productSpecificationVersion: null
+        isBundle: false
+        class: 2
+        status: SUSPENDED
+        trialEndDate: '2021-10-27T13:44:01.000Z'
+        activeEndDate: '2021-12-26T13:44:01.000Z'
+        characteristic:
+          - refName: TrialDeactivationMode
+            value: Postponed
+            valueType: string
+        productPrice:
+          - id: 41c0a44a-e111-4bd0-883f-76ccc62915bd
+            name: ACTIVE_TRIAL МФ+ с промокодом
+            priceType: RecurringCharge
+            productStatus: ACTIVE_TRIAL
+            duration: 1
+            recurringChargePeriodType: day
+            recurringChargePeriodLength: 30
+            priceAlterations: []
+        productRelationship:
+          - productId: 72bf1070-5092-41ba-a100-199501e68f85
+            relationshipType: BUNDLES
+        fabricRef:
+          - fabricRefId: VASP_CHARGING
+            fabricProductOfferingId: megafon_plus_399
+            fabricProductId: megafon_plus_399
+        metaInfo:
+          - chanel: MLK
+            campaign: campaign
+            statusReason: status reason
+        label: null
+        tarificationPeriod: 3
+        machineState:
+          productProvision:
+            payment:
+              paymentOn:
+                notPaid: 1
+            price:
+              priceOn:
+                commercial: 1
+            usage:
+              usageOn:
+                suspended: 1
+        quantity: null
+        bucket_id: 29040
+    update_tasks_extended_example:
+      value:
+        uuid: e0a186f4-03a2-4cb8-8680-988fa6d627a1
+        productId: 0b14e478-2669-40a1-b5d1-8986859cb755
+        wakeAt: '2021-12-21T08:00:00.000Z'
+        wakeAtFunction: send_event
+        extraParams:
+          eventType: commercial_ended
+        status: PENDING
+        retries: 1
+        bucket_id: 5616
+    update_completed_tasks_extended_example:
+      value:
+        uuid: d6d834a1-d8b6-4880-9aa0-1aa74976b7c9
+        productId: 0b14e478-2669-40a1-b5d1-8986859cb755
+        wakeAt: '2021-10-27T13:44:01.000Z'
+        wakeAtFunction: ACTIVATE
+        extraParams: null
+        status: DONE
+        retries: 1
+        historyTimestamp: '2021-10-27T13:44:01.000Z'
+        bucket_id: 5616
