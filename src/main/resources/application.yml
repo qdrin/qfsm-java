@@ -1,4 +1,28 @@
 # See http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+server:
+  port: 8080
+  servlet:
+    context-path: /qfsm
+management:
+  health:
+    db:
+      enabled: false
+  endpoints:
+    web:
+      base-path: /manage
+      exposure:
+        include: health, prometheus
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+    health:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 logging:
   level:
     root: INFO

@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.qdrin.qfsm.model.dto.RequestActivateEventDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.model.dto.ResponseEventDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,15 +54,9 @@ public class EventController {
 	// }
 
     @PostMapping("/event")
-    public ResponseEntity<ResponseEventDto> eventHandler(@RequestBody @Valid RequestActivateEventDto activateEvent) {
+    public ResponseEntity<ResponseEventDto> eventHandler(@RequestBody @Valid RequestEventDto activateEvent) {
         ResponseEventDto response = new ResponseEventDto();
         return ResponseEntity.ok(response);
     }
-
-    // @PostMapping("/event")
-    // public ResponseEntity<ResponseEventDto> eventHandler(@RequestBody @Valid RequestEventDto event) {
-    //     ResponseEventDto response = new ResponseEventDto();
-    //     return ResponseEntity.ok(response);
-    // }
 }
 
