@@ -5,6 +5,8 @@ import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -13,6 +15,7 @@ import lombok.experimental.FieldDefaults;
 import org.qdrin.qfsm.model.dto.*;
 
 @Entity
+@Table(name = "events")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
