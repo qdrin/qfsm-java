@@ -14,8 +14,8 @@ import org.qdrin.qfsm.model.*;
 public class IncomingEvent {
   BaseEvent event;
   ClientInfo clientInfo;
-  List<Product> products;
-  List<ProductOrderItem> productOrderItems;
+  List<ProductRequestDto> products;
+  List<ProductActivateRequestDto> productOrderItems;
   List<Characteristic> characteristics;
   EventProperties eventProperties;
 }

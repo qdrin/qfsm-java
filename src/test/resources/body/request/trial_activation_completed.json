@@ -1,0 +1,19 @@
+{
+  "event": {
+    "refId":"e3fcc810-7a06-4e2b-ad45-1d6678117efd",
+    "refIdType": "orderId",
+    "eventType": "trial_activation_completed",
+    "sourceCode": "OMS"
+  },
+  "products": [
+    {
+      "productId": "c49600a8-0775-4b20-8431-aab80c909477",
+      "fabricRef": [],
+      "metaInfo":
+      {
+        "channel": "MLK",
+        "campaign": "campaign"
+      }
+    }
+  ]
+}

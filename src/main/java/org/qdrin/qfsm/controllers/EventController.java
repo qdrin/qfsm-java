@@ -53,7 +53,7 @@ public class EventController {
 		// 	stateMachineService.releaseStateMachine(machineId);
 	// }
 
-    @PostMapping("/event")
+    @PostMapping("/v1/event")
     public ResponseEntity<ResponseEventDto> eventHandler(@RequestBody @Valid RequestEventDto activateEvent) {
         ResponseEventDto response = new ResponseEventDto();
         return ResponseEntity.ok(response);

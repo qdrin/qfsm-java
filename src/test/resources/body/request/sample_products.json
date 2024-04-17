@@ -1,0 +1,142 @@
+[
+  {
+    "productRelationship": null,
+    "characteristic": [],
+    "fabricRef": null,
+    "isBundle": false,
+    "productSpecificationVersion": null,
+    "productPrice": [],
+    "productOfferingVersion": null,
+    "machineState": {
+      "pendingActivate": 1
+    },
+    "quantity": null,
+    "metaInfo": {
+      "campaign": "campaign",
+      "channel": "MLK"
+    },
+    "partyRoleId": "3c52db51-50d5-49c3-a5ca-3da51aea78a4",
+    "activeEndDate": null,
+    "productId": "2b1ec90c-6e05-4f3a-b142-9edad7b23ecb",
+    "class": 3,
+    "extraParams": null,
+    "tarificationPeriod": 0,
+    "bucket_id": 25468,
+    "trialEndDate": null,
+    "eventId": "f9325e94-3992-4aab-97a1-b6d727283c03",
+    "label": null,
+    "productSpecificationId": null,
+    "productOfferingName": "bbbb",
+    "productOfferingId": "d33298cd-3906-4596-b3e1-76881ca787e2",
+    "status": "PENDING_ACTIVATE"
+  },
+  {
+    "productRelationship": null,
+    "characteristic": [],
+    "fabricRef": null,
+    "isBundle": false,
+    "productSpecificationVersion": null,
+    "productPrice": [],
+    "productOfferingVersion": null,
+    "machineState": {
+      "pendingActivate": 1
+    },
+    "quantity": null,
+    "metaInfo": {
+      "campaign": "campaign",
+      "channel": "MLK"
+    },
+    "partyRoleId": "3c52db51-50d5-49c3-a5ca-3da51aea78a4",
+    "activeEndDate": null,
+    "productId": "7f0a4a8e-51d3-49bc-9407-2245a346dcc5",
+    "class": 3,
+    "extraParams": null,
+    "tarificationPeriod": 0,
+    "bucket_id": 20035,
+    "trialEndDate": null,
+    "eventId": "511a6669-aaa9-4aa9-a0c6-7f04e482847b",
+    "label": null,
+    "productSpecificationId": null,
+    "productOfferingName": "cccc",
+    "productOfferingId": "d33298cd-3906-4596-b3e1-76881ca787e3",
+    "status": "PENDING_ACTIVATE"
+  },
+  {
+    "productRelationship": null,
+    "characteristic": [],
+    "fabricRef": null,
+    "isBundle": false,
+    "productSpecificationVersion": null,
+    "productPrice": [],
+    "productOfferingVersion": null,
+    "machineState": {
+      "pendingActivate": 1
+    },
+    "quantity": null,
+    "metaInfo": {
+      "campaign": "campaign",
+      "channel": "MLK"
+    },
+    "partyRoleId": "3c52db51-50d5-49c3-a5ca-3da51aea78a4",
+    "activeEndDate": null,
+    "productId": "d024758d-3331-44b9-b153-c5abafb0abd4",
+    "class": 3,
+    "extraParams": null,
+    "tarificationPeriod": 0,
+    "bucket_id": 17074,
+    "trialEndDate": null,
+    "eventId": "edf64efb-7997-4af8-a3eb-b1bb5d198ce4",
+    "label": null,
+    "productSpecificationId": null,
+    "productOfferingName": "aaaa",
+    "productOfferingId": "d33298cd-3906-4596-b3e1-76881ca787e1",
+    "status": "PENDING_ACTIVATE"
+  },
+  {
+    "productRelationship": [
+      {
+        "productId": "d024758d-3331-44b9-b153-c5abafb0abd4",
+        "relationshipType": "BUNDLES",
+        "productOfferingId": "d33298cd-3906-4596-b3e1-76881ca787e1"
+      },
+      {
+        "productId": "7f0a4a8e-51d3-49bc-9407-2245a346dcc5",
+        "relationshipType": "BUNDLES",
+        "productOfferingId": "d33298cd-3906-4596-b3e1-76881ca787e3"
+      },
+      {
+        "productId": "2b1ec90c-6e05-4f3a-b142-9edad7b23ecb",
+        "relationshipType": "BUNDLES",
+        "productOfferingId": "d33298cd-3906-4596-b3e1-76881ca787e2"
+      }
+    ],
+    "characteristic": [],
+    "fabricRef": null,
+    "isBundle": true,
+    "productSpecificationVersion": null,
+    "productPrice": [],
+    "productOfferingVersion": null,
+    "machineState": {
+      "pendingActivate": 1
+    },
+    "quantity": null,
+    "metaInfo": {
+      "campaign": "campaign",
+      "channel": "MLK"
+    },
+    "partyRoleId": "3c52db51-50d5-49c3-a5ca-3da51aea78a4",
+    "activeEndDate": "2022-06-02T05:57:43.000Z",
+    "productId": "e5f1fd1b-eafe-4ba5-b5e0-85f3ba908e2e",
+    "class": 2,
+    "extraParams": null,
+    "tarificationPeriod": 0,
+    "bucket_id": 1705,
+    "trialEndDate": "2022-06-02T05:57:43.000Z",
+    "eventId": "461235c1-3696-4658-927f-8777e5d5d0fc",
+    "label": null,
+    "productSpecificationId": null,
+    "productOfferingName": "MultiSubscription",
+    "productOfferingId": "9da02d42-5139-4837-b6f6-2b610c05de7c",
+    "status": "PENDING_ACTIVATE"
+  }
+]

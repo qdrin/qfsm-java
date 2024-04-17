@@ -1,0 +1,13 @@
+{
+  "event": {
+    "refId":"payment_processed_1",
+    "refIdType": "VASP_payment",
+    "eventType": "payment_processed",
+    "sourceCode": "VASP"
+  },
+  "products": [
+    {
+      "productId": "c49600a8-0775-4b20-8431-aab80c909477"
+    }
+  ]
+}

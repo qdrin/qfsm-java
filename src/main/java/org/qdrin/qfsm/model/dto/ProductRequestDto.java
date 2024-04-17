@@ -16,9 +16,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductRequestDto {
   @NotNull String productId;
-  List<ProductCharacteristic> characteristic;
   List<ProductPrice> productPrice;
   List<ProductRelationship> productRelationship;
+  List<ProductCharacteristic> characteristic;
   List<FabricRef> fabricRef;
   Map<String, Object> metaInfo;
   List<Characteristic> label;

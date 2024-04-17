@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.qdrin.qfsm.model.Characteristic;
 import org.qdrin.qfsm.model.FabricRef;
+import org.qdrin.qfsm.model.ProductCharacteristic;
 import org.qdrin.qfsm.model.ProductPrice;
 
 import jakarta.validation.constraints.NotNull;
@@ -20,10 +21,11 @@ public class ProductActivateRequestDto {
   @NotNull String productOrderItemId;  // Must present in activation_started response only
   @NotNull String productOfferingId;
   List<ProductPrice> productPrice;
-  boolean isBundle;
-  boolean isCustom;
+  Boolean isBundle;
+  Boolean isCustom;
   String ProductOfferingName;
   List<ProductOrderItemRelationshipDto> productOrderItemRelationship;
+  List<ProductCharacteristic> characteristic;
   List<FabricRef> fabricRef;
   Map<String, Object> metaInfo;
   List<Characteristic> label;

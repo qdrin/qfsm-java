@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import org.qdrin.qfsm.model.*;
+import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties.Web.Client;
 
 @Data
 @ToString
@@ -15,6 +16,7 @@ import org.qdrin.qfsm.model.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RequestEventDto {
     EventDto event;
+    ClientInfo clientInfo;
     List<ProductRequestDto> products;
     List<ProductActivateRequestDto> productOrderItems;
     List<Characteristic> characteristics;

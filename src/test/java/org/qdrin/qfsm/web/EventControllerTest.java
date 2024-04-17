@@ -15,6 +15,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.Format;
 import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
 import org.mockserver.serialization.HttpRequestSerializer;
 import org.qdrin.qfsm.controllers.EventController;
 import org.qdrin.qfsm.model.dto.*;
@@ -24,6 +25,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.testcontainers.containers.MockServerContainer;
@@ -141,56 +146,46 @@ public class EventControllerTest {
     }
   }
 
-//   @Nested
-//   class ManageMethods {
-//     @Test
-//     public void checkHealth() throws Exception {
-//       String url = String.format("http://localhost:%d%s%s/health", port, basePath, managePath);
-//       log.debug(url);
-//       var resp = restTemplate.getForEntity(url, String.class);
-//       log.debug(resp.toString());
-//       assertEquals(HttpStatus.OK, resp.getStatusCode());
-//     }
+  @Nested
+  class ManageMethods {
+    @Test
+    public void checkHealth() throws Exception {
+      String url = String.format("http://localhost:%d%s%s/health", port, basePath, managePath);
+      log.debug("healthcheckUrl:", url);
+      var resp = restTemplate.getForEntity(url, String.class);
+      log.debug(resp.toString());
+      assertEquals(HttpStatus.OK, resp.getStatusCode());
+    }
 
-//     @Test
-//     public void checkPrometheus() throws Exception {
-//       ClassPathResource resource = new ClassPathResource("/body/request/CheckSuccess.json", getClass());
-//       ClassPathResource mockResource = new ClassPathResource("/body/mock/connector/check/CheckSuccess.json", getClass());
-//       String mock = readResourceAsString(mockResource);
-//       mockServerClient
-//         .when(HttpRequest.request().withMethod("POST").withPath("/eapi/factory-adapter-bss-connector/v1/availability")
-//         )  // .withBody(mockRequest))
-//         .respond(HttpResponse.response()
-//                             .withBody(mock.toString())
-//                             .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
-//         );
+    @Test
+    public void checkPrometheus() throws Exception {
+      ClassPathResource resource = new ClassPathResource("/body/request/activation_started.json", getClass());
 
-//       String url = String.format("http://localhost:%d%s%s/process/start/sync", port, basePath, apiVersion);
-//       log.debug(url);
-//       StartSyncRequestDto body = mapper.readValue(resource.getInputStream(), StartSyncRequestDto.class);
-//       HttpHeaders headers = new HttpHeaders();
-//       headers.setContentType(MediaType.APPLICATION_JSON);
-//       HttpEntity<StartSyncRequestDto> request = new HttpEntity<>(body, headers);
-//       ResponseEntity<String> resp = restTemplate.postForEntity(url, request, String.class);
-//       log.debug(resp.toString());
-//       assertEquals(HttpStatus.OK, resp.getStatusCode());
+      String url = String.format("http://localhost:%d%s%s/event", port, basePath, apiVersion);
+      log.debug("url: {}", url);
+      RequestEventDto body = mapper.readValue(resource.getInputStream(), RequestEventDto.class);
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.APPLICATION_JSON);
+      HttpEntity<RequestEventDto> request = new HttpEntity<>(body, headers);
+      ResponseEntity<String> resp = restTemplate.postForEntity(url, request, String.class);
+      log.debug(resp.toString());
+      assertEquals(HttpStatus.OK, resp.getStatusCode());
 
-//       String prometheusUrl = String.format("http://localhost:%d%s%s/prometheus", port, basePath, managePath);
-//       log.debug("prometheusUrl: {}", prometheusUrl);
-//       var prometheusResp = restTemplate.getForEntity(prometheusUrl, String.class);
-//       log.debug("prometheusResp: {}", prometheusResp);
-//       var pbody = prometheusResp.getBody();
-//       log.debug("prometheusBody: {}", pbody);
-//       log.debug("pbody.contains('cucustom_http_client_requests_seconds'): {}", pbody.contains("cucustom_http_client_requests_seconds"));
-//       assertEquals(HttpStatus.OK, prometheusResp.getStatusCode());
-//       assertThat(pbody.contains("custom_http_client_requests_seconds")).isTrue();
-//       assertThat(pbody.contains("http_server_requests_seconds_count")).isTrue();
-//       assertThat(pbody.contains("http_server_requests_seconds_sum")).isTrue();
-//       assertThat(pbody.contains("custom_http_client_requests_seconds_count")).isTrue();
-//       assertThat(pbody.contains("custom_http_client_requests_seconds_sum")).isTrue();
-//       assertThat(pbody.contains("factory-adapter-bss-connector")).isTrue();
-//     }
-//   }
+      String prometheusUrl = String.format("http://localhost:%d%s%s/prometheus", port, basePath, managePath);
+      log.debug("prometheusUrl: {}", prometheusUrl);
+      var prometheusResp = restTemplate.getForEntity(prometheusUrl, String.class);
+      log.debug("prometheusResp: {}", prometheusResp);
+      var pbody = prometheusResp.getBody();
+      log.debug("prometheusBody: {}", pbody);
+      log.debug("pbody.contains('cucustom_http_client_requests_seconds'): {}", pbody.contains("cucustom_http_client_requests_seconds"));
+      assertEquals(HttpStatus.OK, prometheusResp.getStatusCode());
+      assertThat(pbody.contains("custom_http_client_requests_seconds")).isTrue();
+      assertThat(pbody.contains("http_server_requests_seconds_count")).isTrue();
+      assertThat(pbody.contains("http_server_requests_seconds_sum")).isTrue();
+      assertThat(pbody.contains("custom_http_client_requests_seconds_count")).isTrue();
+      assertThat(pbody.contains("custom_http_client_requests_seconds_sum")).isTrue();
+    }
+  }
 
 //   @Nested
 //   class CheckMethod {

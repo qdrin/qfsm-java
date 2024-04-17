@@ -1,0 +1,27 @@
+{
+  "products": [
+    {
+      "productId": "7bd6fdd8-2852-4439-bdce-644879631c5d",
+      "isBundle": true,
+      "status": "PENDING_ACIVATE",
+      "productOfferingId": "0000",
+      "productRelationship": [
+        {
+          "productId": "21b9d346-b9f8-40bb-9253-2d1fdd39ee08",
+          "relationshipType": "BUNDLES",
+          "productOfferingId": "1111"
+        },
+        {
+          "productId": "d3d12871-a66b-49f2-b80e-47c6af586a73",
+          "relationshipType": "BUNDLES",
+          "productOfferingId": "2222"
+        },
+        {
+          "productId": "1564cd22-c12d-496b-a6df-292922f3ab79",
+          "relationshipType": "BUNDLES",
+          "productOfferingId": "3333"
+        }
+      ]
+    }
+  ]
+}
