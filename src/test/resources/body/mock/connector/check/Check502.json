@@ -1,0 +1,13 @@
+{
+  "result": "Error",
+  "retriable": false,
+  "detailError": {
+    "errorCode": "partnerError",
+    "userMessage": "partner1: partner unavailable",
+    "developerMessage": "502: partner1: partner unavailable"
+  },
+  "partnerResponse": {
+    "responseCode": 502,
+    "responseBody": "partner1: partner unavailable"
+  }
+}

@@ -20,9 +20,6 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class FsmApp {
 
-	// @Autowired
-	// StateMachineFactory<String, String> stateMachineFactory;
-
 	@Autowired
   	StateMachineService<String, String> stateMachineService;
 	

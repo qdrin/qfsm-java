@@ -1,0 +1,45 @@
+{
+  "result": "OK",
+  "partnerResponse": {
+    "responseCode": 200,
+    "responseBody": {}
+  },
+  "items": [
+    {
+      "id": "2fb5ea06-1a1f-494a-94c4-724ba910d8bb",
+      "name": "Яндекс Плюс МегаФон 502280",
+      "type": "ProductOffering",
+      "reason": "0",
+      "prices": [
+        {
+          "id": "613e0f51-b46a-48d3-a6f7-dddd2915fbf7",
+          "name": "Абонентская плата Яндекс Плюс МегаФон 502280",
+          "type": "RecurringCharge"
+        },
+        {
+          "id": "83c94ae5-8cf1-4949-96ce-884dc01491ca",
+          "name": "Выравнивающая цена Яндекс Плюс МегаФон 502280",
+          "type": "RecurringCharge"
+        }
+      ]
+    },
+    {
+      "id": "3354dd60-884b-472d-a434-cc75715baf6e",
+      "name": "Яндекс Плюс МегаФон 502277",
+      "type": "ProductOffering",
+      "reason": "0",
+      "prices": [
+        {
+          "id": "4604df88-a4c5-485c-8fce-81e26d31bd46",
+          "name": "Выравнивающая цена Яндекс Плюс МегаФон 502277",
+          "type": "RecurringCharge"
+        },
+        {
+          "id": "49489d04-acc1-438c-9d5a-cdc2e72b61d5",
+          "name": "Абонентская плата Яндекс Плюс МегаФон 502277",
+          "type": "RecurringCharge"
+        }
+      ]
+    }
+  ]
+}

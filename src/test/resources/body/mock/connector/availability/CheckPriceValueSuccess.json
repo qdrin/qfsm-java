@@ -1,0 +1,19 @@
+{
+  "result": "OK",
+  "items": [
+    {
+      "Id": 1,
+      "prices": [
+        {
+          "id": "productOfferingPriceId_bss_multimapper",
+        "name": "Пробный период",
+        "value": 249.17
+        }
+      ]
+    }
+  ],
+  "partnerResponse": {
+    "responseCode": "200",
+    "responseBody": "responseBody"
+  }
+}

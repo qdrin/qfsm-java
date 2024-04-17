@@ -1,0 +1,12 @@
+{
+  "result": "Error",
+  "detailError": {
+    "errorCode": "Internal error",
+    "userMessage": "no healthy upstream",
+    "developerMessage": "503: no healthy upstream"
+  },
+  "partnerResponse": {
+    "responseCode": 503,
+    "responseBody": "no health upstream"
+  }
+}

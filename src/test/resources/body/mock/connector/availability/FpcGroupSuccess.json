@@ -1,0 +1,146 @@
+{
+  "result": "Ok",
+  "items": [
+    {
+      "requestObjectType": "ProductOffering",
+      "requestObjectId": "178621df-6f6c-4934-b435-1392d2a6d0c2",
+      "requestObjectName": "???",
+      "items": [
+        {
+          "id": "69309422-87a4-47e5-b8b8-262009084de3",
+          "name": "Группа ТП БП 2.3 для Яндекс Плюс МегаФон 502280",
+          "type": "EntityGroup",
+          "groupsRelationType": "ELIGIBLE"
+        }
+      ]
+    }
+  ],
+  "partnerResponse": {
+    "responseCode": 200,
+    "responseBody": 
+    {
+      "items": [
+          {
+              "requestObject": {
+                  "objectType": "ProductOffering",
+                  "objectId": "178621df-6f6c-4934-b435-1392d2a6d0c2"
+              },
+              "entityGroups": [
+                  {
+                      "id": "69309422-87a4-47e5-b8b8-262009084de3",
+                      "name": "Группа ТП БП 2.3 для Яндекс Плюс МегаФон 502280",
+                      "type": "ANY",
+                      "href": "/api/product-catalog-management/v1/entityGroups/69309422-87a4-47e5-b8b8-262009084de3",
+                      "includedEntities": [
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "692e68ec-065b-44fd-bb87-a91bcb2b0751",
+                              "name": "Премиум. Без переплат 3.0"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "df47b3d5-8a4b-4234-aca5-d83d65ac1148",
+                              "name": "Минимум. Без Переплат 3.0"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "03232616-2e26-4108-8848-5d2694eca4a8",
+                              "name": "Звонки. Без переплат 3.0"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "71d8d407-0f95-42c2-aca2-0f58e1e9a985",
+                              "name": "VIP. Без переплат 3.0"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "62e5a057-78e5-4bc0-be0f-d0c2d38500ad",
+                              "name": "Интернет. Без переплат 3.0"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "c57d3886-3c4b-45bc-b8ec-f46b783f3fd1",
+                              "name": "Максимум. Без переплат 3.0"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "9a7d7fe1-09c4-4a3e-9eeb-cfc1581942d7",
+                              "name": "МегаТариф. Без переплат 3.0"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "270b1994-0b9b-4e5c-b938-e66d76463e0e",
+                              "name": "MGF_Test_FT"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "705e9c3f-a8d1-4844-833d-12b83758cdad",
+                              "name": "МегаТариф. Без Переплат 2.3"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "c9095ac2-da4b-4a9c-8c6e-a9c35595e07d",
+                              "name": "Без переплат 2.3. VIP"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "c2be91e3-05c5-47d6-ac00-b7fd6e6ff5e9",
+                              "name": "Минимум. Без Переплат 2.3"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "2138932b-ba27-4177-8023-537c87d1db91",
+                              "name": "Звонки. Без Переплат 2.3"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "178621df-6f6c-4934-b435-1392d2a6d0c2",
+                              "name": "Максимум. Без Переплат 2.3"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "a9aac251-ad75-40f8-a07f-595d4cb09607",
+                              "name": "Без переплат 2.3. Премиум"
+                          },
+                          {
+                              "entityType": "ProductOffering",
+                              "entityId": "b9a393ea-f440-494f-84c5-39d33a8c5d4a",
+                              "name": "Интернет. Без Переплат 2.3"
+                          }
+                      ],
+                      "conditions": [
+                          {
+                              "id": "4b0e5429-7942-43bd-b802-a99aee334135",
+                              "name": "Condition ТП 2.3 для Яндекс Плюс 502280",
+                              "href": "/api/product-catalog-management/v1/conditions/4b0e5429-7942-43bd-b802-a99aee334135",
+                              "rules": [
+                                  {
+                                      "id": "c7fd9808-7223-4d00-9e1a-6a1701bdd5f5",
+                                      "name": "Rule  ТП БП 2.3 для Яндекс Плюс 502280",
+                                      "href": "/api/product-catalog-management/v1/rules/c7fd9808-7223-4d00-9e1a-6a1701bdd5f5",
+                                      "specification": null,
+                                      "characteristics": {
+                                          "groupsRelationType": "ELIGIBLE"
+                                      },
+                                      "unavailabilityReasons": [],
+                                      "@type": "Rule"
+                                  }
+                              ],
+                              "linkedEntityGroups": [
+                                  {
+                                      "id": "40619c05-e110-4ddb-bbd2-f29f7c7e77e1",
+                                      "name": "Группа для Яндекс Плюс МегаФон 502280",
+                                      "type": "ANY",
+                                      "@type": "EntityGroup"
+                                  }
+                              ]
+                          }
+                      ],
+                      "unavailabilityReasons": []
+                  }
+              ]
+          }
+      ]
+    }
+  }
+}

@@ -1,0 +1,318 @@
+{
+  "result": "OK",
+  "items": [
+    {
+      "id": "2fb5ea06-1a1f-494a-94c4-724ba910d8bb",
+      "name": "Яндекс Плюс МегаФон 502280",
+      "type": "productOffering",
+      "reason": "0",
+      "prices": [
+        {
+          "id": "83c94ae5-8cf1-4949-96ce-884dc01491ca",
+          "name": "Выравнивающая цена Яндекс Плюс МегаФон 502280",
+          "type": "AlignmentCharge"
+        },
+        {
+          "id": "49489d04-acc1-438c-9d5a-cdc2e72b61d5",
+          "name": "Абонентская плата Яндекс Плюс МегаФон 502277",
+          "type": "RecurringCharge"
+        },
+        {
+          "id": "49489d04-acc1-438c-9d5a-cdc2e72b61d6",
+          "name": "Триальная Яндекс Плюс МегаФон 502277",
+          "type": "RecurringCharge"
+        }
+      ]
+    },
+    {
+      "id": "3354dd60-884b-472d-a434-cc75715baf6e",
+      "name": "Яндекс Плюс МегаФон 502277",
+      "type": "productOffering",
+      "reason": "0",
+      "prices": [
+        {
+          "id": "4604df88-a4c5-485c-8fce-81e26d31bd46",
+          "name": "Выравнивающая цена Яндекс Плюс МегаФон 502277",
+          "type": "AlignmentCharge"
+        },
+        {
+          "id": "4604df88-a4c5-485c-8fce-81e26d31bd46",
+          "name": "Абонентская плата Яндекс Плюс МегаФон 502277",
+          "type": "RecurringCharge"
+        }
+      ]
+    }
+  ],
+  "partnerResponse": {
+    "responseCode": 200,
+    "responseBody": 
+    {
+      "qualificationDate": "2023-06-02T15:56:22.299Z",
+      "provideAlternative": false,
+      "provideOnlyAvailable": false,
+      "provideUnavailabilityReason": true,
+      "resultQualification": [
+        {
+          "resultingProductOffering": {
+            "id": "2fb5ea06-1a1f-494a-94c4-724ba910d8bb",
+            "name": "Яндекс Плюс МегаФон 502280",
+            "href": "/api/product-catalog-management/v1/productOfferings/2fb5ea06-1a1f-494a-94c4-724ba910d8bb",
+            "promocodeApplied": false,
+            "promocodeApplicable": false,
+            "category": [
+              {
+                "id": "a869a246-9f45-45bd-ac11-fa32584980f4",
+                "name": "Цифровая полка"
+              },
+              {
+                "id": "651cf3f2-3feb-46e3-9cc6-c4c6e2430142",
+                "name": "Послушать"
+              }
+            ],
+            "productSpecification": {
+              "id": "f138e8d7-a21b-4374-9e50-f7bfe115ac04",
+              "name": "Послушать"
+            },
+            "offerQualificationResult": {
+              "resultCode": 0,
+              "resultDescription": "OfferIsEligible"
+            },
+            "prices": {
+              "unconditionalPrices": [
+                {
+                  "refersToPrice": {
+                    "id": "83c94ae5-8cf1-4949-96ce-884dc01491ca",
+                    "name": "Выравнивающая цена Яндекс Плюс МегаФон 502280",
+                    "href": "/api/price-catalog-management/v1/productOfferingsPrices/83c94ae5-8cf1-4949-96ce-884dc01491ca",
+                    "productStatus": "ACTIVE",
+                    "price": {
+                      "unit": "Рубль",
+                      "value": 299.0
+                    },
+                    "duration": 1,
+                    "priceType": "AlignmentCharge",
+                    "recurringChargePeriodLength": null,
+                    "recurringChargePeriodType": "day",
+                    "tax": [
+                      {
+                        "taxAmount": 49.83,
+                        "priceTaxExcluded": 249.17,
+                        "taxCategory": "VAT"
+                      }
+                    ],
+                    "unitOfMeasure": {
+                      "units": "Рубль",
+                      "amount": 1.0
+                    },
+                    "validFor": {
+                      "startDateTime": "2022-11-29T09:18:37.105Z",
+                      "endDateTime": "9999-12-31T23:59:59.999Z"
+                    },
+                    "priceAlterations": []
+                  },
+                  "transitionsBetweenEntities": [
+                    {
+                      "id": "613e0f51-b46a-48d3-a6f7-dddd2915fbf7",
+                      "name": "Абонентская плата Яндекс Плюс МегаФон 502280",
+                      "productStatus": "ACTIVE",
+                      "price": {
+                        "unit": "Рубль",
+                        "value": 299.0
+                      },
+                      "duration": 0,
+                      "priceType": "RecurringCharge",
+                      "recurringChargePeriodLength": "30",
+                      "recurringChargePeriodType": "day",
+                      "tax": [
+                        {
+                          "taxAmount": 49.8,
+                          "priceTaxExcluded": 249.2,
+                          "taxCategory": "VAT"
+                        }
+                      ],
+                      "unitOfMeasure": {
+                        "units": "Рубль",
+                        "amount": 1.0
+                      },
+                      "validFor": {
+                        "startDateTime": "2022-11-29T09:20:00.515Z",
+                        "endDateTime": "9999-12-31T23:59:59.999Z"
+                      },
+                      "nextEntity": {},
+                      "priceAlterations": []
+                    },
+                    {
+                      "id": "83c94ae5-8cf1-4949-96ce-884dc01491ca",
+                      "name": "Выравнивающая цена Яндекс Плюс МегаФон 502280",
+                      "productStatus": "ACTIVE",
+                      "price": {
+                        "unit": "Рубль",
+                        "value": 299.0
+                      },
+                      "duration": 1,
+                      "priceType": "AlignmentCharge",
+                      "recurringChargePeriodLength": null,
+                      "recurringChargePeriodType": "day",
+                      "tax": [
+                        {
+                          "taxAmount": 49.83,
+                          "priceTaxExcluded": 249.17,
+                          "taxCategory": "VAT"
+                        }
+                      ],
+                      "unitOfMeasure": {
+                        "units": "Рубль",
+                        "amount": 1.0
+                      },
+                      "validFor": {
+                        "startDateTime": "2022-11-29T09:18:37.105Z",
+                        "endDateTime": "9999-12-31T23:59:59.999Z"
+                      },
+                      "nextEntity": {
+                        "id": "613e0f51-b46a-48d3-a6f7-dddd2915fbf7"
+                      },
+                      "priceAlterations": []
+                    }
+                  ]
+                }
+              ],
+              "conditionalPrices": []
+            },
+            "bundledProductOffering": []
+          },
+          "unavailabilityReason": []
+        },
+        {
+          "resultingProductOffering": {
+            "id": "3354dd60-884b-472d-a434-cc75715baf6e",
+            "name": "Яндекс Плюс МегаФон 502277",
+            "href": "/api/product-catalog-management/v1/productOfferings/3354dd60-884b-472d-a434-cc75715baf6e",
+            "promocodeApplied": false,
+            "promocodeApplicable": false,
+            "category": [
+              {
+                "id": "a869a246-9f45-45bd-ac11-fa32584980f4",
+                "name": "Цифровая полка"
+              },
+              {
+                "id": "651cf3f2-3feb-46e3-9cc6-c4c6e2430142",
+                "name": "Послушать"
+              }
+            ],
+            "productSpecification": {
+              "id": "f138e8d7-a21b-4374-9e50-f7bfe115ac04",
+              "name": "Послушать"
+            },
+            "offerQualificationResult": {
+              "resultCode": 0,
+              "resultDescription": "OfferIsEligible"
+            },
+            "prices": {
+              "unconditionalPrices": [
+                {
+                  "refersToPrice": {
+                    "id": "4604df88-a4c5-485c-8fce-81e26d31bd46",
+                    "name": "Выравнивающая цена Яндекс Плюс МегаФон 502277",
+                    "href": "/api/price-catalog-management/v1/productOfferingsPrices/4604df88-a4c5-485c-8fce-81e26d31bd46",
+                    "productStatus": "ACTIVE",
+                    "price": {
+                      "unit": "Рубль",
+                      "value": 299.0
+                    },
+                    "duration": 1,
+                    "priceType": "AlignmentCharge",
+                    "recurringChargePeriodLength": null,
+                    "recurringChargePeriodType": "day",
+                    "tax": [
+                      {
+                        "taxAmount": 49.83,
+                        "priceTaxExcluded": 249.17,
+                        "taxCategory": "VAT"
+                      }
+                    ],
+                    "unitOfMeasure": {
+                      "units": "Рубль",
+                      "amount": 1.0
+                    },
+                    "validFor": {
+                      "startDateTime": "2022-11-24T15:10:17.085Z",
+                      "endDateTime": "9999-12-31T23:59:59.999Z"
+                    },
+                    "priceAlterations": []
+                  },
+                  "transitionsBetweenEntities": [
+                    {
+                      "id": "4604df88-a4c5-485c-8fce-81e26d31bd46",
+                      "name": "Выравнивающая цена Яндекс Плюс МегаФон 502277",
+                      "productStatus": "ACTIVE",
+                      "price": {
+                        "unit": "Рубль",
+                        "value": 299.0
+                      },
+                      "duration": 1,
+                      "priceType": "AlignmentCharge",
+                      "recurringChargePeriodLength": null,
+                      "recurringChargePeriodType": "day",
+                      "tax": [
+                        {
+                          "taxAmount": 49.83,
+                          "priceTaxExcluded": 249.17,
+                          "taxCategory": "VAT"
+                        }
+                      ],
+                      "unitOfMeasure": {
+                        "units": "Рубль",
+                        "amount": 1.0
+                      },
+                      "validFor": {
+                        "startDateTime": "2022-11-24T15:10:17.085Z",
+                        "endDateTime": "9999-12-31T23:59:59.999Z"
+                      },
+                      "nextEntity": {
+                        "id": "49489d04-acc1-438c-9d5a-cdc2e72b61d5"
+                      },
+                      "priceAlterations": []
+                    },
+                    {
+                      "id": "49489d04-acc1-438c-9d5a-cdc2e72b61d5",
+                      "name": "Абонентская плата Яндекс Плюс МегаФон 502277",
+                      "productStatus": "ACTIVE",
+                      "price": {
+                        "unit": "Рубль",
+                        "value": 299.0
+                      },
+                      "duration": 0,
+                      "priceType": "RecurringCharge",
+                      "recurringChargePeriodLength": "30",
+                      "recurringChargePeriodType": "day",
+                      "tax": [
+                        {
+                          "taxAmount": 49.8,
+                          "priceTaxExcluded": 249.2,
+                          "taxCategory": "VAT"
+                        }
+                      ],
+                      "unitOfMeasure": {
+                        "units": "Рубль",
+                        "amount": 1.0
+                      },
+                      "validFor": {
+                        "startDateTime": "2022-11-24T15:11:35.606Z",
+                        "endDateTime": "9999-12-31T23:59:59.999Z"
+                      },
+                      "nextEntity": {},
+                      "priceAlterations": []
+                    }
+                  ]
+                }
+              ],
+              "conditionalPrices": []
+            },
+            "bundledProductOffering": []
+          },
+          "unavailabilityReason": []
+        }
+      ]
+    }
+  }
+}

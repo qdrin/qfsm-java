@@ -1,0 +1,18 @@
+{
+  "clientId": "bss",
+  "serviceOrderItems": [
+    {
+      "id": "0",
+      "action": "AVAILABILITYFORRATEPLAN",
+      "service": {
+        "serviceId": "178621df-6f6c-4934-b435-1392d2a6d0c2",
+        "serviceName": "Максимум. Без Переплат 2.3 FPC"
+      }
+    }
+  ],
+  "relatedParty": {
+    "partyId": "789d1ac2-a7b0-458f-8210-090a1109e94f",
+    "partyRoleId": "68e9f8f-2d3b-432d-afd0-d84cac1bb771",
+    "msisdn": "9360020032"
+  }
+}

@@ -1,0 +1,72 @@
+# See http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+server:
+  port: 8080
+  servlet:
+    context-path: /qfsm
+management:
+  health:
+    db:
+      enabled: false
+  endpoints:
+    web:
+      base-path: /manage
+      exposure:
+        include: health, prometheus
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+    health:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+logging:
+  level:
+    root: INFO
+    org.qdrin.qfsm: DEBUG
+spring:
+  thymeleaf:
+    cache: false
+  main:
+    show-banner: true
+  security:
+    basic:
+      enabled: true
+  jpa:
+    show-sql: true
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        # open-in-view: false
+  h2:
+    console:
+      enabled: true
+      path: /console/
+  sql:
+    init:
+      mode: always
+  datasource:
+    # url: jdbc:h2:mem:test
+    url: jdbc:h2:file:./tmp/psi_db
+    username: ${DB_USER:psi}
+    password: ${DB_PASSWORD:psi}
+    # url: "jdbc:postgresql://localhost:5432/psi_db"
+    # url: ${DB_URI}
+    testOnBorrow: true
+    validationQuery: select 1
+    # hikari:
+    #   auto-commit: true
+  liquibase:
+    enabled: false
+  environment:
+    istio-host: ${ISTIO_HOST:localhost}
+# db-scheduler:
+#   threads: 3
+#   polling-interval: 5s

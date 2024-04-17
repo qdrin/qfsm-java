@@ -1,0 +1,49 @@
+{
+  "result": "Ok",
+  "reason": "102",
+  "involvedObjects": [
+    {
+      "serviceId": "520002345",
+      "serviceName": "наименование подписки 1"
+    },
+    {
+      "serviceId": "520002344",
+      "serviceName": "наименование подписки 2"
+    },
+    {
+      "serviceId": "520002343",
+      "serviceName": "наименование подписки 3"
+    }
+  ],
+  "partnerResponse": {
+    "responseCode": "411",
+    "responseBody": {
+      "conflicts": {
+        "subscriptions": [
+          {
+            "serviceCode": "service_1",
+            "serviceId": "520002345",
+            "subscriptionStatus": "active",
+            "serviceName": "наименование подписки 1",
+            "shortDescription": null,
+            "price": {
+              "priceUnit": null,
+              "priceValue": "563.1"
+            }
+          },
+          {
+            "serviceCode": "service_2",
+            "serviceId": "520002344",
+            "subscriptionStatus": "active",
+            "serviceName": "наименование подписки 2",
+            "shortDescription": null,
+            "price": {
+              "priceUnit": null,
+              "priceValue": null
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "result": "OK",
+  "items": [
+    {
+      "requestObjectId": "40619c05-e110-4ddb-bbd2-f29f7c7e77e1",
+      "requestObjectName": "Группа ТП БП 2.3 для Яндекс Плюс МегаФон 502280",
+      "items": [
+        {
+          "type": "ProductOffering",
+          "id": "3354dd60-884b-472d-a434-cc75715baf6e",
+          "name": "Яндекс Плюс МегаФон 502277"
+        },
+        {
+          "type": "ProductOffering",
+          "id": "2fb5ea06-1a1f-494a-94c4-724ba910d8bb",
+          "name": "Яндекс Плюс МегаФон 502280"
+        }
+      ]
+    }
+  ],
+  "partnerResponse":  {
+    "responseCode": 200,
+    "responseBody": {
+      "items": [
+        {
+          "requestObject": {
+              "objectType": "EntityGroup",
+              "objectId": "40619c05-e110-4ddb-bbd2-f29f7c7e77e1"
+          },
+          "entityGroups": [
+            {
+              "id": "40619c05-e110-4ddb-bbd2-f29f7c7e77e1",
+              "name": "Группа для Яндекс Плюс МегаФон 502280",
+              "type": "ANY",
+              "href": "/api/product-catalog-management/v1/entityGroups/40619c05-e110-4ddb-bbd2-f29f7c7e77e1",
+              "includedEntities": [
+                  {
+                      "entityType": "ProductOffering",
+                      "entityId": "3354dd60-884b-472d-a434-cc75715baf6e",
+                      "name": "Яндекс Плюс МегаФон 502277"
+                  },
+                  {
+                      "entityType": "ProductOffering",
+                      "entityId": "2fb5ea06-1a1f-494a-94c4-724ba910d8bb",
+                      "name": "Яндекс Плюс МегаФон 502280"
+                  }
+              ],
+              "conditions": [
+                  {
+                      "id": "4b0e5429-7942-43bd-b802-a99aee334135",
+                      "name": "Condition ТП 2.3 для Яндекс Плюс 502280",
+                      "href": "/api/product-catalog-management/v1/conditions/4b0e5429-7942-43bd-b802-a99aee334135",
+                      "rules": [
+                          {
+                              "id": "c7fd9808-7223-4d00-9e1a-6a1701bdd5f5",
+                              "name": "Rule  ТП БП 2.3 для Яндекс Плюс 502280",
+                              "href": "/api/product-catalog-management/v1/rules/c7fd9808-7223-4d00-9e1a-6a1701bdd5f5",
+                              "specification": null,
+                              "characteristics": {
+                                  "groupsRelationType": "ELIGIBLE"
+                              },
+                              "unavailabilityReasons": [],
+                              "@type": "Rule"
+                          }
+                      ],
+                      "linkedEntityGroups": [
+                          {
+                              "id": "69309422-87a4-47e5-b8b8-262009084de3",
+                              "name": "Группа ТП БП 2.3 для Яндекс Плюс МегаФон 502280",
+                              "type": "ANY",
+                              "@type": "EntityGroup"
+                          }
+                      ]
+                  }
+              ],
+              "unavailabilityReasons": []
+            }
+          ]
+        }
+      ]
+    }
+  }
+
+}

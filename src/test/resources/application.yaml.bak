@@ -1,0 +1,81 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /eapi/factory-adapter-bss-camunda
+logging:
+  level:
+    com.paco.workflow: debug
+    script: debug
+    org.hibernate.SQL: warn
+    # org.hibernate.type.descriptor.sql.BasicBinder: trace
+    # org.camunda.bpm: debug
+
+management:
+  health:
+    db:
+      enabled: false
+  prometheus:
+    metrics.export.enabled: true
+  endpoints:
+    web:
+      base-path: /manage
+      exposure:
+        include: health, prometheus
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+    health:
+      enabled: true
+
+camunda:
+  bpm:
+    generic-properties:
+      properties:
+        history-time-to-live: "0"
+    admin-user:
+      id: demo
+      password: demo
+    default-serialization-format: application/json
+
+logback:
+  access:
+    tee-filter:
+      enabled: true
+
+spring:
+  job-execution:
+    core-pool-size: ${CORE_POOL_SIZE:30}
+    max-pool-size: ${MAX_POOL_SIZE:60}
+    queue-capacity: ${QUEUE_CAPACITY:60}
+    thread-name-prefix: ${THREAD_NAME_PREFIX:CamundaRunProcessTest_}
+  environment:
+    istio-host: ${ISTIO_HOST:localhost}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+#    open-in-view: false
+  datasource:
+    h2-datasource:
+      hikari:
+        pool-name: "H2HikariPool"
+        maximum-pool-size: ${DB_POOL_SIZE:200}
+    postgres-datasource:
+      driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+      url: "jdbc:tc:postgresql:13.3:///test?TC_INITFUNCTION=com.paco.workflow.web.StartControllerTest::dbInitFunction"
+      username: test
+      password: test
+      testOnBorrow: true
+      validationQuery: select 1
+      hikari:
+        pool-name: "PostgresHikariPool"
+        maximum-pool-size: ${DB_POOL_SIZE:10}
+  liquibase:
+    enabled: false

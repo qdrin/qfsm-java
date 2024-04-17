@@ -1,0 +1,8 @@
+{
+  "result": "Ok",
+  "reason": "999",
+  "partnerResponse": {
+    "responseCode": "424",
+    "responseBody": "{}"
+  }
+}

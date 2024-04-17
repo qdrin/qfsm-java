@@ -1,0 +1,68 @@
+{
+  "id": "1",
+  "action": "modify",
+  "service": {
+    "serviceId": "fpc_partner1_offer1",
+    "serviceName": "Yandex Music",
+    "serviceCharacteristics": [
+      {
+        "characteristicId": "characteristic1",
+        "name": "price",
+        "valueType": "array",
+        "value": [
+          {
+            "priceId": "priceTrial",
+            "productStatus": "ACTIVE_TRIAL",
+            "nextPayDate": "{NEXTPAYDATE}"
+          }
+        ]
+      },
+      {
+        "characteristicId": "characteristic2",
+        "name": "fabricRef",
+        "value": {
+                "fabricRefId": "PARTNER_ADAPTER",
+                "fabricProductOfferingId": "partner1_paid_code1_month",
+                "fabricProductId": "partner1_paid_code1_month"
+        }
+      }
+    ]
+  },
+  "partnerContext": {
+    "partnerItemResult": {
+      "code": "0"
+    },
+    "partnerServices": [
+      {
+        "partnerServiceId": "partner1_paid_code1_day",
+        "partnerServiceCharacteristics": [
+          {
+            "id": "1812fc41-04d9-4bc7-a88c-e01e8e42b274",
+            "name": "periodToApply",
+            "characteristicValues": [
+              {
+                "value": "P1D",
+                "valueType": "string"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "partnerServiceId": "partner1_paid_code1_month",
+        "partnerServiceCharacteristics": [
+          {
+            "id": "1812fc41-04d9-4bc7-a88c-e01e8e42b275",
+            "name": "periodToApply",
+            "characteristicValues": [
+              {
+                "value": "P30D",
+                "valueType": "string"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
