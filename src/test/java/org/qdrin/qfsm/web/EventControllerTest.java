@@ -63,14 +63,13 @@ public class EventControllerTest {
   private String managePath;
 
   private String apiVersion = "/v1";
+  private String eventUrl;
 
   @Autowired
   private EventController eventController;
 
   @Autowired
   private TestRestTemplate restTemplate;
-
-  private static final AtomicInteger testCounter = new AtomicInteger();
 
   private static String readResourceAsString(ClassPathResource resource) {
     try (Reader reader = new InputStreamReader(resource.getInputStream(), "UTF8")) {
@@ -129,6 +128,7 @@ public class EventControllerTest {
 
   @BeforeEach
   public void resetMock() {
+    eventUrl = String.format("http://localhost:%d%s%s/event", port, basePath, apiVersion);
     mockServerClient.reset();
   }
 
@@ -161,14 +161,12 @@ public class EventControllerTest {
     public void checkPrometheus() throws Exception {
       ClassPathResource resource = new ClassPathResource("/body/request/activation_started.json", getClass());
 
-      String url = String.format("http://localhost:%d%s%s/event", port, basePath, apiVersion);
       String eventPath = String.format("%s%s/event", basePath, apiVersion);
-      log.debug("url: {}", url);
       RequestEventDto body = mapper.readValue(resource.getInputStream(), RequestEventDto.class);
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
       HttpEntity<RequestEventDto> request = new HttpEntity<>(body, headers);
-      ResponseEntity<String> resp = restTemplate.postForEntity(url, request, String.class);
+      ResponseEntity<String> resp = restTemplate.postForEntity(eventUrl, request, String.class);
       log.debug(resp.toString());
       assertEquals(HttpStatus.OK, resp.getStatusCode());
 
@@ -185,64 +183,53 @@ public class EventControllerTest {
     }
   }
 
-//   @Nested
-//   class CheckMethod {
-//     @Test
-//     public void checkSuccess() throws Exception {
-//       ClassPathResource resource = new ClassPathResource("/body/request/CheckSuccess.json", getClass());
-//       ClassPathResource mockResource = new ClassPathResource("/body/mock/connector/check/CheckSuccess.json", getClass());
-//       String mock = readResourceAsString(mockResource);
-//       var mock_request = HttpRequest.request()
-//         .withMethod("POST").withPath("/eapi/factory-adapter-bss-connector/v1/availability");
-//       mockServerClient.when(mock_request)
-//         // .when(HttpRequest.request().withMethod("POST").withPath("/eapi/factory-adapter-bss-connector/v1/availability")
-//         // )  // .withBody(mockRequest))
-//         .respond(HttpResponse.response()
-//                             .withBody(mock.toString())
-//                             .withContentType(org.mockserver.model.MediaType.APPLICATION_JSON)
-//         );
+  // @Nested
+  // class ActivationStarted {
+  //   @Test
+  //   public void activationStartedSimpleSuccess() throws Exception {
+  //     ClassPathResource resource = new ClassPathResource("/body/request/simple/activation_started.json", getClass());
+  //     String url = String.format("http://localhost:%d%s%s/process/start/sync", port, basePath, apiVersion);
+  //     log.debug(url);
+  //     StartSyncRequestDto body = mapper.readValue(resource.getInputStream(), StartSyncRequestDto.class);
+  //     HttpHeaders headers = new HttpHeaders();
+  //     headers.setContentType(MediaType.APPLICATION_JSON);
+  //     HttpEntity<StartSyncRequestDto> request = new HttpEntity<>(body, headers);
+  //     ResponseEntity<String> resp = restTemplate.postForEntity(url, request, String.class);
+  //     log.debug(resp.toString());
+  //     assertEquals(HttpStatus.OK, resp.getStatusCode());
+  //     var rbody = mapper.readValue(resp.getBody(), new TypeReference<StartResponseDto<OrderItemResult>>() {});
+  //     assertThat(rbody.getOrder().getInternalId()).isNotNull();
+  //     assertThat(rbody.getResult()).isNotNull();
+  //     var result = rbody.getResult();
+  //     assertThat(result.getClazz()).isNull();
+  //     assertThat(result.getOrderItemsResults()).isNotNull();
+  //     var orderItemsResults = result.getOrderItemsResults();
+  //     assertEquals(1, orderItemsResults.size());
+  //     var mreq = getMockRequests(mock_request)[0];
+  //     assertThat(mreq.getBody()).isNotNull();
+  //     JsonBody mbody = (JsonBody) mreq.getBody();
+  //     log.debug("mbody: {}", mbody);
+  //     JsonNode context = mbody.get("context");
+  //     assertThat(context).isNotNull();
+  //     assertThat(mbody.get("order")).isNotNull();
+  //     assertThat(mbody.get("order").get("internalId")).isNotNull();
+  //     assertEquals("partner1_paid_code1_month", context.get("partnerServiceId").asText());
+  //     assertEquals(body.getRelatedParty().getMsisdn(), context.get("partnerParty").get("msisdn").asText());
+  //     assertEquals(body.getServiceOrderItems().get(0).getAction(), mbody.get("action").asText());
+  //     assertThat(mbody.get("config").get("command")).isNotNull();
+  //     assertThat(mbody.get("config").get("command").get("url").asText().contains("availability"));
 
-//       String url = String.format("http://localhost:%d%s%s/process/start/sync", port, basePath, apiVersion);
-//       log.debug(url);
-//       StartSyncRequestDto body = mapper.readValue(resource.getInputStream(), StartSyncRequestDto.class);
-//       HttpHeaders headers = new HttpHeaders();
-//       headers.setContentType(MediaType.APPLICATION_JSON);
-//       HttpEntity<StartSyncRequestDto> request = new HttpEntity<>(body, headers);
-//       ResponseEntity<String> resp = restTemplate.postForEntity(url, request, String.class);
-//       log.debug(resp.toString());
-//       assertEquals(HttpStatus.OK, resp.getStatusCode());
-//       var rbody = mapper.readValue(resp.getBody(), new TypeReference<StartResponseDto<OrderItemResult>>() {});
-//       assertThat(rbody.getOrder().getInternalId()).isNotNull();
-//       assertThat(rbody.getResult()).isNotNull();
-//       var result = rbody.getResult();
-//       assertThat(result.getClazz()).isNull();
-//       assertThat(result.getOrderItemsResults()).isNotNull();
-//       var orderItemsResults = result.getOrderItemsResults();
-//       assertEquals(1, orderItemsResults.size());
-//       var mreq = getMockRequests(mock_request)[0];
-//       assertThat(mreq.getBody()).isNotNull();
-//       JsonBody mbody = (JsonBody) mreq.getBody();
-//       log.debug("mbody: {}", mbody);
-//       JsonNode context = mbody.get("context");
-//       assertThat(context).isNotNull();
-//       assertThat(mbody.get("order")).isNotNull();
-//       assertThat(mbody.get("order").get("internalId")).isNotNull();
-//       assertEquals("partner1_paid_code1_month", context.get("partnerServiceId").asText());
-//       assertEquals(body.getRelatedParty().getMsisdn(), context.get("partnerParty").get("msisdn").asText());
-//       assertEquals(body.getServiceOrderItems().get(0).getAction(), mbody.get("action").asText());
-//       assertThat(mbody.get("config").get("command")).isNotNull();
-//       assertThat(mbody.get("config").get("command").get("url").asText().contains("availability"));
-
-//       var item0 = orderItemsResults.get(0);
-//       log.debug("item0: {} ({})", item0, item0.getClass().getName());
-//       // OrderItemResult item0 = (OrderItemResult) orderItemsResults.get(0);
-//       assertEquals("1", item0.getId());
-//       assertEquals("OK", item0.getResult());
-//       assertEquals("0", item0.getReason());
-//       assertEquals(200, item0.getPartnerResponse().getResponseCode());
-//       assertEquals("partner1_paid_code1_month", item0.getPartnerServiceId());
-//       assertEquals(null, item0.getPartnerProductId());
-//     }
+  //     var item0 = orderItemsResults.get(0);
+  //     log.debug("item0: {} ({})", item0, item0.getClass().getName());
+  //     // OrderItemResult item0 = (OrderItemResult) orderItemsResults.get(0);
+  //     assertEquals("1", item0.getId());
+  //     assertEquals("OK", item0.getResult());
+  //     assertEquals("0", item0.getReason());
+  //     assertEquals(200, item0.getPartnerResponse().getResponseCode());
+  //     assertEquals("partner1_paid_code1_month", item0.getPartnerServiceId());
+  //     assertEquals(null, item0.getPartnerProductId());
+  //   }
+  // }
 
 //     @Test
 //     public void check411() throws Exception {
