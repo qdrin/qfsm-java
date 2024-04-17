@@ -1,0 +1,26 @@
+{
+  "event": {
+    "refId":"e3fcc810-7a06-4e2b-ad45-1d6678117efd",
+    "refIdType": "orderId",
+    "eventType": "activation_started",
+    "sourceCode": "OMS"
+  },
+  "clientInfo": {
+    "partyRoleId": "3c52db51-50d5-49c3-a5ca-3da51aea78a4",
+    "partyId": "c40c3daf-199c-4184-bf5d-db274c1b70a3"
+  },
+  "productOrderItems": [
+    {
+      "productOrderItemId": "100",
+      "isBundle": false,
+      "productOfferingId": "simplePromoOffer1",
+      "productOfferingName": "ACTIVE TRIAL PROMO МФ+",
+      "characteristic":[],
+      "metaInfo":
+      {
+        "channel": "MLK",
+        "campaign": "campaign"
+      }
+    }
+  ]
+}

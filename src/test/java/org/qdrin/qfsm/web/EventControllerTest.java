@@ -1,6 +1,7 @@
 package org.qdrin.qfsm.web;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.*;
@@ -62,6 +63,8 @@ public class EventControllerTest {
   @Value(value="${management.endpoints.web.base-path}")
   private String managePath;
 
+  private static HttpHeaders headers = new HttpHeaders();
+
   private String apiVersion = "/v1";
   private String eventUrl;
 
@@ -122,6 +125,7 @@ public class EventControllerTest {
 
   @BeforeAll
   static void setEnvironment() {
+    headers.setContentType(MediaType.APPLICATION_JSON);
     System.setProperty("ISTIO_HOST", mockServer.getHost());
   }
 
@@ -163,8 +167,6 @@ public class EventControllerTest {
 
       String eventPath = String.format("%s%s/event", basePath, apiVersion);
       RequestEventDto body = mapper.readValue(resource.getInputStream(), RequestEventDto.class);
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_JSON);
       HttpEntity<RequestEventDto> request = new HttpEntity<>(body, headers);
       ResponseEntity<String> resp = restTemplate.postForEntity(eventUrl, request, String.class);
       log.debug(resp.toString());
@@ -183,53 +185,21 @@ public class EventControllerTest {
     }
   }
 
-  // @Nested
-  // class ActivationStarted {
-  //   @Test
-  //   public void activationStartedSimpleSuccess() throws Exception {
-  //     ClassPathResource resource = new ClassPathResource("/body/request/simple/activation_started.json", getClass());
-  //     String url = String.format("http://localhost:%d%s%s/process/start/sync", port, basePath, apiVersion);
-  //     log.debug(url);
-  //     StartSyncRequestDto body = mapper.readValue(resource.getInputStream(), StartSyncRequestDto.class);
-  //     HttpHeaders headers = new HttpHeaders();
-  //     headers.setContentType(MediaType.APPLICATION_JSON);
-  //     HttpEntity<StartSyncRequestDto> request = new HttpEntity<>(body, headers);
-  //     ResponseEntity<String> resp = restTemplate.postForEntity(url, request, String.class);
-  //     log.debug(resp.toString());
-  //     assertEquals(HttpStatus.OK, resp.getStatusCode());
-  //     var rbody = mapper.readValue(resp.getBody(), new TypeReference<StartResponseDto<OrderItemResult>>() {});
-  //     assertThat(rbody.getOrder().getInternalId()).isNotNull();
-  //     assertThat(rbody.getResult()).isNotNull();
-  //     var result = rbody.getResult();
-  //     assertThat(result.getClazz()).isNull();
-  //     assertThat(result.getOrderItemsResults()).isNotNull();
-  //     var orderItemsResults = result.getOrderItemsResults();
-  //     assertEquals(1, orderItemsResults.size());
-  //     var mreq = getMockRequests(mock_request)[0];
-  //     assertThat(mreq.getBody()).isNotNull();
-  //     JsonBody mbody = (JsonBody) mreq.getBody();
-  //     log.debug("mbody: {}", mbody);
-  //     JsonNode context = mbody.get("context");
-  //     assertThat(context).isNotNull();
-  //     assertThat(mbody.get("order")).isNotNull();
-  //     assertThat(mbody.get("order").get("internalId")).isNotNull();
-  //     assertEquals("partner1_paid_code1_month", context.get("partnerServiceId").asText());
-  //     assertEquals(body.getRelatedParty().getMsisdn(), context.get("partnerParty").get("msisdn").asText());
-  //     assertEquals(body.getServiceOrderItems().get(0).getAction(), mbody.get("action").asText());
-  //     assertThat(mbody.get("config").get("command")).isNotNull();
-  //     assertThat(mbody.get("config").get("command").get("url").asText().contains("availability"));
-
-  //     var item0 = orderItemsResults.get(0);
-  //     log.debug("item0: {} ({})", item0, item0.getClass().getName());
-  //     // OrderItemResult item0 = (OrderItemResult) orderItemsResults.get(0);
-  //     assertEquals("1", item0.getId());
-  //     assertEquals("OK", item0.getResult());
-  //     assertEquals("0", item0.getReason());
-  //     assertEquals(200, item0.getPartnerResponse().getResponseCode());
-  //     assertEquals("partner1_paid_code1_month", item0.getPartnerServiceId());
-  //     assertEquals(null, item0.getPartnerProductId());
-  //   }
-  // }
+  @Nested
+  class ActivationStarted {
+    @Test
+    public void activationStartedSimpleSuccess() throws Exception {
+      ClassPathResource resource = new ClassPathResource("/body/request/simple/activation_started.json", getClass());
+      RequestEventDto body = mapper.readValue(resource.getInputStream(), RequestEventDto.class);
+      HttpEntity<RequestEventDto> request = new HttpEntity<>(body, headers);
+      ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
+      log.debug(resp.toString());
+      assertEquals(HttpStatus.OK, resp.getStatusCode());
+      ResponseEventDto response = resp.getBody();
+      assertNotNull(response.getProducts());
+      assertEquals(1, response.getProducts().size());
+    }
+  }
 
 //     @Test
 //     public void check411() throws Exception {

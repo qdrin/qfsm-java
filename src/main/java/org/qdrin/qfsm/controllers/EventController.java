@@ -3,10 +3,14 @@ package org.qdrin.qfsm.controllers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import org.qdrin.qfsm.FsmApp;
+import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
+import org.qdrin.qfsm.model.dto.ProductResponseDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.model.dto.ResponseEventDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +27,17 @@ import jakarta.validation.Valid;
 @Service
 @Slf4j
 public class EventController {
-    @Autowired
-    StateMachineService<String, String> stateMachineService;
+    // @Autowired
+    // StateMachineService<String, String> stateMachineService;
   
-    @Autowired
-    StateMachinePersister<String, String, String> persister;
+    // @Autowired
+    // StateMachinePersister<String, String, String> persister;
     
-    @Autowired
-    DataSource dataSource;
+    // @Autowired
+    // DataSource dataSource;
+
+		@Autowired
+		FsmApp fsmApp;
 
     // private void sendEvent(RequestActivateEventDto activateEvent) {
         // String machineId = UUID.randomUUID().toString();
@@ -55,8 +62,17 @@ public class EventController {
 
     @PostMapping("/v1/event")
     public ResponseEntity<ResponseEventDto> eventHandler(@RequestBody @Valid RequestEventDto activateEvent) {
-        ResponseEventDto response = new ResponseEventDto();
-        return ResponseEntity.ok(response);
+			String machineId = UUID.randomUUID().toString();
+			ProductActivateRequestDto orderItem = activateEvent.getProductOrderItems().get(0);
+			ResponseEventDto response = new ResponseEventDto();
+			response.setRefId(activateEvent.getEvent().getRefId());
+			ProductResponseDto product = new ProductResponseDto();
+			product.setProductId(machineId);
+			product.setProductOfferingId(orderItem.getProductOfferingId());
+			product.setBundle(orderItem.getIsBundle());
+			response.setProducts(Arrays.asList(product));
+			fsmApp.sendEvent(machineId, activateEvent.getEvent().getEventType());
+			return ResponseEntity.ok(response);
     }
 }
 
