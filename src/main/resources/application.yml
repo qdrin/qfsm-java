@@ -4,9 +4,10 @@ server:
   servlet:
     context-path: /qfsm
 management:
-  health:
-    db:
-      enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: true
   endpoints:
     web:
       base-path: /manage
