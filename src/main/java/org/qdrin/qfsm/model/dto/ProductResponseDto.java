@@ -18,8 +18,8 @@ public class ProductResponseDto {
   @NotNull String productOfferingId;
   @NotNull String status;
   String productOrderItemId;  // Must present in activation_started response only
-  boolean isBundle;
-  boolean isCustom;
+  Boolean isBundle;
+  Boolean isCustom;
   String ProductOfferingName;
   List<ProductRelationship> productRelationship;
 }

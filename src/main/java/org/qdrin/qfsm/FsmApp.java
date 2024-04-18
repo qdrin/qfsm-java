@@ -15,6 +15,7 @@ import org.springframework.statemachine.state.State;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
+import org.qdrin.qfsm.exception.*;
 
 @Slf4j
 @Configuration
@@ -65,41 +66,20 @@ public class FsmApp {
 		stateMachineService.releaseStateMachine(machineId);
 	}
 
-//   public void sendUserEvent(String machineId) {
-// 		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
-//     String machineState = getMachineState(machine.getState());
-//     var variables = machine.getExtendedState().getVariables();
-//     log.info("current state: {}, variables: {}", machineState, variables);
-//     System.out.print("input event name:");
-//     String event = Application.scanner.nextLine();
-//     sendEvent(machine, event);
-//     machineState = getMachineState(machine.getState());
-//     variables = machine.getExtendedState().getVariables();
-//     log.info("new state: {}, variables: {}", machineState, variables);
-// 		// stateMachineService.releaseStateMachine(machineId);
-//   }
-
 	public void sendEvent(String machineId, String event) {
 		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
-		try {
-			persister.restore(machine, machineId);
-			log.debug("machine.getId(): {}", machine.getId());
-		} catch(Exception e) {
-			log.error("Cannot restore stateMachineId '{}': {}", machineId, e.getLocalizedMessage());
-			e.printStackTrace();
-			return;
-		}
+		log.debug("machine acquired: {}", machine.getId());
 		String machineState = getMachineState(machine.getState());
 		var variables = machine.getExtendedState().getVariables();
 		log.info("current state: {}, variables: {}", machineState, variables);
-		sendEvent(machine, event);
+		sendMessage(machine, event);
 		machineState = getMachineState(machine.getState());
 		variables = machine.getExtendedState().getVariables();
 		log.info("new state: {}, variables: {}", machineState, variables);
-			stateMachineService.releaseStateMachine(machineId);
+		stateMachineService.releaseStateMachine(machineId);
 	}
 
-  public void sendEvent(StateMachine<String, String> machine, String eventName) throws IllegalArgumentException {
+  private void sendMessage(StateMachine<String, String> machine, String eventName) {
 		Map<Object, Object> variables = machine.getExtendedState().getVariables();
 		variables.put("transitionCount", 0);
 
@@ -108,15 +88,25 @@ public class FsmApp {
 			.setHeader("origin", "user")
 			.build();
 		Mono<Message<String>> monomsg = Mono.just(message);
-		log.info("sending event: {}, message: {}", eventName, message);
+		log.debug("[{}] sending event: {}, message: {}", machine.getId(), eventName, message);
     try {
-		  machine.sendEvent(monomsg).blockLast();
+		  var res = machine.sendEvent(monomsg).blockLast();
+			log.debug("event result: {}", res);
     } catch(IllegalArgumentException e) {
-      log.error("Event {} not accepted in current state: {}", eventName, e.getMessage());
+			e.printStackTrace();
+			String emsg = String.format("[%s] Event %s not accepted in current state: %s", machine.getId(), eventName, e.getLocalizedMessage());
+      log.error(emsg);
+			throw new NotAcceptedEventException(emsg, e);
     }
+		finally {
+			stateMachineService.releaseStateMachine(machine.getId());
+		}
 
 		int trcount = (int) machine.getExtendedState().getVariables().get("transitionCount");
-		// Here we can distinguish accepted event from non-accepted
-		stateMachineService.releaseStateMachine(machine.getId());
+		if(trcount == 0) {
+			String emsg = String.format("[%s] Event %s not accepted in current state, transition count is zero", machine.getId(), eventName);
+      log.error(emsg);
+			throw new NotAcceptedEventException(emsg);
+		}
 	}
 }

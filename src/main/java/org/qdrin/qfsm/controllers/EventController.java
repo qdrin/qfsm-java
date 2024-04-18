@@ -13,6 +13,7 @@ import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.ProductResponseDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.model.dto.ResponseEventDto;
+import org.qdrin.qfsm.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.statemachine.persist.StateMachinePersister;
@@ -69,7 +70,8 @@ public class EventController {
 			ProductResponseDto product = new ProductResponseDto();
 			product.setProductId(machineId);
 			product.setProductOfferingId(orderItem.getProductOfferingId());
-			product.setBundle(orderItem.getIsBundle());
+			product.setIsBundle(orderItem.getIsBundle());
+			product.setIsCustom(orderItem.getIsCustom());
 			response.setProducts(Arrays.asList(product));
 			fsmApp.sendEvent(machineId, activateEvent.getEvent().getEventType());
 			return ResponseEntity.ok(response);

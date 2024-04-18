@@ -172,6 +172,7 @@ public class QStateMachineService<S, E> implements StateMachineService<S, E>, Di
 				}
 			}
 		}
+		log.debug("machine started: {}", stateMachine.getId());
 		return stateMachine;
 	}
 
