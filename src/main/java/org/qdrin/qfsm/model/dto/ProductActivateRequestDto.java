@@ -10,6 +10,7 @@ import org.qdrin.qfsm.model.ProductPrice;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.Builder.Default;
 import lombok.experimental.FieldDefaults;
 
 @Data
@@ -21,8 +22,8 @@ public class ProductActivateRequestDto {
   @NotNull String productOrderItemId;  // Must present in activation_started response only
   @NotNull String productOfferingId;
   List<ProductPrice> productPrice;
-  Boolean isBundle;
-  Boolean isCustom;
+  @Default Boolean isBundle = false;
+  @Default Boolean isCustom = false;
   String ProductOfferingName;
   List<ProductOrderItemRelationshipDto> productOrderItemRelationship;
   List<ProductCharacteristic> characteristic;
