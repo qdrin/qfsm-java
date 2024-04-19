@@ -37,4 +37,18 @@ public class Event {
   List<Characteristic> characteristics;
   @JdbcTypeCode(SqlTypes.JSON)
   EventProperties eventProperties;
+
+  public Event(RequestEventDto eventDto) {
+    EventDto ev = eventDto.getEvent();
+    this.refId = ev.getRefId();
+    this.refIdType = ev.getRefIdType();
+    this.sourceCode = ev.getSourceCode();
+    this.eventDate = ev.getEventDate();
+    this.eventType = ev.getEventType();
+    this.clientInfo = eventDto.getClientInfo();
+    this.products = eventDto.getProducts();
+    this.productOrderItems = eventDto.getProductOrderItems();
+    this.characteristics = eventDto.getCharacteristics();
+    this.eventProperties = eventDto.getEventProperties();
+  }
 }

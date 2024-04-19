@@ -16,6 +16,7 @@ import org.springframework.statemachine.state.State;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import org.qdrin.qfsm.exception.*;
+import org.qdrin.qfsm.model.Event;
 
 @Slf4j
 @Configuration
@@ -66,13 +67,14 @@ public class FsmApp {
 		stateMachineService.releaseStateMachine(machineId);
 	}
 
-	public void sendEvent(String machineId, String event) {
+	public void sendEvent(String machineId, Event event) {
 		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
+		String eventType = event.getEventType();
 		log.debug("machine acquired: {}", machine.getId());
 		String machineState = getMachineState(machine.getState());
 		var variables = machine.getExtendedState().getVariables();
 		log.info("current state: {}, variables: {}", machineState, variables);
-		sendMessage(machine, event);
+		sendMessage(machine, eventType);
 		machineState = getMachineState(machine.getState());
 		variables = machine.getExtendedState().getVariables();
 		log.info("new state: {}, variables: {}", machineState, variables);

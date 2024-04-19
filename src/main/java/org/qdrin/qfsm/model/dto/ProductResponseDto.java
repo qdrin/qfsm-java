@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.qdrin.qfsm.model.*;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,9 +13,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductResponseDto {
-  @NotNull String productId;
-  @NotNull String productOfferingId;
-  @NotNull String status;
+  @NonNull String productId;
+  @NonNull String productOfferingId;
+  @NonNull String status;
   String productOrderItemId;  // Must present in activation_started response only
   Boolean isBundle;
   Boolean isCustom;

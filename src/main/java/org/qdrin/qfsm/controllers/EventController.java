@@ -62,11 +62,12 @@ public class EventController {
 	// }
 
     @PostMapping("/v1/event")
-    public ResponseEntity<ResponseEventDto> eventHandler(@RequestBody @Valid RequestEventDto activateEvent) {
+    public ResponseEntity<ResponseEventDto> eventHandler(@RequestBody @Valid RequestEventDto incomingEvent) {
+			Event event = new Event(incomingEvent);
 			String machineId = UUID.randomUUID().toString();
-			ProductActivateRequestDto orderItem = activateEvent.getProductOrderItems().get(0);
+			ProductActivateRequestDto orderItem = incomingEvent.getProductOrderItems().get(0);
 			ResponseEventDto response = new ResponseEventDto();
-			response.setRefId(activateEvent.getEvent().getRefId());
+			response.setRefId(incomingEvent.getEvent().getRefId());
 			ProductResponseDto product = new ProductResponseDto();
 			product.setProductId(machineId);
 			product.setProductOfferingId(orderItem.getProductOfferingId());
