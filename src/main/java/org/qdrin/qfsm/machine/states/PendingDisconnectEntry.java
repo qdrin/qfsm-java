@@ -40,15 +40,15 @@ public class PendingDisconnectEntry implements Action<String, String> {
     // TODO: Remove after manual mode
     List<ProductCharacteristic> chars = ExternalData.requestProductCharacteristics();
     if(chars.size() > 0) {
-      product.setCharacteristics(chars);
+      product.setCharacteristic(chars);
       log.debug("product with characteristics: {}", product);
     }
     
     // ----------------------------------------------------------------------------------
-    List<ProductCharacteristic> characteristics = product.getCharacteristics();
+    List<ProductCharacteristic> characteristics = product.getCharacteristic();
     Optional<ProductCharacteristic> ch = Optional.empty();
     if(characteristics != null) {
-      ch = product.getCharacteristics().stream()
+      ch = product.getCharacteristic().stream()
         .filter(c -> {return c.getRefName().equals("deactivation_mode");})
         .findFirst();
     }

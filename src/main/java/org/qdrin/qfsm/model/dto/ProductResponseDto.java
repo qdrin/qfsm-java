@@ -29,6 +29,6 @@ public class ProductResponseDto {
     this.isBundle = product.getIsBundle();
     this.isCustom = product.getIsCustom();
     this.productOfferingName = product.getProductOfferingName();
-    this.productRelationship = product.getProductRelationships();
+    this.productRelationship = product.getProductRelationship();
   }
 }

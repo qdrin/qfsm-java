@@ -12,7 +12,9 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductBundle {
-  ProductDescription drive;
-  List<ProductDescription> components;
+public class ProductDescription {
+  Product product;
+  String productOrderItemId;
+  String errorCode;
+  String errorMessage;
 }

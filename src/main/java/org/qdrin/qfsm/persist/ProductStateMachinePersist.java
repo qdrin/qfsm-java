@@ -21,9 +21,6 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
   Map<String, StateMachineContext<String, String>> contexts = new HashMap<>();
 
   final static int bufferSize = 1024*1024*1024;
-  
-  @Autowired
-  private ProductRepository productRepository;
 
   @Autowired
   private ContextRepository contextRepository;
@@ -41,35 +38,21 @@ public class ProductStateMachinePersist implements StateMachinePersist<String, S
 
   // @Override
   public void write(StateMachineContext<String, String> context, String machineId) throws Exception {
-    Map<Object, Object> variables = context.getExtendedState().getVariables();
     clearVariables(context, false);
-    Product product = (Product) variables.getOrDefault("product", new Product());
-    variables.remove("product");
     ContextEntity ce = new ContextEntity();
     ce.setProductId(machineId);
     ce.setContext(converter.toBytes(context));
-    if(product.getProductId() == null) {
-      product.setProductId(machineId);
-    }
-    productRepository.save(product);
     contextRepository.save(ce);
   }
   
   // @Override
   public StateMachineContext<String, String> read(String machineId) throws Exception {
-    Optional<Product> op = productRepository.findById(machineId);
     Optional<ContextEntity> cep = contextRepository.findById(machineId);
-    if(op.isEmpty() || cep.isEmpty()) {
+    if(cep.isEmpty()) {
       return null;
     }
-    Product product = op.get();
     byte[] bcontext = cep.get().getContext();
     StateMachineContext<String, String> context = converter.toContext(bcontext);
-    context.getExtendedState().getVariables().put("product", product);
-    if(product.getProductId() == null) {
-      log.debug("new product, set productId to '{}'", machineId);
-      product.setProductId(machineId);
-    }
     return context;
   }
 }

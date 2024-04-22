@@ -329,12 +329,7 @@
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_bp6j8LoEEe6yNs2FzguhlQ" name="ProvisionFork" kind="fork"/>
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_lUS-kLoEEe6yNs2FzguhlQ" name="ProvisionJoin" kind="join"/>
       <subvertex xmi:type="uml:State" xmi:id="__Z-08LzsEe6WIIctFrkbQg" name="Disconnect"/>
-      <subvertex xmi:type="uml:State" xmi:id="_mBTgYMlsEe6D_qDhyLHyWw" name="Entry">
-        <exit xmi:type="uml:OpaqueBehavior" xmi:id="_MSF0cON8Ee6jrIJXmDVxqg">
-          <language>bean</language>
-          <body>createProduct</body>
-        </exit>
-      </subvertex>
+      <subvertex xmi:type="uml:State" xmi:id="_mBTgYMlsEe6D_qDhyLHyWw" name="Entry"/>
     </region>
   </packagedElement>
   <packagedElement xmi:type="uml:Signal" xmi:id="_1mdCwKALEe6Sh616vaZpZA" name="suspend"/>
