@@ -3,13 +3,17 @@ package org.qdrin.qfsm.controllers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import javax.sql.DataSource;
 
 import org.qdrin.qfsm.FsmApp;
 import org.qdrin.qfsm.model.Event;
+import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.model.ProductBundle;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.ProductResponseDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
@@ -65,17 +69,15 @@ public class EventController {
     @PostMapping("/v1/event")
     public ResponseEntity<ResponseEventDto> eventHandler(@RequestBody @Valid RequestEventDto incomingEvent) {
 			Event event = new Event(incomingEvent);
-			String machineId = UUID.randomUUID().toString();
-			ProductActivateRequestDto orderItem = incomingEvent.getProductOrderItems().get(0);
+			List<ProductBundle> bundles = fsmApp.sendEvent(event);
+			List<ProductResponseDto> responseProducts = new ArrayList<>();
+			for(Product product: products) {
+				responseProducts.add(new ProductResponseDto(product));
+			}
 			ResponseEventDto response = new ResponseEventDto();
 			response.setRefId(incomingEvent.getEvent().getRefId());
-			ProductResponseDto product = new ProductResponseDto();
-			product.setProductId(machineId);
-			product.setProductOfferingId(orderItem.getProductOfferingId());
-			product.setIsBundle(orderItem.getIsBundle());
-			product.setIsCustom(orderItem.getIsCustom());
-			response.setProducts(Arrays.asList(product));
-			fsmApp.sendEvent(machineId, event);
+			response.setProducts(responseProducts);
+	
 			return ResponseEntity.ok(response);
     }
 }

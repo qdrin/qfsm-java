@@ -1,6 +1,11 @@
 package org.qdrin.qfsm;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +21,13 @@ import org.springframework.statemachine.state.State;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import org.qdrin.qfsm.exception.*;
-import org.qdrin.qfsm.model.Event;
+import org.qdrin.qfsm.model.*;
+import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
+import org.qdrin.qfsm.model.dto.ProductOrderItemRelationshipDto;
+import org.qdrin.qfsm.model.dto.ProductRequestDto;
 import org.qdrin.qfsm.repository.EventRepository;
+import org.qdrin.qfsm.repository.ProductRepository;
+import org.qdrin.qfsm.ProductClasses;
 
 @Slf4j
 @Configuration
@@ -31,6 +41,9 @@ public class FsmApp {
 
 	@Autowired
 	EventRepository eventRepository;
+
+	@Autowired
+	ProductRepository productRepository;
 
   // get stringified full-state
   public String getMachineState(State<String, String> state) {
@@ -85,8 +98,141 @@ public class FsmApp {
 		}
 	}
 
-	public void sendEvent(String machineId, Event event) {
+	private void validateEvent(Event event) {
+		return;
+	}
+
+	private List<ProductBundle> createProducts(Event event) {
+		ArrayList<ProductBundle> bundles = new ArrayList<>();
+		List<ProductActivateRequestDto> orderItems = new ArrayList<ProductActivateRequestDto>(event.getProductOrderItems());
+		log.debug("event: {}", event);
+
+		List<ProductActivateRequestDto> heads = orderItems.stream()
+				.filter(item -> item.getIsBundle())
+				.collect(Collectors.toList());
+		
+		for(ProductActivateRequestDto head: heads) {
+			ProductClasses productClass = head.getIsCustom() ? ProductClasses.CUSTOM_BUNDLE : ProductClasses.BUNDLE;
+			ProductBundle bundle = new ProductBundle();
+			Product product = new Product(head);
+			product.setProductClass(productClass.ordinal());
+			ArrayList<Product> components = new ArrayList<>();
+			List<ProductRelationship> productRelations = new ArrayList<>(); 
+			List<ProductOrderItemRelationshipDto> itemRelations = head.getProductOrderItemRelationship();
+			for(ProductOrderItemRelationshipDto rel: itemRelations) {
+				Optional<ProductActivateRequestDto> componentItem = orderItems.stream()
+						.filter(item -> item.getProductOrderItemId().equals(rel.getProductOrderItemId()))
+						.findFirst();
+				if(componentItem.isEmpty()) {
+					throw new BadUserDataException(
+						String.format("Cannot find leg orderItem %s, specified in relations for %s", 
+													rel.getProductOrderItemId(), head.getProductOrderItemId())
+						);
+				}
+				Product component = new Product(componentItem.get());
+				components.add(component);
+				ProductRelationship pr = new ProductRelationship();
+				pr.setProductId(component.getProductId());
+				pr.setProductOfferingId(component.getProductOfferingId());
+				pr.setRelationshipType(rel.getRelationshipType());
+				pr.setProductOfferingName(component.getProductOfferingName());
+				productRelations.add(pr);
+			}
+			product.setProductRelationship(productRelations);
+			bundle.setMainProduct(product);
+			bundle.setComponents(components);
+			orderItems.remove(head);
+		}  // End of bundle processing, orderItems contain just simple and legs now
+
+		for(ProductActivateRequestDto orderItem: orderItems) {
+			log.debug("productOrderItem {}", orderItem);
+			ProductBundle simple = new ProductBundle();
+			Product product = new Product(orderItem);
+			List<ProductOrderItemRelationshipDto> relations = orderItem.getProductOrderItemRelationship();
+			Optional<ProductOrderItemRelationshipDto> headRelation = relations.stream().filter(r -> r.getRelationshipType().equals("BELONGS")).findFirst();
+			ProductClasses productClass = headRelation.isPresent() ? ProductClasses.CUSTOM_BUNDLE_COMPONENT : ProductClasses.SIMPLE;
+			product.setProductClass(productClass.ordinal());
+			simple.setMainProduct(product);
+			simple.setComponents(null);
+			bundles.add(simple);
+		}
+		log.debug("bundles: {}", bundles);
+		return bundles;
+	}
+
+	private List<ProductBundle> getProducts(Event event) {
+		ArrayList<ProductBundle> bundles = new ArrayList<>();
+		List<ProductRequestDto> orderItems = new ArrayList<ProductRequestDto>(event.getProducts());
+		ArrayList<Product> products = new ArrayList<>();
+		log.debug("event: {}", event);
+		for(ProductRequestDto orderItem: orderItems) {
+			Optional<Product> dbProduct = productRepository.findById(orderItem.getProductId());
+			if(dbProduct.isEmpty()) {
+				String errString = String.format("Event contains productId: %s, that cannot be found");
+				log.error( errString);
+				throw new BadUserDataException(errString);
+			}
+			Product product = dbProduct.get();
+			product.updateUserData(orderItem);
+			products.add(product);
+		}
+		List<Product> heads = products.stream()
+				.filter(p -> ProductClasses.getBundles().contains(p.getProductClass()))
+				.collect(Collectors.toList());
+		for(Product head: heads) {
+			ProductBundle bundle = new ProductBundle();
+			bundle.setMainProduct(head);
+			List<Product> components = new ArrayList<>();
+			for(ProductRelationship relationship: head.getProductRelationship()) {
+				Optional<Product> component = products.stream().filter(p->p.getProductId().equals(relationship.getProductId())).findFirst();
+				if(component.isEmpty()) {
+					component = productRepository.findById(relationship.getProductId());
+				} else {
+					products.remove(component.get());
+				}
+				if(component.isEmpty()) {
+					throw new RuntimeException(String.format("component %s not found for bundle %s",
+										relationship.getProductId(), head.getProductId()));
+				}
+				components.add(component.get());
+			}
+			bundle.setComponents(components);
+			bundles.add(bundle);
+			products.remove(head);
+		}
+		for(Product product: products) {
+			int index = product.getProductClass();
+			ProductClasses productClass = ProductClasses.values()[index];
+			switch(productClass) {
+				case BUNDLE_COMPONENT:
+					String errString = String.format("Hard bundle component without bundle: %s", product.getProductId());
+					log.error(errString);
+					throw new BadUserDataException(errString);
+				case SIMPLE:
+				case CUSTOM_BUNDLE_COMPONENT:
+					ProductBundle bundle = new ProductBundle();
+					bundle.setMainProduct(product);
+					bundles.add(bundle);
+					break;
+				default:
+					errString = String.format("Unexpected bundle or custom bundle remains after their processing: %s", product.getProductId());
+					log.error(errString);
+					throw new RuntimeException(errString);
+			}
+		}
+		return bundles;
+	}
+
+	public List<ProductBundle> sendEvent(Event event) {
 		checkEvent(event);
+		validateEvent(event);
+		List<ProductBundle> bundles = event.getEventType().equals("activation_started") ? createProducts(event) : getProducts(event);
+		if(bundles.size() != 1) {
+			String errString = String.format("incorrect number of products: %d", bundles.size());
+			log.error(errString);
+			throw new BadUserDataException(errString);
+		}
+		String machineId = bundles.get(0).getMainProduct().getProductId();
 		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 		String eventType = event.getEventType();
 		log.debug("machine acquired: {}", machine.getId());
@@ -99,6 +245,7 @@ public class FsmApp {
 		log.info("new state: {}, variables: {}", machineState, variables);
 		stateMachineService.releaseStateMachine(machineId);
 		eventRepository.save(event);
+		return bundles;
 	}
 
   private void sendMessage(StateMachine<String, String> machine, String eventName) {

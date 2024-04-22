@@ -20,6 +20,7 @@ public class ControllerExceptionHandler  {
         put("UnknownError", HttpStatus.INTERNAL_SERVER_ERROR);
         put("NotAcceptedEventException", HttpStatus.BAD_REQUEST);
         put("RepeatedEventException", HttpStatus.BAD_REQUEST);
+        put("BadUserDataException", HttpStatus.BAD_REQUEST);
     }};
 
     @Value(value="${server.servlet.context-path}")

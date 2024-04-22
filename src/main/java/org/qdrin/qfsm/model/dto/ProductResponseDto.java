@@ -19,6 +19,16 @@ public class ProductResponseDto {
   String productOrderItemId;  // Must present in activation_started response only
   Boolean isBundle;
   Boolean isCustom;
-  String ProductOfferingName;
+  String productOfferingName;
   List<ProductRelationship> productRelationship;
+
+  public ProductResponseDto(Product product) {
+    this.productId = product.getProductId();
+    this.productOfferingId = product.getProductOfferingId();
+    this.status = product.getStatus();
+    this.isBundle = product.getIsBundle();
+    this.isCustom = product.getIsCustom();
+    this.productOfferingName = product.getProductOfferingName();
+    this.productRelationship = product.getProductRelationships();
+  }
 }
