@@ -121,7 +121,7 @@ public class ScheduledTasks {
           /////////////////////////////////////////////////////
           
           fsmApp.setVariable(productId, "nextPrice", nextPrice);
-          fsmApp.sendEvent(instance.getId(), "change_price");
+          // fsmApp.sendEvent(instance.getId(), "change_price");
           });
   }
 
@@ -177,7 +177,7 @@ public class ScheduledTasks {
   private VoidExecutionHandler<Void> getTaskInstance(TaskWithoutDataDescriptor descriptor) {
     return (instance, ctx) -> {
       log.info("task instance run. productId: {}, taskName: {}", instance.getId(), instance.getTaskName());
-      fsmApp.sendEvent(instance.getId(), instance.getTaskName());
+      // fsmApp.sendEvent(instance.getId(), instance.getTaskName());
     };
   }
 

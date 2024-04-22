@@ -9,6 +9,7 @@ import java.util.UUID;
 import javax.sql.DataSource;
 
 import org.qdrin.qfsm.FsmApp;
+import org.qdrin.qfsm.model.Event;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.ProductResponseDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
@@ -74,7 +75,7 @@ public class EventController {
 			product.setIsBundle(orderItem.getIsBundle());
 			product.setIsCustom(orderItem.getIsCustom());
 			response.setProducts(Arrays.asList(product));
-			fsmApp.sendEvent(machineId, activateEvent.getEvent().getEventType());
+			fsmApp.sendEvent(machineId, event);
 			return ResponseEntity.ok(response);
     }
 }

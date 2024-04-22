@@ -5,6 +5,7 @@ import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -16,6 +17,7 @@ import org.qdrin.qfsm.model.dto.*;
 
 @Entity
 @Table(name = "events")
+@IdClass(EventPK.class)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,16 +25,16 @@ import org.qdrin.qfsm.model.dto.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Event {
   @Id String refId;
-  String sourceCode;
+  @Id String sourceCode;
+  @Id String eventType;
   String refIdType;
-  String eventType;
   OffsetDateTime eventDate;
   @JdbcTypeCode(SqlTypes.JSON)
   ClientInfo clientInfo;
   @JdbcTypeCode(SqlTypes.JSON)
-  List<Product> products;
+  List<ProductRequestDto> products;
   @JdbcTypeCode(SqlTypes.JSON)
-  List<ProductResponseDto> productOrderItems;
+  List<ProductActivateRequestDto> productOrderItems;
   @JdbcTypeCode(SqlTypes.JSON)
   List<Characteristic> characteristics;
   @JdbcTypeCode(SqlTypes.JSON)

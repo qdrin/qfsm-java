@@ -19,6 +19,7 @@ public class ControllerExceptionHandler  {
     private static HashMap<String, HttpStatus> statuses = new HashMap<String, HttpStatus>() {{
         put("UnknownError", HttpStatus.INTERNAL_SERVER_ERROR);
         put("NotAcceptedEventException", HttpStatus.BAD_REQUEST);
+        put("RepeatedEventException", HttpStatus.BAD_REQUEST);
     }};
 
     @Value(value="${server.servlet.context-path}")

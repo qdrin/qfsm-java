@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import org.qdrin.qfsm.exception.*;
 import org.qdrin.qfsm.model.Event;
+import org.qdrin.qfsm.repository.EventRepository;
 
 @Slf4j
 @Configuration
@@ -27,6 +28,9 @@ public class FsmApp {
 	
 	@Autowired
 	StateMachinePersister<String, String, String> persister;
+
+	@Autowired
+	EventRepository eventRepository;
 
   // get stringified full-state
   public String getMachineState(State<String, String> state) {
@@ -67,7 +71,22 @@ public class FsmApp {
 		stateMachineService.releaseStateMachine(machineId);
 	}
 
+	private void checkEvent(Event event) {
+		Event savedEvent = eventRepository.findByRefIdAndSourceCodeAndEventType(
+			event.getRefId(),
+			event.getSourceCode(),
+			event.getEventType());
+		// log.debug("savedEvent: {}", savedEvent);
+		if(savedEvent != null) {
+			String errString = String.format("Event is already processed. refId: %s, sourceCode: %s, eventType: %s",
+						event.getRefId(), event.getSourceCode(), event.getEventType());
+			log.error(errString);
+			throw new RepeatedEventException(errString);
+		}
+	}
+
 	public void sendEvent(String machineId, Event event) {
+		checkEvent(event);
 		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 		String eventType = event.getEventType();
 		log.debug("machine acquired: {}", machine.getId());
@@ -79,6 +98,7 @@ public class FsmApp {
 		variables = machine.getExtendedState().getVariables();
 		log.info("new state: {}, variables: {}", machineState, variables);
 		stateMachineService.releaseStateMachine(machineId);
+		eventRepository.save(event);
 	}
 
   private void sendMessage(StateMachine<String, String> machine, String eventName) {
