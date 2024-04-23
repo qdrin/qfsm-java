@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import org.qdrin.qfsm.model.dto.ProductOrderItemRelationshipDto;
 import org.qdrin.qfsm.model.dto.ProductRequestDto;
 import org.qdrin.qfsm.repository.EventRepository;
 import org.qdrin.qfsm.repository.ProductRepository;
-import org.qdrin.qfsm.ProductClasses;
 
 @Slf4j
 @Configuration
@@ -102,25 +100,35 @@ public class FsmApp {
 		return;
 	}
 
-	private List<ProductBundle> createBundles(Event event) {
+	private Optional<Product> getCustomBundle(Product component) {
+		List<ProductRelationship> rels = component.getProductRelationshipByRelationType("BELONGS");
+		if(rels.size() != 1) {
+			throw new BadUserDataException(
+				String.format("Custom bundle component %s must have exactly 1 bundle product, now has %d",
+					component.getProductId(), rels.size()));
+		}
+		Optional<Product> ohead = productRepository.findById(rels.get(0).getProductId());
+		return ohead;
+	}
+
+	private FsmResult createBundles(Event event) {
 		String partyRoleId = event.getClientInfo().getPartyRoleId();
 		ArrayList<ProductBundle> bundles = new ArrayList<>();
-		List<ProductActivateRequestDto> orderItems = new ArrayList<ProductActivateRequestDto>(event.getProductOrderItems());
+		List<ProductActivateRequestDto> orderItems = new ArrayList<ProductActivateRequestDto>();
+		final List<ProductActivateRequestDto> eventOrderItems = event.getProductOrderItems();
 		log.debug("event: {}", event);
 
-		List<ProductActivateRequestDto> heads = orderItems.stream()
+		List<ProductActivateRequestDto> heads = eventOrderItems.stream()
 				.filter(item -> item.getIsBundle())
 				.collect(Collectors.toList());
 		
 		for(ProductActivateRequestDto head: heads) {
 			ProductClasses productClass = head.getIsCustom() ? ProductClasses.CUSTOM_BUNDLE : ProductClasses.BUNDLE;
-			ProductBundle bundle = new ProductBundle();
-			ProductDescription drive = new ProductDescription();
-			drive.setProductOrderItemId(head.getProductOrderItemId());
+			ProductBundle productBundle = new ProductBundle();
 			Product product = new Product(head);
 			product.setPartyRoleId(partyRoleId);
 			product.setProductClass(productClass.ordinal());
-			ArrayList<ProductDescription> components = new ArrayList<>();
+			ArrayList<Product> components = new ArrayList<>();
 			List<ProductRelationship> productRelations = new ArrayList<>(); 
 			List<ProductOrderItemRelationshipDto> itemRelations = head.getProductOrderItemRelationship();
 			itemRelations = itemRelations == null ? new ArrayList<>() : itemRelations;
@@ -134,32 +142,34 @@ public class FsmApp {
 													rel.getProductOrderItemId(), head.getProductOrderItemId())
 						);
 				}
-				Product componentProduct = new Product(componentItem.get());
-				componentProduct.setPartyRoleId(partyRoleId);
-				ProductDescription component = new ProductDescription();
-				component.setProduct(product);
-				component.setProductOrderItemId(componentItem.get().getProductOrderItemId());
+				Product component = new Product(componentItem.get());
+				component.setPartyRoleId(partyRoleId);
+				// component.setProductOrderItemId(componentItem.get().getProductOrderItemId());
 				components.add(component);
 				ProductRelationship pr = new ProductRelationship();
-				pr.setProductId(componentProduct.getProductId());
-				pr.setProductOfferingId(componentProduct.getProductOfferingId());
+				pr.setProductId(component.getProductId());
+				pr.setProductOfferingId(component.getProductOfferingId());
 				pr.setRelationshipType(rel.getRelationshipType());
-				pr.setProductOfferingName(componentProduct.getProductOfferingName());
+				pr.setProductOfferingName(component.getProductOfferingName());
 				productRelations.add(pr);
-				orderItems.remove(componentItem.get());
+				componentItem.get().setProductId(component.getProductId());
+				orderItems.add(componentItem.get());
 			}
 			product.setProductRelationship(productRelations);
-			drive.setProduct(product);
-			bundle.setDrive(drive);
-			bundle.setComponents(components);
-			orderItems.remove(head);
-		}  // End of bundle processing, orderItems contain just simple and legs now
+			head.setProductId(product.getProductId());
+			productBundle.setDrive(product);
+			productBundle.setBundle(product);
+			productBundle.setComponents(components);
+			orderItems.add(head);
+		}  // End of bundle processing, orderItems contain bundles now
 
-		for(ProductActivateRequestDto orderItem: orderItems) {
+		for(ProductActivateRequestDto orderItem: eventOrderItems) {
+			if(orderItems.contains(orderItem)) {
+				continue;
+			}
 			log.debug("productOrderItem {}", orderItem);
-			ProductBundle simple = new ProductBundle();
-			ProductDescription drive = new ProductDescription();
-			drive.setProductOrderItemId(orderItem.getProductOrderItemId());
+			ProductBundle productBundle = new ProductBundle();
+			// drive.setProductOrderItemId(orderItem.getProductOrderItemId());
 			Product product = new Product(orderItem);
 			product.setPartyRoleId(partyRoleId);
 			List<ProductOrderItemRelationshipDto> relations = orderItem.getProductOrderItemRelationship();
@@ -168,21 +178,26 @@ public class FsmApp {
 				relations.stream().filter(r -> r.getRelationshipType().equals("BELONGS")).findFirst();
 			ProductClasses productClass = headRelation.isPresent() ? ProductClasses.CUSTOM_BUNDLE_COMPONENT : ProductClasses.SIMPLE;
 			product.setProductClass(productClass.ordinal());
-			drive.setProduct(product);
-			simple.setDrive(drive);
-			simple.setComponents(null);
-			bundles.add(simple);
+			orderItem.setProductId(product.getProductId());
+			orderItems.add(orderItem);
+			productBundle.setBundle(product);
+			productBundle.setDrive(product);
+			productBundle.setComponents(null);
+			bundles.add(productBundle);
 		}
+		FsmResult result = new FsmResult();
+		result.setBundles(bundles);
+		result.setProductOrderItems(orderItems);
 		log.debug("bundles: {}", bundles);
-		return bundles;
+		return result;
 	}
 
-	private List<ProductBundle> getBundles(Event event) {
+	private FsmResult getBundles(Event event) {
 		ArrayList<ProductBundle> bundles = new ArrayList<>();
-		List<ProductRequestDto> orderItems = new ArrayList<ProductRequestDto>(event.getProducts());
+		final List<ProductRequestDto> eventOrderItems = event.getProducts();
 		ArrayList<Product> products = new ArrayList<>();
 		log.debug("event: {}", event);
-		for(ProductRequestDto orderItem: orderItems) {
+		for(ProductRequestDto orderItem: eventOrderItems) {
 			Optional<Product> dbProduct = productRepository.findById(orderItem.getProductId());
 			if(dbProduct.isEmpty()) {
 				String errString = String.format("Event contains productId: %s, that cannot be found");
@@ -193,48 +208,57 @@ public class FsmApp {
 			product.updateUserData(orderItem);
 			products.add(product);
 		}
+		ArrayList<Product> processedProducts = new ArrayList<>();  // нужен для фильтрации уже отработанных
 		List<Product> heads = products.stream()
 				.filter(p -> ProductClasses.getBundles().contains(p.getProductClass()))
 				.collect(Collectors.toList());
 		for(Product head: heads) {
 			ProductBundle bundle = new ProductBundle();
-			ProductDescription drive = new ProductDescription();
-			drive.setProduct(head);
-			bundle.setDrive(drive);
-			List<ProductDescription> components = new ArrayList<>();
+			bundle.setDrive(head);
+			bundle.setBundle(head);
+
+			List<Product> components = new ArrayList<>();
 			for(ProductRelationship relationship: head.getProductRelationship()) {
-				Optional<Product> componentProduct = products.stream().filter(p->p.getProductId().equals(relationship.getProductId())).findFirst();
-				if(componentProduct.isEmpty()) {
-					componentProduct = productRepository.findById(relationship.getProductId());
-				} else {
-					products.remove(componentProduct.get());
+				Optional<Product> component = products.stream()  // Ищем по продуктам, заявленным в ордере
+					.filter(p->p.getProductId().equals(relationship.getProductId()))
+					.findFirst();
+				if(component.isEmpty()) {  // Если не находим, подтягиваем по relationship из базы
+					component = productRepository.findById(relationship.getProductId());
 				}
-				if(componentProduct.isEmpty()) {
+				if(component.isEmpty()) {
 					throw new RuntimeException(String.format("component %s not found for bundle %s",
 										relationship.getProductId(), head.getProductId()));
 				}
-				ProductDescription component = new ProductDescription();
-				component.setProduct(componentProduct.get());
-				components.add(component);
+				processedProducts.add(component.get());
+				components.add(component.get());
 			}
 			bundle.setComponents(components);
 			bundles.add(bundle);
-			products.remove(head);
+			processedProducts.add(head);
 		}
 		for(Product product: products) {
 			int index = product.getProductClass();
 			ProductClasses productClass = ProductClasses.values()[index];
+			ProductBundle bundle = new ProductBundle();
 			switch(productClass) {
 				case BUNDLE_COMPONENT:
 					String errString = String.format("Hard bundle component without bundle: %s", product.getProductId());
 					log.error(errString);
 					throw new BadUserDataException(errString);
 				case SIMPLE:
+					bundle.setBundle(product);
+					bundle.setDrive(product);
+					break;
 				case CUSTOM_BUNDLE_COMPONENT:
-					ProductBundle bundle = new ProductBundle();
-					ProductDescription drive = new ProductDescription();
-					drive.setProduct(product);
-					bundle.setDrive(drive);;
+					Optional<Product> ohead = getCustomBundle(product);
+					if(ohead.isEmpty()) {
+						throw new BadUserDataException(
+							String.format("Custom bundle component %s has no head",
+								product.getProductId()));
+					}
+					bundle.setDrive(product);
+					bundle.setBundle(ohead.get());
+					bundle.setComponents(null);
 					bundles.add(bundle);
 					break;
 				default:
@@ -243,20 +267,23 @@ public class FsmApp {
 					throw new RuntimeException(errString);
 			}
 		}
-		return bundles;
+		FsmResult result = new FsmResult();
+		result.setBundles(bundles);
+		return result;
 	}
 
-	public List<ProductBundle> sendEvent(Event event) {
+	public FsmResult sendEvent(Event event) {
 		checkEvent(event);
 		validateEvent(event);
-		List<ProductBundle> bundles = event.getEventType().equals("activation_started") ? createBundles(event) : getBundles(event);
+		FsmResult result = event.getEventType().equals("activation_started") ? createBundles(event) : getBundles(event);
+		List<ProductBundle> bundles = result.getBundles();
 		if(bundles.size() != 1) {
 			String errString = String.format("incorrect number of products: %d", bundles.size());
 			log.error(errString);
 			throw new BadUserDataException(errString);
 		}
 		for(ProductBundle bundle: bundles) {
-			Product product = bundle.getDrive().getProduct();
+			Product product = bundle.getDrive();
 			String machineId = product.getProductId();
 			StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 			String eventType = event.getEventType();
@@ -275,7 +302,7 @@ public class FsmApp {
 			stateMachineService.releaseStateMachine(machineId);
 		}
 		eventRepository.save(event);
-		return bundles;
+		return result;
 	}
 
   private void sendMessage(StateMachine<String, String> machine, String eventName) {

@@ -4,26 +4,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
-
-import javax.sql.DataSource;
+import java.util.Optional;
 
 import org.qdrin.qfsm.FsmApp;
 import org.qdrin.qfsm.model.Event;
+import org.qdrin.qfsm.model.FsmResult;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductBundle;
-import org.qdrin.qfsm.model.ProductDescription;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.ProductResponseDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.model.dto.ResponseEventDto;
-import org.qdrin.qfsm.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.statemachine.persist.StateMachinePersister;
-import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,22 +43,32 @@ public class EventController {
     @PostMapping("/v1/event")
     public ResponseEntity<ResponseEventDto> eventHandler(@RequestBody @Valid RequestEventDto incomingEvent) {
 			Event event = new Event(incomingEvent);
-			List<ProductBundle> bundles = fsmApp.sendEvent(event);
+			FsmResult result = fsmApp.sendEvent(event);
+			List<ProductBundle> bundles = result.getBundles();
+			List<ProductActivateRequestDto> orderItems = result.getProductOrderItems();
 			log.debug("bundles: {}", bundles);
-			List<ProductDescription> productDescriptions = new ArrayList<>();
+			List<Product> products = new ArrayList<>();
 			List<ProductResponseDto> responseProducts = new ArrayList<>();
 			for(ProductBundle bundle: bundles) {
-				productDescriptions.add(bundle.getDrive());
-				List<ProductDescription> components = bundle.getComponents(); 
+				products.add(bundle.getDrive());
+				List<Product> components = bundle.getComponents(); 
 				if(components != null) {
-					productDescriptions.addAll(bundle.getComponents());
+					products.addAll(bundle.getComponents());
 				}
 			}
-			log.debug("productDescriptions: {}", productDescriptions);
-			for(ProductDescription desc: productDescriptions) {
-				ProductResponseDto resp = new ProductResponseDto(desc.getProduct());
+			log.debug("products: {}", products);
+			for(Product product: products) {
+				ProductResponseDto resp = new ProductResponseDto(product);
 				if(event.getEventType().equals("activation_started")) {
-					resp.setProductOrderItemId(desc.getProductOrderItemId());
+					Optional<ProductActivateRequestDto> orderItem = orderItems
+							.stream()
+							.filter(item -> item.getProductId().equals(product.getProductId()))
+							.findFirst();
+					if(orderItem.isEmpty()) {
+						throw new RuntimeException(String.format("Cannot find orderItem for productId: %s, productOfferingId: %s",
+											product.getProductId(), product.getProductOfferingId()));
+					}
+					resp.setProductOrderItemId(orderItem.get().getProductOrderItemId());
 				}
 				responseProducts.add(resp);
 			}

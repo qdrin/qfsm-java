@@ -8,7 +8,6 @@ import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.annotation.*;
 import org.springframework.statemachine.state.AbstractState;
-import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
 
 import lombok.extern.slf4j.Slf4j;

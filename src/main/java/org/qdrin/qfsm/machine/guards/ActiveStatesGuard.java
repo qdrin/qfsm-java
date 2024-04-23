@@ -2,11 +2,8 @@ package org.qdrin.qfsm.machine.guards;
 
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.guard.Guard;
-import org.springframework.util.ObjectUtils;
 
 import java.util.Collection;
-
-import org.qdrin.qfsm.model.*;
 
 import lombok.extern.slf4j.Slf4j;
 

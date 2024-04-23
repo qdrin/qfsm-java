@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -81,5 +82,12 @@ public class Product {
     if(metaInfo != null && ! metaInfo.isEmpty()) {
       setMetaInfo(metaInfo);
     }
+  }
+
+  public final List<ProductRelationship> getProductRelationshipByRelationType(String relationType) {
+    return this.productRelationship
+        .stream()
+        .filter(r -> r.getRelationshipType().equals(relationType))
+        .collect(Collectors.toList());
   }
 }

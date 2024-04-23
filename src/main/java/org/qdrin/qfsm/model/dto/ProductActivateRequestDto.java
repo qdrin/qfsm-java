@@ -21,6 +21,7 @@ import lombok.experimental.FieldDefaults;
 public class ProductActivateRequestDto {
   @NotNull String productOrderItemId;  // Must present in activation_started response only
   @NotNull String productOfferingId;
+  String productId;
   List<ProductPrice> productPrice;
   @Default Boolean isBundle = false;
   @Default Boolean isCustom = false;

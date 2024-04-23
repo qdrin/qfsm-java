@@ -13,6 +13,9 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductBundle {
-  ProductDescription drive;
-  List<ProductDescription> components;
+  Product drive;              // Product feeded to state machine
+  Product bundle;             // Bundle head
+  List<Product> components;   // bundle legs
+  String errorCode;
+  String errorMessage;
 }
