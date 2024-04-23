@@ -1,5 +1,4 @@
 package org.qdrin.qfsm.machine.states;
-import java.util.Arrays;
 
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
