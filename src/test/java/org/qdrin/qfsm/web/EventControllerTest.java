@@ -8,7 +8,6 @@ import java.io.*;
 import java.sql.Connection;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
@@ -18,6 +17,7 @@ import org.mockserver.model.Format;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 import org.mockserver.serialization.HttpRequestSerializer;
+import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.controllers.EventController;
 import org.qdrin.qfsm.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +73,9 @@ public class EventControllerTest {
 
   @Autowired
   private TestRestTemplate restTemplate;
+
+  @Autowired
+  private Helper helper;
 
   private static String readResourceAsString(ClassPathResource resource) {
     try (Reader reader = new InputStreamReader(resource.getInputStream(), "UTF8")) {
@@ -134,6 +137,7 @@ public class EventControllerTest {
   public void resetMock() {
     eventUrl = String.format("http://localhost:%d%s%s/event", port, basePath, apiVersion);
     mockServerClient.reset();
+    helper.clearDb();
   }
 
   @Nested

@@ -248,6 +248,7 @@ public class FsmApp {
 				case SIMPLE:
 					bundle.setBundle(product);
 					bundle.setDrive(product);
+					bundles.add(bundle);
 					break;
 				case CUSTOM_BUNDLE_COMPONENT:
 					Optional<Product> ohead = getCustomBundle(product);
