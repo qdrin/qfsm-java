@@ -1,0 +1,13 @@
+{
+  "event": {
+    "refId":"e3fcc810-7a06-4e2b-ad45-1d6678117efd",
+    "refIdType": "orderId",
+    "eventType": "activation_aborted",
+    "sourceCode": "OMS"
+  },
+  "products": [
+    {
+      "productId": "e70268dd-d68a-4aa8-bf8a-3778aed82e99"
+    }
+  ]
+}
