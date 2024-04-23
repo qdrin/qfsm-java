@@ -1,0 +1,22 @@
+{
+  "event": {
+    "refId": "00000000-0000-0000-0001-000000000001",
+    "refIdType": "orderId",
+    "eventType": null,
+    "sourceCode": "OMS"
+  },
+  "productOrderItems": [
+    {
+      "productId": "00000000-0000-0000-0000-000000000001",
+      "isBundle": false,
+      "isSimple": false,
+      "productOfferingId": "simplePromoOffer1",
+      "productOfferingName": "ACTIVE TRIAL PROMO МФ+",
+      "metaInfo":
+      {
+        "channel": "MLK_sample",
+        "campaign": "campaign_sample"
+      }
+    }
+  ]
+}

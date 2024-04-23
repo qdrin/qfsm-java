@@ -117,7 +117,9 @@ public class FsmApp {
 		List<ProductActivateRequestDto> orderItems = new ArrayList<ProductActivateRequestDto>();
 		final List<ProductActivateRequestDto> eventOrderItems = event.getProductOrderItems();
 		log.debug("event: {}", event);
-
+		if(eventOrderItems == null || eventOrderItems.isEmpty()) {
+			throw new BadUserDataException("event productOrderItems is null or empty");
+		}
 		List<ProductActivateRequestDto> heads = eventOrderItems.stream()
 				.filter(item -> item.getIsBundle())
 				.collect(Collectors.toList());

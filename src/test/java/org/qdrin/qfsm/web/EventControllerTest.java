@@ -78,6 +78,8 @@ public class EventControllerTest {
   @Autowired
   private Helper helper;
 
+  private static Helper.TestEvent.Builder eventBuilder = new Helper.TestEvent.Builder();
+
   private static String readResourceAsString(ClassPathResource resource) {
     try (Reader reader = new InputStreamReader(resource.getInputStream(), "UTF8")) {
       return FileCopyUtils.copyToString(reader);
@@ -195,8 +197,10 @@ public class EventControllerTest {
     @Test
     public void activationStartedSimpleSuccess() throws Exception {
       ClassPathResource resource = new ClassPathResource("/body/request/simple/activation_started.json", getClass());
+      Helper.TestEvent event = eventBuilder.build();
+      log.debug("requestEvent: {}", event.requestEvent);
       RequestEventDto body = mapper.readValue(resource.getInputStream(), RequestEventDto.class);
-      HttpEntity<RequestEventDto> request = new HttpEntity<>(body, headers);
+      HttpEntity<RequestEventDto> request = new HttpEntity<>(event.requestEvent, headers);
       ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
       log.debug(resp.toString());
       assertEquals(HttpStatus.OK, resp.getStatusCode());
@@ -206,7 +210,19 @@ public class EventControllerTest {
     }
 
     @Test
-    public void repeatedActivationStartedFailed() throws Exception {
+    public void activationStartedSimpleFailedNullOrderItems() throws Exception {
+      Helper.TestEvent event = eventBuilder.build();
+      log.debug("requestEvent: {}", event.requestEvent);
+      HttpEntity<RequestEventDto> request = new HttpEntity<>(event.requestEvent, headers);
+      ResponseEntity<ErrorModel> resp = restTemplate.postForEntity(eventUrl, request, ErrorModel.class);
+      log.debug(resp.toString());
+      assertEquals(HttpStatus.BAD_REQUEST, resp.getStatusCode());
+      ErrorModel response = resp.getBody();
+      assertEquals(response.getErrorCode(), "BadUserDataException");
+    }
+
+    @Test
+    public void activationStartedSimpleFailedRepeatedEvent() throws Exception {
       ClassPathResource resource = new ClassPathResource("/body/request/simple/activation_started.json", getClass());
       RequestEventDto body = mapper.readValue(resource.getInputStream(), RequestEventDto.class);
       HttpEntity<RequestEventDto> request = new HttpEntity<>(body, headers);
@@ -216,7 +232,19 @@ public class EventControllerTest {
       ResponseEntity<ErrorModel> respBad = restTemplate.postForEntity(eventUrl, request, ErrorModel.class);
       assertEquals(HttpStatus.BAD_REQUEST, respBad.getStatusCode());
       log.debug(respBad.toString());
-      assertEquals(respBad.getBody().getErrorCode(), "RepeatedEventException");
+      ErrorModel response = respBad.getBody();
+      assertEquals(response.getErrorCode(), "RepeatedEventException");
     }
+
+    // @Test
+    // public void activationStartedBundleSuccess() throws Exception {
+    //   HttpEntity<RequestEventDto> request = new HttpEntity<>(body, headers);
+    //   ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
+    //   log.debug(resp.toString());
+    //   assertEquals(HttpStatus.OK, resp.getStatusCode());
+    //   ResponseEventDto response = resp.getBody();
+    //   assertNotNull(response.getProducts());
+    //   assertEquals(1, response.getProducts().size());
+    // }
   }
 }

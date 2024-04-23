@@ -22,19 +22,4 @@ public class Application {  // implements CommandLineRunner {
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
-
-	// @Override
-	// public void run(String... args) throws Exception {
-	// 	HikariDataSource hds = (HikariDataSource) dataSource;
-	// 	log.info("database: {}", hds.getJdbcUrl());
-	// 	String mid = "m1";
-	// 	while(! mid.equals("exit")) {
-	// 		System.out.print("input machineId:");
-	// 		mid = scanner.nextLine();
-	// 		if(mid.isEmpty()) {continue;}
-	// 		fsmApp.sendUserEvent(mid);
-	// 	}
-	// 	scanner.close();
-	// 	log.info("exiting...");
-	// }
 }
