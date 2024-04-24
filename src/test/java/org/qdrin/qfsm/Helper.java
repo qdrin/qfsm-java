@@ -9,12 +9,16 @@ import org.qdrin.qfsm.model.ClientInfo;
 import org.qdrin.qfsm.model.EventProperties;
 import org.qdrin.qfsm.model.dto.EventDto;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
+import org.qdrin.qfsm.model.dto.ProductOrderItemRelationshipDto;
 import org.qdrin.qfsm.model.dto.ProductRequestDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class Helper {
   
@@ -50,7 +54,7 @@ public class Helper {
 
       public Builder() {}
 
-      public Builder sourceCode(String val) {
+      public Builder sourceCode(String val) { 
         sourceCode = val;
         return this;
       }
@@ -128,5 +132,37 @@ public class Helper {
             requestEvent.setProducts(builder.products);
       }
     }
+  }
+
+  public static List<ProductActivateRequestDto> buildOrderItems(
+        String mainOfferId,
+        String priceId,
+        String... componentOffers) {
+    log.debug("componentOffers.length(): {}", componentOffers.length);
+    ArrayList<ProductActivateRequestDto> items = new ArrayList<>();
+    ProductActivateRequestDto bundle = new ProductActivateRequestDto();
+    String bundleItemId = UUID.randomUUID().toString();
+    List<ProductOrderItemRelationshipDto> relations = new ArrayList<>();
+    bundle.setProductOrderItemId(bundleItemId);
+    bundle.setProductOfferingId(mainOfferId);
+    bundle.setProductOfferingName("");
+    items.add(bundle);
+    if(componentOffers.length > 0) {
+      bundle.setProductOrderItemRelationship(relations);
+    }
+    for(int i = 0; i < componentOffers.length; i++) {
+      ProductActivateRequestDto component = new ProductActivateRequestDto();
+      String componentItemId = UUID.randomUUID().toString();
+      component.setProductOrderItemId(componentItemId);
+      component.setIsBundle(false);
+      component.setIsCustom(false);
+      component.setProductOfferingId(componentOffers[i]);
+      ProductOrderItemRelationshipDto rel = new ProductOrderItemRelationshipDto();
+      rel.setProductOrderItemId(componentItemId);
+      rel.setRelationshipType("BUNDLES");  // TODO: CUSTOM_BUNDLES???
+      relations.add(rel);
+      items.add(component);
+    }
+    return items;
   }
 }

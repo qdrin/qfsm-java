@@ -1,0 +1,200 @@
+offers:
+  simpleOffer1:
+    name: Simple offer 1
+    isBundle: false
+    isCustom: false
+    prices:
+      simple1-price-trial:
+        # name: Simple1 price trial
+        duration: 1
+        recurringChargePeriodType: month
+        recurringChargePeriodLength: 12
+        priceType: RecurringCharge
+        productStatus: ACTIVE_TRIAL
+        priceAlterations: null
+        tarificationTag: "FPC"
+        price:
+          unit: "Рубль"
+          value: 0
+        nextEntity:
+          id: simple1-price-active
+      simple1-price-active:
+        # name: Simple1 price active
+        duration: 0
+        recurringChargePeriodType: month
+        recurringChargePeriodLength: 1
+        priceType: RecurringCharge
+        productStatus: ACTIVE
+        tarificationTag: "FPC"
+        price:
+          unit: "Рубль"
+          value: 299
+        nextEntity:
+          id: null
+        priceAlterations: null
+  bundleOffer1:
+    name: Bundle offer 1
+    isBundle: true
+    isCustom: false
+    prices:
+      bundle1-price-trial:
+        # name: Bundle1 price trial
+        duration: 1
+        recurringChargePeriodType: day
+        recurringChargePeriodLength: 30
+        priceType: RecurringCharge
+        productStatus: ACTIVE_TRIAL
+        priceAlterations: null
+        tarificationTag: "FPC"
+        price:
+          unit: "Рубль"
+          value: 0
+        nextEntity:
+          id: bundle1-price-active
+      bundle1-price-active:
+        # name: Bundle1 price active
+        duration: 0
+        recurringChargePeriodType: day
+        recurringChargePeriodLength: 30
+        priceType: RecurringCharge
+        productStatus: ACTIVE
+        tarificationTag: "FPC"
+        price:
+          unit: "Рубль"
+          value: 0
+        nextEntity:
+          id: null
+        priceAlterations: null
+  bundleOffer2:
+    name: Bundle offer 2
+    isBundle: true
+    isCustom: false
+    prices:
+      bundle2-price-trial:
+        # name: Bundle2 price trial
+        duration: 1
+        recurringChargePeriodType: hour
+        priceType: RecurringCharge
+        productStatus: ACTIVE_TRIAL
+        priceAlterations: null
+        tarificationTag: "VASP"
+        price:
+          unit: "Рубль"
+          value: 0
+        nextEntity:
+          id: bundle2-price-active-align
+      bundle2-price-active-align:
+        # name: Bundle2 price active align
+        duration: 1
+        recurringChargePeriodType: hour
+        priceType: RecurringCharge
+        productStatus: ACTIVE
+        priceAlterations: null
+        tarificationTag: "BSS-RP"
+        price:
+          unit: "Рубль"
+          value: 0
+        nextEntity:
+          id: bundle2-price-active-const
+      bundle2-price-active-const:
+        # name: Bundle2 price active const
+        duration: 0
+        recurringChargePeriodType: day
+        recurringChargePeriodLength: 30
+        priceType: RecurringCharge
+        productStatus: ACTIVE
+        priceAlterations: null
+        tarificationTag: "VASP"
+        price:
+          unit: "Рубль"
+          value: 0
+        nextEntity:
+          id: null
+  customBundleOffer1:
+    name: Custom bundle offer1 (FPC)
+    isBundle: true
+    isCustom: true
+    prices:
+      custom1-price-trial:
+        # name: Custom1 price trial
+        duration: 1
+        recurringChargePeriodType: day
+        recurringChargePeriodLength: 30
+        priceType: RecurringCharge
+        productStatus: ACTIVE_TRIAL
+        priceAlterations: null
+        tarificationTag: "FPC"
+        price:
+          unit: "Рубль"
+          value: 0
+        nextEntity:
+          id: ACTIVE_BUNDLE_1
+      custom1-price-active:
+        # name: Custom1 price active
+        duration: 0
+        recurringChargePeriodType: day
+        recurringChargePeriodLength: 30
+        priceType: RecurringCharge
+        productStatus: ACTIVE
+        tarificationTag: "FPC"
+        price:
+          unit: "Рубль"
+          value: 299
+        nextEntity:
+          id: null
+        priceAlterations: null
+  simpleOffer2:   
+    name: Simple offer 2 month duration and promo
+    prices:
+      simple2-price-active:
+        # name: Simple2 price active
+        duration: 0
+        recurringChargePeriodType: month
+        recurringChargePeriodLength: 12
+        priceType: RecurringCharge
+        productStatus: ACTIVE
+        priceAlterations: null
+        tarificationTag: "FPC"
+        price:
+          unit: "Рубль"
+          value: 299
+        nextEntity:
+          id: null
+      simple2-price-active-promo:
+        # name: Simple2 price active promo
+        duration: 0
+        recurringChargePeriodType: month
+        recurringChargePeriodLength: 1
+        priceType: RecurringCharge
+        productStatus: ACTIVE
+        nextPrice: null
+        priceAlterations:
+          simple2-price-alteration:
+            name: Simple2 price alteration
+            duration: 1
+            recurringChargePeriodType: month
+            recurringChargePeriodLength: 1
+            priceType: RecurringCharge
+  component1:
+    name: VASP Component1
+    isBundle: false
+    isCustom: false
+    fabricRef:
+    - fabricId: VASP
+      fabricProductId: vaspServiceCode1
+      fabricProductOfferingId: vaspServiceCode1
+  component2:
+    name: VASP Component2
+    isBundle: false
+    isCustom: false
+    fabricRef:
+    - fabricId: VASP
+      fabricProductId: vaspServiceCode2
+      fabricProductOfferingId: vaspServiceCode2
+  component3:
+    name: BSS Component3
+    isBundle: false
+    isCustom: false
+    fabricRef:
+    - fabricId: BSS
+      fabricProductOfferingId: "900525"

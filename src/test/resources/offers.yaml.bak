@@ -1,4 +1,40 @@
-prices:
+offers:
+  simpleOffer1:
+    name: Simple offer 1
+    isBundle: false
+    isCustom: false
+    prices:
+      simple1PriceTrial
+        name: ACTIVE TRIAL МФ+
+        duration: 1
+        recurringChargePeriodType: month
+        recurringChargePeriodLength: 12
+        priceType: RecurringCharge
+        productStatus: ACTIVE_TRIAL
+        priceAlterations: null
+        tarificationTag: "FPC"
+        price:
+          unit: "Рубль"
+          value: 0
+        nextEntity:
+          id: ACTIVE_SIMPLE_1
+  - id: ACTIVE_SIMPLE_1
+    name: ACTIVE MF+
+    duration: 0
+    recurringChargePeriodType: month
+    recurringChargePeriodLength: 1
+    priceType: RecurringCharge
+    productStatus: ACTIVE
+    tarificationTag: "FPC"
+    price:
+      unit: "Рубль"
+      value: 299
+    nextEntity:
+      id: null
+    priceAlterations: null
+
+
+
   bundleSuboffer2:
   - id: ACTIVE_BUNDLE_2
     name: ACTIVE MF+
@@ -43,35 +79,6 @@ prices:
     nextEntity:
       id: null
     priceAlterations: null        
-  simpleOffer1:
-  - id: ACTIVE_TRIAL_SIMPLE_1
-    name: ACTIVE TRIAL МФ+
-    duration: 1
-    recurringChargePeriodType: month
-    recurringChargePeriodLength: 12
-    priceType: RecurringCharge
-    productStatus: ACTIVE_TRIAL
-    priceAlterations: null
-    tarificationTag: "FPC"
-    price:
-      unit: "Рубль"
-      value: 0
-    nextEntity:
-      id: ACTIVE_SIMPLE_1
-  - id: ACTIVE_SIMPLE_1
-    name: ACTIVE MF+
-    duration: 0
-    recurringChargePeriodType: month
-    recurringChargePeriodLength: 1
-    priceType: RecurringCharge
-    productStatus: ACTIVE
-    tarificationTag: "FPC"
-    price:
-      unit: "Рубль"
-      value: 299
-    nextEntity:
-      id: null
-    priceAlterations: null
   bundleOffer3:
   - id: ACTIVE_TRIAL_BUNDLE_3
     name: ACTIVE TRIAL МФ+

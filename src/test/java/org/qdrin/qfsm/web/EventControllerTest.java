@@ -8,6 +8,7 @@ import java.io.*;
 import java.sql.Connection;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.List;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
@@ -18,6 +19,7 @@ import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 import org.mockserver.serialization.HttpRequestSerializer;
 import org.qdrin.qfsm.Helper;
+import org.qdrin.qfsm.TestOffers;
 import org.qdrin.qfsm.controllers.EventController;
 import org.qdrin.qfsm.exception.RepeatedEventException;
 import org.qdrin.qfsm.model.dto.*;
@@ -38,7 +40,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -196,10 +200,20 @@ public class EventControllerTest {
   class ActivationStarted {
     @Test
     public void activationStartedSimpleSuccess() throws Exception {
-      ClassPathResource resource = new ClassPathResource("/body/request/simple/activation_started.json", getClass());
-      Helper.TestEvent event = eventBuilder.build();
+      ClassPathResource resource = new ClassPathResource("/offers.yaml", getClass());
+      ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory())
+                                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      TestOffers offers = yamlMapper.readValue(resource.getInputStream(), TestOffers.class);
+      log.debug("offers: {}", offers.getOffers());
+      // ProductActivateRequestDto item = new ProductActivateRequestDto();
+      // item.setProductOfferingId("simpleOffer1");
+      // item.setProductOrderItemId("100");
+      // item.setIsBundle(false);
+      // item.setProductOfferingName("ACTIVE TRIAL PROMO МФ+");
+      List<ProductActivateRequestDto> items = Helper.buildOrderItems("simpleOffer1", null, null);
+      Helper.TestEvent event = eventBuilder.productOrderItems(items).build();
+      
       log.debug("requestEvent: {}", event.requestEvent);
-      RequestEventDto body = mapper.readValue(resource.getInputStream(), RequestEventDto.class);
       HttpEntity<RequestEventDto> request = new HttpEntity<>(event.requestEvent, headers);
       ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
       log.debug(resp.toString());
