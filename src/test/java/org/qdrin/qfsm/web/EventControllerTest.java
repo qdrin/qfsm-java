@@ -7,8 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.*;
 import java.sql.Connection;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
@@ -43,6 +42,7 @@ import org.testcontainers.utility.DockerImageName;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.qdrin.qfsm.Helper.TestEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -81,8 +81,6 @@ public class EventControllerTest {
 
   @Autowired
   private Helper helper;
-
-  private static Helper.TestEvent.Builder eventBuilder = new Helper.TestEvent.Builder();
 
   private static String readResourceAsString(ClassPathResource resource) {
     try (Reader reader = new InputStreamReader(resource.getInputStream(), "UTF8")) {
@@ -199,33 +197,9 @@ public class EventControllerTest {
   @Nested
   class ActivationStarted {
     @Test
-    public void activationStartedSimpleSuccess() throws Exception {
-      ClassPathResource resource = new ClassPathResource("/offers.yaml", getClass());
-      ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory())
-                                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      TestOffers offers = yamlMapper.readValue(resource.getInputStream(), TestOffers.class);
-      log.debug("offers: {}", offers.getOffers());
-      // ProductActivateRequestDto item = new ProductActivateRequestDto();
-      // item.setProductOfferingId("simpleOffer1");
-      // item.setProductOrderItemId("100");
-      // item.setIsBundle(false);
-      // item.setProductOfferingName("ACTIVE TRIAL PROMO МФ+");
-      List<ProductActivateRequestDto> items = Helper.buildOrderItems("simpleOffer1", null, null);
-      Helper.TestEvent event = eventBuilder.productOrderItems(items).build();
-      
-      log.debug("requestEvent: {}", event.requestEvent);
-      HttpEntity<RequestEventDto> request = new HttpEntity<>(event.requestEvent, headers);
-      ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
-      log.debug(resp.toString());
-      assertEquals(HttpStatus.OK, resp.getStatusCode());
-      ResponseEventDto response = resp.getBody();
-      assertNotNull(response.getProducts());
-      assertEquals(1, response.getProducts().size());
-    }
-
-    @Test
     public void activationStartedSimpleFailedNullOrderItems() throws Exception {
-      Helper.TestEvent event = eventBuilder.build();
+      Helper.TestEvent event = new TestEvent.Builder().build();
+      assertEquals(null, event.requestEvent.getProductOrderItems());
       log.debug("requestEvent: {}", event.requestEvent);
       HttpEntity<RequestEventDto> request = new HttpEntity<>(event.requestEvent, headers);
       ResponseEntity<ErrorModel> resp = restTemplate.postForEntity(eventUrl, request, ErrorModel.class);
@@ -250,15 +224,62 @@ public class EventControllerTest {
       assertEquals(response.getErrorCode(), "RepeatedEventException");
     }
 
-    // @Test
-    // public void activationStartedBundleSuccess() throws Exception {
-    //   HttpEntity<RequestEventDto> request = new HttpEntity<>(body, headers);
-    //   ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
-    //   log.debug(resp.toString());
-    //   assertEquals(HttpStatus.OK, resp.getStatusCode());
-    //   ResponseEventDto response = resp.getBody();
-    //   assertNotNull(response.getProducts());
-    //   assertEquals(1, response.getProducts().size());
-    // }
+    @Test
+    public void activationStartedSimpleSuccess() throws Exception {
+      List<ProductActivateRequestDto> items = helper.buildOrderItems("simpleOffer1", "simple1-price-trial", null);
+      Helper.TestEvent event = new TestEvent.Builder().productOrderItems(items).build();
+      
+      log.debug("requestEvent: {}", event.requestEvent);
+      HttpEntity<RequestEventDto> request = new HttpEntity<>(event.requestEvent, headers);
+      ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
+      log.debug(resp.toString());
+      assertEquals(HttpStatus.OK, resp.getStatusCode());
+      ResponseEventDto response = resp.getBody();
+      assertNotNull(response.getProducts());
+      assertEquals(1, response.getProducts().size());
+      ProductResponseDto resultProduct = response.getProducts().get(0);
+      assertNotNull(resultProduct.getProductId());
+      assertNotNull(resultProduct.getProductOfferingId());
+      assertNotNull(resultProduct.getStatus());
+      assertEquals("PENDING_ACTIVATE", resultProduct.getStatus());
+      assertEquals(resultProduct.getProductRelationship(), null);
+    }
+
+    @Test
+    public void activationStartedBundleSuccess() throws Exception {
+      List<ProductActivateRequestDto> items = helper.buildOrderItems("bundleOffer1", "bundle1-price-trial",
+       "component1", "component2", "component3");
+      Helper.TestEvent event = new TestEvent.Builder().productOrderItems(items).build();
+      
+      log.debug("requestEvent: {}", event.requestEvent);
+      HttpEntity<RequestEventDto> request = new HttpEntity<>(event.requestEvent, headers);
+      ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
+      log.debug(resp.toString());
+      assertEquals(HttpStatus.OK, resp.getStatusCode());
+      ResponseEventDto response = resp.getBody();
+      assertNotNull(response.getProducts());
+      assertEquals(4, response.getProducts().size());
+    }
+  }
+
+  @Nested
+  class Disconnect {
+    @Test
+    public void disconnectSimpleFailedDeclined() throws Exception {
+      List<ProductActivateRequestDto> items = helper.buildOrderItems("simpleOffer1", "simple1-price-trial", null);
+      Helper.TestEvent event = new TestEvent.Builder().productOrderItems(items).build();
+      HttpEntity<RequestEventDto> request = new HttpEntity<>(event.requestEvent, headers);
+      ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
+      assertEquals(HttpStatus.OK, resp.getStatusCode());
+      ResponseEventDto response = resp.getBody();
+      ProductRequestDto prreq = new ProductRequestDto();
+      prreq.setProductId(response.getProducts().get(0).getProductId());
+      event = new TestEvent.Builder().eventType("disconnect").products(Arrays.asList(prreq)).build();
+      HttpEntity<RequestEventDto> requestError = new HttpEntity<>(event.requestEvent, headers);
+      ResponseEntity<ErrorModel> respError = restTemplate.postForEntity(eventUrl, requestError, ErrorModel.class);
+      assertEquals(HttpStatus.BAD_REQUEST, respError.getStatusCode());
+      ErrorModel error = respError.getBody();
+      assertEquals(error.getErrorCode(), "EventDeniedException");
+    }
   }
 }

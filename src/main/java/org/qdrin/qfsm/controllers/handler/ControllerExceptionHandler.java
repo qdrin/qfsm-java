@@ -18,7 +18,7 @@ import org.qdrin.qfsm.model.dto.ErrorModel;
 public class ControllerExceptionHandler  {
     private static HashMap<String, HttpStatus> statuses = new HashMap<String, HttpStatus>() {{
         put("UnknownError", HttpStatus.INTERNAL_SERVER_ERROR);
-        put("NotAcceptedEventException", HttpStatus.BAD_REQUEST);
+        put("EventDeniedException", HttpStatus.BAD_REQUEST);
         put("RepeatedEventException", HttpStatus.BAD_REQUEST);
         put("BadUserDataException", HttpStatus.BAD_REQUEST);
     }};

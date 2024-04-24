@@ -34,7 +34,7 @@ public class PriceGuard implements Guard<String, String> {
   @Override
   public boolean evaluate(StateContext<String, String> context) {
     ProductPrice price =  PriceHelper.getProductPrice(context);
-    String priceId = price == null ? "" : price.getPriceId();
+    String priceId = price == null ? "" : price.getId();
     ProductPrice nextPrice = context.getStateMachine().getExtendedState().get("nextPrice", ProductPrice.class);
     boolean res = true;
     if(fullCompare) {
@@ -42,7 +42,7 @@ public class PriceGuard implements Guard<String, String> {
       res = fullDir? isFull : ! isFull;
     }
     if(equalCompare) {
-      boolean isEqual = priceId.equals(nextPrice.getPriceId());
+      boolean isEqual = priceId.equals(nextPrice.getId());
       res = res && (equalDir? isEqual : ! isEqual);
     }
     return res;

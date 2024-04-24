@@ -19,7 +19,7 @@ public class ExternalData {
     String input;
     // Application.scanner.reset();
 		ProductPrice price = new ProductPrice();
-		price.setPriceId("1");
+		price.setId("1");
     input = "ACTIVE";
 		price.setProductStatus("ACTIVE");
 		price.setDuration(0);

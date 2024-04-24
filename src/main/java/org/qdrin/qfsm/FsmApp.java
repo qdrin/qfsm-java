@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.StateMachineEventResult;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.state.AbstractState;
@@ -133,9 +134,10 @@ public class FsmApp {
 			ArrayList<Product> components = new ArrayList<>();
 			List<ProductRelationship> productRelations = new ArrayList<>(); 
 			List<ProductOrderItemRelationshipDto> itemRelations = head.getProductOrderItemRelationship();
+			log.debug("searching bundle relationship for components {}", itemRelations);
 			itemRelations = itemRelations == null ? new ArrayList<>() : itemRelations;
 			for(ProductOrderItemRelationshipDto rel: itemRelations) {
-				Optional<ProductActivateRequestDto> componentItem = orderItems.stream()
+				Optional<ProductActivateRequestDto> componentItem = eventOrderItems.stream()
 						.filter(item -> item.getProductOrderItemId().equals(rel.getProductOrderItemId()))
 						.findFirst();
 				if(componentItem.isEmpty()) {
@@ -163,6 +165,7 @@ public class FsmApp {
 			productBundle.setBundle(product);
 			productBundle.setComponents(components);
 			orderItems.add(head);
+			bundles.add(productBundle);
 		}  // End of bundle processing, orderItems contain bundles now
 
 		for(ProductActivateRequestDto orderItem: eventOrderItems) {
@@ -190,7 +193,7 @@ public class FsmApp {
 		FsmResult result = new FsmResult();
 		result.setBundles(bundles);
 		result.setProductOrderItems(orderItems);
-		log.debug("bundles: {}", bundles);
+		log.debug("created {} bundles: {}", bundles.size(), bundles);
 		return result;
 	}
 
@@ -199,6 +202,9 @@ public class FsmApp {
 		final List<ProductRequestDto> eventOrderItems = event.getProducts();
 		ArrayList<Product> products = new ArrayList<>();
 		log.debug("event: {}", event);
+		if(eventOrderItems == null || eventOrderItems.isEmpty()) {
+			throw new BadUserDataException("event products is null or empty");
+		}
 		for(ProductRequestDto orderItem: eventOrderItems) {
 			Optional<Product> dbProduct = productRepository.findById(orderItem.getProductId());
 			if(dbProduct.isEmpty()) {
@@ -310,7 +316,6 @@ public class FsmApp {
 
   private void sendMessage(StateMachine<String, String> machine, String eventName) {
 		Map<Object, Object> variables = machine.getExtendedState().getVariables();
-		variables.put("transitionCount", 0);
 
 		Message<String> message = MessageBuilder
 			.withPayload(eventName)
@@ -318,24 +323,21 @@ public class FsmApp {
 			.build();
 		Mono<Message<String>> monomsg = Mono.just(message);
 		log.debug("[{}] sending event: {}, message: {}", machine.getId(), eventName, message);
+		StateMachineEventResult<String, String> res;
     try {
-		  var res = machine.sendEvent(monomsg).blockLast();
+		  res = machine.sendEvent(monomsg).blockLast();
 			log.debug("event result: {}", res);
     } catch(IllegalArgumentException e) {
 			e.printStackTrace();
 			String emsg = String.format("[%s] Event %s not accepted in current state: %s", machine.getId(), eventName, e.getLocalizedMessage());
       log.error(emsg);
-			throw new NotAcceptedEventException(emsg, e);
+			throw new EventDeniedException(emsg, e);
     }
 		finally {
 			stateMachineService.releaseStateMachine(machine.getId());
 		}
-
-		int trcount = (int) machine.getExtendedState().getVariables().get("transitionCount");
-		if(trcount == 0) {
-			String emsg = String.format("[%s] Event %s not accepted in current state, transition count is zero", machine.getId(), eventName);
-      log.error(emsg);
-			throw new NotAcceptedEventException(emsg);
+		if(res == null || res.getResultType() == StateMachineEventResult.ResultType.DENIED) {
+			throw new EventDeniedException(String.format("[%s] Event %s not accepted in current state", machine.getId(), eventName));
 		}
 	}
 }

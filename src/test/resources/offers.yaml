@@ -167,7 +167,7 @@ offers:
         recurringChargePeriodLength: 1
         priceType: RecurringCharge
         productStatus: ACTIVE
-        nextPrice: null
+        nextEntity: null
         priceAlterations:
           simple2-price-alteration:
             name: Simple2 price alteration

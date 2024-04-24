@@ -23,14 +23,8 @@ public class CustomTransition {
         StateContext<String, String> context
         ) {
     State<String, String> source = context.getSource();
-    String targetId = context.getTarget().getId();
-    String sourceId = source == null ? "null" : source.getId();
     StateMachine<String, String> machine = context.getStateMachine();
     AbstractState<String, String> mstate = (AbstractState<String, String>) machine.getState();
-    ExtendedState extendedState = context.getExtendedState();
-    int count = (int) extendedState.getVariables().getOrDefault("transitionCount", 0) + 1;
-    extendedState.getVariables().put("transitionCount", count);
-    log.debug("registerTransition {} -> {}, transitionCount: {}", sourceId, targetId, count);
     
     // TODO: Check condition function for it may cause double action call
     if(source != null && mstate.isComposite()) { 
