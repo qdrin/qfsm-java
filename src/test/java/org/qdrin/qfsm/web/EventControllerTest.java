@@ -263,6 +263,14 @@ public class EventControllerTest {
   }
 
   @Nested
+  class ActivationAborted {
+    @Test
+    public void abortSimpleFailedDeclined() throws Exception {
+      assert(false);
+    }
+  }
+
+  @Nested
   class Disconnect {
     @Test
     public void disconnectSimpleFailedDeclined() throws Exception {
