@@ -21,6 +21,7 @@ import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.TestOffers;
 import org.qdrin.qfsm.controllers.EventController;
 import org.qdrin.qfsm.exception.RepeatedEventException;
+import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +40,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.qdrin.qfsm.Helper.TestEvent;
@@ -173,7 +173,6 @@ public class EventControllerTest {
     @Test
     public void checkPrometheus() throws Exception {
       ClassPathResource resource = new ClassPathResource("/body/request/activation_started.json", getClass());
-
       String eventPath = String.format("%s%s/event", basePath, apiVersion);
       RequestEventDto body = mapper.readValue(resource.getInputStream(), RequestEventDto.class);
       HttpEntity<RequestEventDto> request = new HttpEntity<>(body, headers);

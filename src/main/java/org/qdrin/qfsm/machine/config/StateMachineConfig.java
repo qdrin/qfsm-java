@@ -75,11 +75,6 @@ public class StateMachineConfig {
     }
 
     @Bean
-    CreateProduct createProduct() {
-      return new CreateProduct();
-    }
-
-    @Bean
     PendingDisconnectEntry pendingDisconnectEntry() {
       return new PendingDisconnectEntry();
     }
@@ -215,7 +210,7 @@ public class StateMachineConfig {
         public void execute(StateContext<String, String> context) {
           Product product = context.getExtendedState().get("product", Product.class);
           log.info("Clear product price. productId: {}", product.getProductId());
-          product.setProductPrices(null);
+          product.setProductPrice(null);
         }
       };
     }

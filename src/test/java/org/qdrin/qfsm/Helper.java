@@ -11,6 +11,7 @@ import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.model.Characteristic;
 import org.qdrin.qfsm.model.ClientInfo;
 import org.qdrin.qfsm.model.EventProperties;
+import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.model.dto.EventDto;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
@@ -215,47 +216,4 @@ public class Helper {
     }
     return items;
   }
-
-  // public List<ProductRequestDto> buildProducts(
-  //       String status,
-  //       String mainOfferId,
-  //       String priceId,
-  //       String... componentOffers) {
-  //   Map<String, OfferDef> offers = getTestOffers().getOffers();
-  //   ArrayList<ProductActivateRequestDto> items = new ArrayList<>();
-  //   ProductRequestDto bundle = new ProductRequestDto();
-  //   String bundleItemId = UUID.randomUUID().toString();
-  //   List<ProductOrderItemRelationshipDto> relations = new ArrayList<>();
-  //   OfferDef bundleOffer = offers.get(mainOfferId);
-  //   ProductPrice price = bundleOffer.getPrices().get(priceId);
-  //   price.setId(priceId);
-  //   String relationType = bundleOffer.getIsCustom() ? "CUSTOM_BUNDLES" : "BUNDLES";
-  //   bundle.setProductOrderItemId(bundleItemId);
-  //   bundle.setProductOfferingId(mainOfferId);
-  //   bundle.setProductOfferingName(bundleOffer.getName());
-  //   bundle.setFabricRef(bundleOffer.getFabricRef());
-  //   bundle.setIsBundle(bundleOffer.getIsBundle());
-  //   bundle.setIsCustom(bundleOffer.getIsCustom());
-  //   bundle.setProductPrice(Arrays.asList(price));
-  //   items.add(bundle);
-  //   if(componentOffers != null) {
-  //     bundle.setProductOrderItemRelationship(relations);
-  //     for(int i = 0; i < componentOffers.length; i++) {
-  //       OfferDef componentOffer = offers.get(componentOffers[i]);
-  //       ProductActivateRequestDto component = new ProductActivateRequestDto();
-  //       String componentItemId = UUID.randomUUID().toString();
-  //       component.setProductOrderItemId(componentItemId);
-  //       component.setProductOfferingName(componentOffer.getName());
-  //       component.setIsBundle(false);
-  //       component.setIsCustom(false);
-  //       component.setProductOfferingId(componentOffers[i]);
-  //       ProductOrderItemRelationshipDto rel = new ProductOrderItemRelationshipDto();
-  //       rel.setProductOrderItemId(componentItemId);
-  //       rel.setRelationshipType(relationType);  // TODO: CUSTOM_BUNDLES???
-  //       relations.add(rel);
-  //       items.add(component);
-  //     }
-  //   }
-  //   return items;
-  // }
 }

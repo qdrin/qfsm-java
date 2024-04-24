@@ -178,7 +178,6 @@ offers:
   component1:
     name: VASP Component1
     isBundle: false
-    isCustom: false
     fabricRef:
     - fabricId: VASP
       fabricProductId: vaspServiceCode1
@@ -186,7 +185,6 @@ offers:
   component2:
     name: VASP Component2
     isBundle: false
-    isCustom: false
     fabricRef:
     - fabricId: VASP
       fabricProductId: vaspServiceCode2
@@ -194,7 +192,6 @@ offers:
   component3:
     name: BSS Component3
     isBundle: false
-    isCustom: false
     fabricRef:
     - fabricId: BSS
       fabricProductOfferingId: "900525"

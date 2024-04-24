@@ -1,5 +1,6 @@
 package org.qdrin.qfsm.machine.states;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -18,8 +19,6 @@ import org.springframework.statemachine.action.Action;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.serializer.JacksonSerializer;
 
-import org.qdrin.qfsm.machine.actions.SignalAction;
-
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -34,9 +33,9 @@ public class PriceChangingExit implements Action<String, String> {
     log.debug("PriceChangingExit started. event: {}, message: {}", context.getEvent(), context.getMessage());
     Product product = context.getExtendedState().get("product", Product.class);
     // При выходе из Suspended мы обнуляем прайс, а здесь выставляем его равным nextPrice
-    if(product.getProductPrices() == null) {
+    if(product.getProductPrice() == null) {
       ProductPrice nextPrice = context.getExtendedState().get("nextPrice", ProductPrice.class);
-      product.setProductPrices(nextPrice);
+      product.setProductPrice(Arrays.asList(nextPrice));
     }
   }
 }
