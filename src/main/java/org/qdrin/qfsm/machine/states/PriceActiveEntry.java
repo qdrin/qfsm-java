@@ -9,6 +9,7 @@ import com.github.kagkarlsson.scheduler.serializer.JacksonSerializer;
 import org.qdrin.qfsm.tasks.ScheduledTasks;
 import org.qdrin.qfsm.tasks.ScheduledTasks.TaskContext;
 
+import java.time.OffsetDateTime;
 import java.util.function.Consumer;
 
 import javax.sql.DataSource;
@@ -32,14 +33,20 @@ public class PriceActiveEntry implements Action<String, String> {
     Product product = context.getExtendedState().get("product", Product.class);
     ProductPrice nextPrice = context.getStateMachine().getExtendedState().get("nextPrice", ProductPrice.class);
     if(! context.getEvent().equals("complete_price")) {
-      product.setActiveEndDate(nextPrice.getNextPayDate());
+      OffsetDateTime activeEndDate = nextPrice.getNextPayDate();
+      product.setActiveEndDate(activeEndDate);
+      // TODO: Change direct task creation to post action variable here and everywhere
+      // var postActions = context.getExtendedState().get("postActions", PostActions);
+      // postActions.addNewTask("startPriceEndedTask", product.getProductId(), activeEndDate);
+////////////////////////////////////////////////////////////////////////////////////////////////////////
       final SchedulerClient schedulerClient =
         SchedulerClient.Builder.create(dataSource)
             .serializer(new JacksonSerializer())
             .build();
       Consumer<TaskContext> priceEndedFunc = ScheduledTasks::startPriceEndedTask;
-      TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), product.getActiveEndDate().toInstant());
+      TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), activeEndDate.toInstant());
       priceEndedFunc.accept(ctx);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
       context.getStateMachine().getExtendedState().getVariables().remove("nextPrice");
     }
   }

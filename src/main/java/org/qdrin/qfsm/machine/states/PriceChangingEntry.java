@@ -35,31 +35,22 @@ public class PriceChangingEntry implements Action<String, String> {
     Product product = context.getExtendedState().get("product", Product.class);
     Map<Object, Object> variables = context.getExtendedState().getVariables();
     int tPeriod = product.getTarificationPeriod();
-    if (tPeriod == 0) {
-      ProductPrice price = PriceHelper.getProductPrice(context);
-      variables.put("nextPrice", price);
-      SignalAction changePrice = new SignalAction("change_price");
-      changePrice.execute(context);
-      if(price.getProductStatus().equals("ACTIVE_TRIAL")) {
-        log.debug("First trial period. Sending auto 'payment_processed'");
-        SignalAction paymentProcessed = new SignalAction("payment_processed");
-        paymentProcessed.execute(context);
-      }
+    ProductPrice nextPrice;
+    SignalAction paymentProcessed = null;
+    if(tPeriod != 0) {
+      nextPrice = ExternalData.requestProductPrice();
     } else {
-      // TODO: This is emulator of price-calculator request. Remove after develop
-      ProductPrice plannedPrice = ExternalData.requestProductPrice();
-      variables.put("plannedPrice", plannedPrice);
-      ///////////////////////////////////////////////////////////////////////////
-      
-      final SchedulerClient schedulerClient =
-        SchedulerClient.Builder.create(dataSource)
-            .serializer(new JacksonSerializer())
-            .build();
-      Consumer<TaskContext> taskFunc = ScheduledTasks::startChangePriceTask;
-      TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), Instant.now());
-      taskFunc.accept(ctx);
-      // ProductPrice nextPrice = ExternalData.RequestProductPrice();
-      // variables.put("nextPrice", nextPrice);
+      nextPrice = PriceHelper.getProductPrice(context);
+      if(nextPrice.getProductStatus().equals("ACTIVE_TRIAL")) {
+        log.debug("First trial period. Sending auto 'payment_processed'");
+        paymentProcessed = new SignalAction("payment_processed");        
+      }
+    }
+    variables.put("nextPrice", nextPrice);
+    SignalAction changePrice = new SignalAction("change_price");
+    changePrice.execute(context);
+    if(paymentProcessed != null) {
+      paymentProcessed.execute(context);
     }
   }
 }
