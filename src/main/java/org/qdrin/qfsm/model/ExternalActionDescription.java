@@ -14,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ExternalAction {
+public class ExternalActionDescription {
   String name;
   String productId;
   String context;
@@ -24,11 +24,8 @@ public class ExternalAction {
     "deleteFutureInternalEvent",  // need list of event at input
     "createFutureExternalEvent",
     "deleteFutureExternalEvent",  // need list of events at input
-    "getExternalData",  // nextPrice, bundle composition
-    "changeComponents",
-    "addCustomBundleRelationship",
-    "removeCustomBundleRelationship",
-    "...",
-    "N_doSomethingWithBundle"
+    "immediateExternalEvent"      // Если будет нужен: отдельный вид action-а, запускаемый в синхроне после успешного прощелкивания FSM
+    // "getExternalData",  // actions, не меняющие состояние систем, запускаем из FSM: nextPrice, bundle composition
+    // "changeComponents", add/removeCustomBundleRelation   // Делаем внутри FSM, в случае ошибки откат будет не нужен
   );
 }
