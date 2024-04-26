@@ -4,13 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 
-import com.github.kagkarlsson.scheduler.SchedulerClient;
-import com.github.kagkarlsson.scheduler.serializer.JacksonSerializer;
-import org.qdrin.qfsm.tasks.ScheduledTasks;
-import org.qdrin.qfsm.tasks.ScheduledTasks.TaskContext;
+import org.qdrin.qfsm.tasks.ActionSuit;
 
 import java.time.OffsetDateTime;
-import java.util.function.Consumer;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -35,17 +32,19 @@ public class PriceActiveEntry implements Action<String, String> {
     if(! context.getEvent().equals("complete_price")) {
       OffsetDateTime activeEndDate = nextPrice.getNextPayDate();
       product.setActiveEndDate(activeEndDate);
+      List<ActionSuit> actions = (List<ActionSuit>) context.getExtendedState().getVariables().get("actions");
+      actions.add(ActionSuit.PRICE_ENDED);  // activeEndDate.toInstant()
       // TODO: Change direct task creation to post action variable here and everywhere
       // var postActions = context.getExtendedState().get("postActions", PostActions);
       // postActions.addNewTask("startPriceEndedTask", product.getProductId(), activeEndDate);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-      final SchedulerClient schedulerClient =
-        SchedulerClient.Builder.create(dataSource)
-            .serializer(new JacksonSerializer())
-            .build();
-      Consumer<TaskContext> priceEndedFunc = ScheduledTasks::startPriceEndedTask;
-      TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), activeEndDate.toInstant());
-      priceEndedFunc.accept(ctx);
+      // final SchedulerClient schedulerClient =
+      //   SchedulerClient.Builder.create(dataSource)
+      //       .serializer(new JacksonSerializer())
+      //       .build();
+      // Consumer<TaskContext> priceEndedFunc = ScheduledTasks::startPriceEndedTask;
+      // TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), activeEndDate.toInstant());
+      // priceEndedFunc.accept(ctx);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
       context.getStateMachine().getExtendedState().getVariables().remove("nextPrice");
     }

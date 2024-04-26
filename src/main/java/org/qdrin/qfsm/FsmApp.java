@@ -29,6 +29,7 @@ import org.qdrin.qfsm.model.dto.ProductOrderItemRelationshipDto;
 import org.qdrin.qfsm.model.dto.ProductRequestDto;
 import org.qdrin.qfsm.repository.EventRepository;
 import org.qdrin.qfsm.repository.ProductRepository;
+import org.qdrin.qfsm.tasks.*;
 
 @Slf4j
 @Configuration
@@ -294,17 +295,31 @@ public class FsmApp {
 			String machineId = product.getProductId();
 			StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 			String eventType = event.getEventType();
+			List<ActionSuit> actions = new ArrayList<>();
+			List<ActionSuit> deleteActions = new ArrayList<>();
+
 			log.debug("machine acquired: {}", machine.getId());
 			String machineState = getMachineState(machine.getState());
 			var variables = machine.getExtendedState().getVariables();
 			variables.put("product", product);
+			variables.put("actions", actions);
+			variables.put("deleteActions", deleteActions);
 			log.info("current state: {}, variables: {}", machineState, variables);
 			sendMessage(machine, eventType);
 			machineState = getMachineState(machine.getState());
 			variables = machine.getExtendedState().getVariables();
-			product = machine.getExtendedState().get("product", Product.class);
 			variables.remove("product");
+			variables.remove("actions");
+			variables.remove("deleteActions");
 			productRepository.save(product);
+
+			FsmActions fsmActions = new FsmActions();
+			for(ActionSuit action: deleteActions) {
+				fsmActions.deleteTask(action);
+			}
+			for(ActionSuit action: actions) {
+				fsmActions.createTask(action);
+			}
 			log.info("new state: {}, variables: {}", machineState, variables);
 			stateMachineService.releaseStateMachine(machineId);
 		}
@@ -313,8 +328,6 @@ public class FsmApp {
 	}
 
   private void sendMessage(StateMachine<String, String> machine, String eventName) {
-		Map<Object, Object> variables = machine.getExtendedState().getVariables();
-
 		Message<String> message = MessageBuilder
 			.withPayload(eventName)
 			.setHeader("origin", "user")

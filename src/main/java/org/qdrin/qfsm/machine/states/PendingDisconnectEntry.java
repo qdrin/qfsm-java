@@ -1,27 +1,19 @@
 package org.qdrin.qfsm.machine.states;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
-
-import javax.sql.DataSource;
 
 import org.qdrin.qfsm.machine.actions.DeleteTaskAction;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductCharacteristic;
+import org.qdrin.qfsm.tasks.ActionSuit;
 import org.qdrin.qfsm.tasks.ExternalData;
-import org.qdrin.qfsm.tasks.ScheduledTasks;
-import org.qdrin.qfsm.tasks.ScheduledTasks.TaskContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
-
-import com.github.kagkarlsson.scheduler.SchedulerClient;
-import com.github.kagkarlsson.scheduler.serializer.JacksonSerializer;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -29,9 +21,6 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 public class PendingDisconnectEntry implements Action<String, String> {
-
-  @Autowired
-  DataSource dataSource;
 
   @Override
   public void execute(StateContext<String, String> context) {
@@ -62,24 +51,18 @@ public class PendingDisconnectEntry implements Action<String, String> {
       .withPayload("price_off").build());
     var paymentRes = context.getStateMachine().sendEvent(paymentOff).collectList();
     var priceRes = context.getStateMachine().sendEvent(priceOff).collectList();
-    for(String taskname: Arrays.asList(
-          "price_ended",
-          "suspend_ended",
-          "waiting_pay_ended",
-          "change_price",
-          "resume"
+    List<ActionSuit> deleteActions = (List<ActionSuit>) context.getExtendedState().getVariables().get("deleteActions");
+    for(ActionSuit action: Arrays.asList(
+          ActionSuit.PRICE_ENDED,
+          ActionSuit.SUSPEND_ENDED,
+          ActionSuit.WAITING_PAY_ENDED,
+          ActionSuit.CHANGE_PRICE,
+          ActionSuit.RESUME_EXTERNAL
         )) {
-      DeleteTaskAction action = new DeleteTaskAction(taskname, dataSource);
-      action.execute(context);
+      deleteActions.add(action);
     }
-    final SchedulerClient schedulerClient =
-      SchedulerClient.Builder.create(dataSource)
-          .serializer(new JacksonSerializer())
-          .build();
-    Consumer<TaskContext> taskFunc = ScheduledTasks::startDisconnectTask;
-    // TODO: Add characteristics analysis
-    TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), product.getActiveEndDate().toInstant());
-    taskFunc.accept(ctx);
+    List<ActionSuit> actions = (List<ActionSuit>) context.getExtendedState().getVariables().get("actions");
+    actions.add(ActionSuit.DISCONNECT);  // product.getActiveEndDate().toInstant() or characteristic-valued
     paymentRes.block();
     priceRes.block();
   }
