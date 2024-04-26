@@ -1,12 +1,7 @@
 package org.qdrin.qfsm.event;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 import org.qdrin.qfsm.exception.BadUserDataException;
 import org.qdrin.qfsm.model.ClientInfo;
@@ -16,7 +11,20 @@ import org.qdrin.qfsm.model.dto.ProductRequestDto;
 
 public class EventValidator {
   private static void checkCommonParameters(Event event) {
+    String refId = event.getRefId();
+    String eventType = event.getEventType();
+    String refIdType = event.getRefIdType();
     OffsetDateTime eventDate = event.getEventDate();
+
+    if(eventType == null || eventType.isEmpty()) {
+      throw new BadUserDataException("Mandatory attribute is missing: eventType");
+    }
+    if(refId == null || refId.isEmpty()) {
+      throw new BadUserDataException("Mandatory attribute is missing: refId");
+    }
+    if(refIdType == null || refIdType.isEmpty()) {
+      throw new BadUserDataException("Mandatory attribute is missing: refIdType");
+    }
     if(eventDate == null || eventDate.isAfter(OffsetDateTime.now())) {
       throw new BadUserDataException(String.format("Bad eventDate (null or future): %s", eventDate));
     }
