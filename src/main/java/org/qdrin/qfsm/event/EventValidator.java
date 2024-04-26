@@ -18,7 +18,7 @@ public class EventValidator {
   private static void checkCommonParameters(Event event) {
     OffsetDateTime eventDate = event.getEventDate();
     if(eventDate == null || eventDate.isAfter(OffsetDateTime.now())) {
-      throw new BadUserDataException(String.format("Bad eventDate (null or future): %s", eventDate.toInstant()));
+      throw new BadUserDataException(String.format("Bad eventDate (null or future): %s", eventDate));
     }
   }
   private static void checkClientInfo(Event event) {

@@ -20,6 +20,8 @@ import org.springframework.statemachine.state.State;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
+
+import org.qdrin.qfsm.event.EventValidator;
 import org.qdrin.qfsm.exception.*;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
@@ -95,10 +97,6 @@ public class FsmApp {
 			log.error(errString);
 			throw new RepeatedEventException(errString);
 		}
-	}
-
-	private void validateEvent(Event event) {
-		return;
 	}
 
 	private Optional<Product> getCustomBundle(Product component) {
@@ -283,7 +281,7 @@ public class FsmApp {
 
 	public FsmResult sendEvent(Event event) {
 		checkEvent(event);
-		validateEvent(event);
+		EventValidator.validate(event);
 		FsmResult result = event.getEventType().equals("activation_started") ? createBundles(event) : getBundles(event);
 		List<ProductBundle> bundles = result.getBundles();
 		if(bundles.size() != 1) {
