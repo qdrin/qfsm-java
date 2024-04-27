@@ -11,7 +11,6 @@ import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.model.Characteristic;
 import org.qdrin.qfsm.model.ClientInfo;
 import org.qdrin.qfsm.model.EventProperties;
-import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.model.dto.EventDto;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;

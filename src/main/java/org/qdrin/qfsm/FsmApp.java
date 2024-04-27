@@ -11,7 +11,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineEventResult;
-import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
@@ -36,9 +35,6 @@ public class FsmApp {
 
 	@Autowired
   	StateMachineService<String, String> stateMachineService;
-	
-	@Autowired
-	StateMachinePersister<String, String, String> persister;
 
 	@Autowired
 	EventRepository eventRepository;

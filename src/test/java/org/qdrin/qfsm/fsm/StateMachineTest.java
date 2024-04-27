@@ -2,31 +2,34 @@ package org.qdrin.qfsm.fsm;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
+import org.springframework.statemachine.StateMachinePersist;
 import org.springframework.statemachine.access.StateMachineAccess;
 
 import static org.junit.Assert.assertEquals;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.springframework.statemachine.config.StateMachineFactory;
-import org.springframework.statemachine.state.AbstractState;
+import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -36,19 +39,56 @@ public class StateMachineTest {
   @Autowired
   private StateMachineFactory<String, String> stateMachineFactory;
 
+  @Resource(name = "stateMachinePersist")
+  private ProductStateMachinePersist persist;
+
+  @Autowired
+  StateMachineService<String, String> service;
+
   private StateMachine<String, String> machine;
 
   @BeforeEach
   public void setup() throws Exception {
-    machine = stateMachineFactory.getStateMachine();
+    // machine = stateMachineFactory.getStateMachine();
   }
 
   ObjectMapper mapper = new ObjectMapper();
 
   private StateMachineContext<String, String> createContext(JsonNode jstate) {
-    String state = jstate.get("state").asText();
-    log.debug("jstate: {}, state: {}", jstate, state);
-    return new DefaultStateMachineContext<String,String>(state, null, null, null);
+    StateMachineContext<String, String> context = null;
+    String state = null;
+    switch(jstate.getNodeType()) {
+      case OBJECT:
+        state = jstate.fieldNames().next();
+        context = new DefaultStateMachineContext<>(state, null, null, null);
+        JsonNode jchild = jstate.get(state);
+        if(jchild.getNodeType() == JsonNodeType.ARRAY) {
+          for(var j: jchild) {
+            StateMachineContext<String, String> child = createContext(j);
+            context.getChilds().add(child);
+          }
+        } else {
+          StateMachineContext<String, String> child = createContext(jchild);
+          context.getChilds().add(child);
+        }
+        break;  // ?
+      case STRING:
+        state = jstate.asText();
+        context = new DefaultStateMachineContext<>(state, null, null, null);
+      default:
+    }
+    return context;
+  }
+
+  @Test
+  public void testContextBuilder() throws Exception {
+    ClassPathResource resource = new ClassPathResource("/contexts/machinestate_sample.json", getClass());
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode machineState = mapper.readTree(resource.getInputStream());
+    StateMachineContext<String, String> context = createContext(machineState);
+    log.debug("context: {}", context);
+    assertEquals("Provision", context.getState());
+    assertEquals(3, context.getChilds().size());
   }
 
   @Test
@@ -87,26 +127,27 @@ public class StateMachineTest {
 
   @Test
   public void testOrthogonalStateSet() throws Exception {
-    var accessor = machine.getStateMachineAccessor();
-    AbstractState<String, String> astate= (AbstractState<String, String>) machine.getState();
-
-    JsonNode jstate = mapper.readTree("{}");
-    ObjectNode ostate = (ObjectNode) jstate;
-    ostate.put("state", "Disconnect");
-    StateMachineContext<String, String> context = createContext(jstate);
-    log.debug("context: {}", context);
-    Consumer<StateMachineAccess<String, String>> access;
-    access = arg -> {
-      arg.resetStateMachineReactively(context).block();
-    }; 
-    accessor.doWithAllRegions(access);
+    String machineId = "testOrthogonalStateSet";
+    ClassPathResource resource = new ClassPathResource("/contexts/machinestate_sample.json", getClass());
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode machineState = mapper.readTree(resource.getInputStream());
+    StateMachineContext<String, String> context = createContext(machineState);
+    persist.write(context, machineId);
+    machine = service.acquireStateMachine(machineId);
+    // var accessor = machine.getStateMachineAccessor();
+    // log.debug("context: {}", context);
+    // Consumer<StateMachineAccess<String, String>> access;
+    // access = arg -> {
+    //   arg.resetStateMachineReactively(context).block();
+    // }; 
+    // accessor.doWithAllRegions(access);
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
           .stateMachine(machine)
           .step()
-              .expectState("Disconnect")
+              .expectStates("Prolongation", "Paid", "PriceActive")
               .and()
           .build();
         plan.test();
