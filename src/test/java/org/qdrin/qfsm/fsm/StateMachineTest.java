@@ -10,6 +10,7 @@ import org.springframework.statemachine.access.StateMachineAccess;
 import static org.junit.Assert.assertEquals;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,10 +18,18 @@ import org.junit.jupiter.api.Test;
 import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.model.Product;
 import org.springframework.statemachine.config.StateMachineFactory;
+import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @SpringBootTest
 public class StateMachineTest {
 
@@ -34,6 +43,14 @@ public class StateMachineTest {
     machine = stateMachineFactory.getStateMachine();
   }
 
+  ObjectMapper mapper = new ObjectMapper();
+
+  private StateMachineContext<String, String> createContext(JsonNode jstate) {
+    String state = jstate.get("state").asText();
+    log.debug("jstate: {}, state: {}", jstate, state);
+    return new DefaultStateMachineContext<String,String>(state, null, null, null);
+  }
+
   @Test
   public void testInitial() throws Exception {
     StateMachineTestPlan<String, String> plan =
@@ -41,7 +58,7 @@ public class StateMachineTest {
           .defaultAwaitTime(2)
           .stateMachine(machine)
           .step()
-              .expectState("Aborted")
+              .expectState("Entry")
               .and()
           .build();
         plan.test();
@@ -66,6 +83,34 @@ public class StateMachineTest {
               .and()
           .build();
         plan.test();
+  }
+
+  @Test
+  public void testOrthogonalStateSet() throws Exception {
+    var accessor = machine.getStateMachineAccessor();
+    AbstractState<String, String> astate= (AbstractState<String, String>) machine.getState();
+
+    JsonNode jstate = mapper.readTree("{}");
+    ObjectNode ostate = (ObjectNode) jstate;
+    ostate.put("state", "Disconnect");
+    StateMachineContext<String, String> context = createContext(jstate);
+    log.debug("context: {}", context);
+    Consumer<StateMachineAccess<String, String>> access;
+    access = arg -> {
+      arg.resetStateMachineReactively(context).block();
+    }; 
+    accessor.doWithAllRegions(access);
+
+    StateMachineTestPlan<String, String> plan =
+        StateMachineTestPlanBuilder.<String, String>builder()
+          .defaultAwaitTime(2)
+          .stateMachine(machine)
+          .step()
+              .expectState("Disconnect")
+              .and()
+          .build();
+        plan.test();
+    log.debug("state: {}", machine.getState());
   }
 
   @Test
