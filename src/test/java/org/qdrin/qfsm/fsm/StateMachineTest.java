@@ -277,8 +277,9 @@ public class StateMachineTest {
               .and()
           .step()
               .sendEvent("activation_completed")
-              .expectStates(stateSuit("ActiveTrial", "Paid", "PriceChanged"))
+              .expectStates(stateSuit("ActiveTrial", "Paid", "PriceActive"))
               .and()
+          .defaultAwaitTime(1)
           .build();
     plan.test();
     log.debug("states: {}", machine.getState().getIds());
