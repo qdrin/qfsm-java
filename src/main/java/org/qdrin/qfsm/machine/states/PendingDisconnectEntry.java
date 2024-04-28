@@ -1,15 +1,12 @@
 package org.qdrin.qfsm.machine.states;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.qdrin.qfsm.machine.actions.DeleteTaskAction;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductCharacteristic;
 import org.qdrin.qfsm.tasks.ActionSuit;
 import org.qdrin.qfsm.tasks.ExternalData;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateContext;

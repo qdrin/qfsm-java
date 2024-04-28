@@ -15,13 +15,9 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.Format;
 import org.mockserver.model.HttpRequest;
-import org.mockserver.model.HttpResponse;
 import org.mockserver.serialization.HttpRequestSerializer;
 import org.qdrin.qfsm.Helper;
-import org.qdrin.qfsm.TestOffers;
 import org.qdrin.qfsm.controllers.EventController;
-import org.qdrin.qfsm.exception.RepeatedEventException;
-import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +37,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.qdrin.qfsm.Helper.TestEvent;
 
 import lombok.extern.slf4j.Slf4j;
