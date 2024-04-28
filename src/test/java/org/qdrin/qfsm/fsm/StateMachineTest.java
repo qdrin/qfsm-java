@@ -10,12 +10,12 @@ import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.StateMachinePersist;
 import org.springframework.statemachine.access.StateMachineAccess;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.assertEquals;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -24,10 +24,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductBuilder;
-import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.qdrin.qfsm.tasks.ActionSuit;
-import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.support.DefaultExtendedState;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
@@ -262,7 +261,14 @@ public class StateMachineTest {
   public void testActivationCompletedSuccess() throws Exception {
     machine = createMachine(null, "testActivationCompletedSuccess");
     Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-trial").build();
-    machine.getExtendedState().getVariables().put("product", product);
+    ProductPrice price = product.getProductPrice().get(0);
+    price.setNextPayDate(OffsetDateTime.now().plusDays(30));
+    ExtendedState extendedState = machine.getExtendedState();
+    Map<Object, Object> variables = extendedState.getVariables();
+    variables.put("product", product);
+    List<ActionSuit> actions = (List<ActionSuit>) variables.get("actions");
+    List<ActionSuit> deleteActions = (List<ActionSuit>) variables.get("deleteActions");
+
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
@@ -283,6 +289,10 @@ public class StateMachineTest {
           .build();
     plan.test();
     log.debug("states: {}", machine.getState().getIds());
+    log.debug("actions: {}, deleteActions: {}", actions, deleteActions);
     assertEquals(product.getStatus(), "ACTIVE_TRIAL");
+    assert(actions.contains(ActionSuit.PRICE_ENDED));
+    assert(! actions.contains(ActionSuit.WAITING_PAY_ENDED));
+    assert(! deleteActions.contains(ActionSuit.WAITING_PAY_ENDED));
   }
 }

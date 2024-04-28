@@ -35,6 +35,7 @@ public class PriceChangingEntry implements Action<String, String> {
       }
     }
     variables.put("nextPrice", nextPrice);
+    log.debug("price: {}, nextPrice: {}", PriceHelper.getProductPrice(context), nextPrice);
     SignalAction changePrice = new SignalAction("change_price");
     changePrice.execute(context);
     if(paymentProcessed != null) {

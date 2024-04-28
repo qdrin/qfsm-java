@@ -1,4 +1,4 @@
-package org.qdrin.qfsm.machine.actions;
+package org.qdrin.qfsm.tasks;
 
 import javax.sql.DataSource;
 
