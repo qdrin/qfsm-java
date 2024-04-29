@@ -37,6 +37,8 @@ import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -228,6 +230,42 @@ public class StateMachineTest {
             .build();
           plan.test();
       assert(machine.getState().getIds().contains("Paid"));
+    }
+
+    @Test
+    public void testOrthogonalStateSetMachineBuilder() throws Exception {
+      String machineId = "testOrthogonalStateSetMachineBuilder";
+      JsonNode machineState = Helper.buildMachineState("Prolongation", "Paid", "PriceActive");
+      machine = createMachine(machineState, machineId);
+      log.debug("machine: {}", machine);
+      log.debug("states: {}", machine.getState().getIds());
+      log.debug("search states: {}", Arrays.asList(stateSuit("Prolongation", "Paid", "PriceActive")));
+      StateMachineTestPlan<String, String> plan =
+          StateMachineTestPlanBuilder.<String, String>builder()
+            .defaultAwaitTime(2)
+            .stateMachine(machine)
+            .step()
+                .expectStates(stateSuit("Prolongation", "Paid", "PriceActive"))
+                .and()
+            .build();
+          plan.test();
+      assert(machine.getState().getIds().contains("Paid"));
+    }
+
+    @Test
+    public void testBuildMachineState() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode expected = mapper.createObjectNode();
+        ArrayNode provisions = mapper.createArrayNode();
+        provisions.add(
+                mapper.createObjectNode().set("UsageOn", mapper.createObjectNode().put("Activated", "ActiveTrial")))
+                .add(mapper.createObjectNode().put("PaymentOn", "Paid"))
+                .add(mapper.createObjectNode().put("PriceOn", "PriceActive"));
+        JsonNode machineState = Helper.buildMachineState("ActiveTrial", "Paid", "PriceActive");
+        expected.set("Provision", provisions);
+        log.debug("machineState: {}", machineState);
+        log.debug("expected: {}", expected);
+        JSONAssert.assertEquals(expected.toString(), machineState.toString(), false);
     }
   }
 

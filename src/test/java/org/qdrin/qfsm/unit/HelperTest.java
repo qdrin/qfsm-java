@@ -4,6 +4,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.Helper;
+import org.skyscreamer.jsonassert.JSONAssert;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,5 +82,21 @@ public class HelperTest {
         assertNotEquals(product.getProductId(), p1.getProductId());
         assertEquals("subscriber1", p1.getPartyRoleId());
         assertNull(p1.getProductPrice());
+    }
+
+    @Test
+    public void testBuildMachineState() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode expected = mapper.createObjectNode();
+        ArrayNode provisions = mapper.createArrayNode();
+        provisions.add(
+                mapper.createObjectNode().set("UsageOn", mapper.createObjectNode().put("Activated", "ActiveTrial")))
+                .add(mapper.createObjectNode().put("PaymentOn", "Paid"))
+                .add(mapper.createObjectNode().put("PriceOn", "PriceActive"));
+        JsonNode machineState = Helper.buildMachineState("ActiveTrial", "Paid", "PriceActive");
+        expected.set("Provision", provisions);
+        log.debug("machineState: {}", machineState);
+        log.debug("expected: {}", expected);
+        JSONAssert.assertEquals(expected.toString(), machineState.toString(), false);
     }
 }
