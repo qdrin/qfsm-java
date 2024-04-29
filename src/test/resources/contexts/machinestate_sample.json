@@ -1,19 +1,7 @@
 {
     "Provision": [
-        {
-            "Usage": {
-                "UsageOn": "Prolongation"
-            }
-        },
-        {
-            "Payment": {
-                "PaymentOn": "Paid"
-            }
-        },
-        {
-            "Price": {
-                "PriceOn": "PriceActive"
-            }
-        }
+        {"UsageOn": "Prolongation"},
+        {"PaymentOn": "Paid"},
+        {"PriceOn": "PriceActive"}
     ]
 }
