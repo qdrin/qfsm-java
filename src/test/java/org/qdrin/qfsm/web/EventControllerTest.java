@@ -241,15 +241,8 @@ public class EventControllerTest {
       log.debug(resp.toString());
       assertEquals(HttpStatus.OK, resp.getStatusCode());
       ResponseEventDto response = resp.getBody();
-      assertNotNull(response.getProducts());
-      assertEquals(1, response.getProducts().size());
+      Helper.Assertions.assertResponseEquals(event, response);
       ProductResponseDto resultProduct = response.getProducts().get(0);
-      assertNotNull(resultProduct.getProductId());
-      assertEquals(offerId, resultProduct.getProductOfferingId());
-      assertEquals(item0.getProductOfferingName(), resultProduct.getProductOfferingName());
-      assertNotNull(resultProduct.getStatus());
-      assertEquals("PENDING_ACTIVATE", resultProduct.getStatus());
-      assertEquals(resultProduct.getProductRelationship(), null);
 
       Product product = helper.getProduct(resultProduct.getProductId());
       assertEquals(offerId, product.getProductOfferingId());
@@ -274,8 +267,9 @@ public class EventControllerTest {
       log.debug(resp.toString());
       assertEquals(HttpStatus.OK, resp.getStatusCode());
       ResponseEventDto response = resp.getBody();
-      assertNotNull(response.getProducts());
-      assertEquals(4, response.getProducts().size());
+      Helper.Assertions.assertResponseEquals(event, response);
+      // assertNotNull(response.getProducts());
+      // assertEquals(4, response.getProducts().size());
     }
   }
 

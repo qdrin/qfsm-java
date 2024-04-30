@@ -1,24 +1,24 @@
 package org.qdrin.qfsm;
 
+import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.qdrin.qfsm.TestOffers.OfferDef;
-import org.qdrin.qfsm.model.Characteristic;
-import org.qdrin.qfsm.model.ClientInfo;
-import org.qdrin.qfsm.model.EventProperties;
 import org.qdrin.qfsm.model.Product;
-import org.qdrin.qfsm.model.ProductPrice;
-import org.qdrin.qfsm.model.dto.EventDto;
+import org.qdrin.qfsm.model.ProductRelationship;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
-import org.qdrin.qfsm.model.dto.ProductOrderItemRelationshipDto;
 import org.qdrin.qfsm.model.dto.ProductRequestDto;
+import org.qdrin.qfsm.model.dto.ProductResponseDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
+import org.qdrin.qfsm.model.dto.ResponseEventDto;
 import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.qdrin.qfsm.persist.QStateMachineContextConverter;
 import org.qdrin.qfsm.repository.*;
@@ -29,8 +29,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.service.StateMachineService;
-import org.springframework.statemachine.test.StateMachineTestPlan;
-import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
@@ -253,5 +251,72 @@ public class Helper {
   public StateMachine<String, String> createMachine() {
     Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-trial").build();
     return createMachine(product);
+  }
+
+  public static class Assertions {
+
+    public static void assertResponseEquals(RequestEventDto request, ResponseEventDto response) {
+      assertEquals(request.getEvent().getRefId(), response.getRefId());
+      List<ProductResponseDto> rproducts = response.getProducts();
+      assertNotNull(rproducts);
+      String eventType = request.getEvent().getEventType();
+      if(eventType.equals("activation_started")) {
+        List<ProductActivateRequestDto> orderItems = request.getProductOrderItems();
+        assertEquals(orderItems.size(), rproducts.size());
+        for(ProductActivateRequestDto item: orderItems) {
+          List<ProductResponseDto> lp = rproducts.stream()
+              .filter(p -> p.getProductOrderItemId().equals(item.getProductOrderItemId()))
+              .collect(Collectors.toList());
+          assertEquals(String.format("Expected 1 product corresponding to orderItem %s, actual: %d",
+                        item.getProductOrderItemId(), lp.size()), 1, lp.size());
+          ProductResponseDto rproduct = lp.get(0);
+          assertNotNull(rproduct.getProductId());
+          assertEquals(item.getProductOfferingId(), rproduct.getProductOfferingId());
+          assertEquals(item.getProductOfferingName(), rproduct.getProductOfferingName());
+          assertEquals(item.getIsBundle(), rproduct.getIsBundle());
+          assertEquals(item.getIsCustom(), rproduct.getIsCustom());
+          assertEquals("PENDING_ACTIVATE", rproduct.getStatus());
+          if(rproduct.getIsBundle()) {
+            List<ProductRelationship> relations = rproduct.getProductRelationship();
+            if(relations == null) {
+              relations = new ArrayList<>();
+            }
+            assertEquals(rproducts.size()-1, relations.size());
+            for(ProductRelationship r: relations) {
+              List<ProductResponseDto> lrp = rproducts.stream()
+                .filter(p -> p.getProductId().equals(r.getProductId()))
+                .collect(Collectors.toList());
+              assertEquals(1, lrp.size());
+            }
+          }
+        }
+      } else {
+        List<ProductRequestDto> orderItems = request.getProducts();
+        assert(orderItems.size() <= rproducts.size());
+        for(ProductRequestDto item: orderItems) {
+          List<ProductResponseDto> lp = rproducts.stream()
+              .filter(p -> p.getProductId().equals(item.getProductId()))
+              .collect(Collectors.toList());
+          assertEquals(String.format("Expected 1 product corresponding to order product %s, actual: %d",
+                        item.getProductId(), lp.size()), 1, lp.size());
+          
+        }
+        for(ProductResponseDto rproduct: rproducts) {
+          if(rproduct.getIsBundle()) {
+            List<ProductRelationship> relations = rproduct.getProductRelationship();
+            if(relations == null) {
+              relations = new ArrayList<>();
+            }
+            assertEquals(rproducts.size()-1, relations.size());
+            for(ProductRelationship r: relations) {
+              List<ProductResponseDto> lrp = rproducts.stream()
+              .filter(p -> p.getProductId().equals(r.getProductId()))
+              .collect(Collectors.toList());
+            assertEquals(1, lrp.size());
+            }
+          }
+        }
+      }
+    }
   }
 }
