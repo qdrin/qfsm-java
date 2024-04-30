@@ -2,8 +2,13 @@ package org.qdrin.qfsm.unit;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.OffsetDateTime;
+
 import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.model.dto.RequestEventDto;
+import org.qdrin.qfsm.EventBuilder;
 import org.qdrin.qfsm.Helper;
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -85,6 +90,16 @@ public class HelperTest {
     }
 
     @Test
+    public void testBuildMachineStateInitial() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        TextNode expected = mapper.getNodeFactory().textNode("Entry");
+        JsonNode machineState = Helper.buildMachineState();
+        System.out.println(String.format("machineState: %s", machineState));
+        System.out.println(String.format("expected: %s", expected));
+        JSONAssert.assertEquals(expected.toString(), machineState.toString(), false);
+    }
+
+    @Test
     public void testBuildMachineState() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode expected = mapper.createObjectNode();
@@ -98,5 +113,32 @@ public class HelperTest {
         log.debug("machineState: {}", machineState);
         log.debug("expected: {}", expected);
         JSONAssert.assertEquals(expected.toString(), machineState.toString(), false);
+    }
+
+    @Test
+    public void EventBuilderActivateSimple() throws Exception {
+        EventBuilder eventBuilder = new EventBuilder("activation_started", "simpleOffer1", "simple1-price-trial");
+        RequestEventDto event = eventBuilder.build();
+        log.debug("event: {}", event);
+        assertEquals("activation_started", event.getEvent().getEventType());
+        assert(event.getEvent().getEventDate().isBefore(OffsetDateTime.now().plusSeconds(1)));
+        assert(event.getEvent().getEventDate().isAfter(OffsetDateTime.now().minusSeconds(1)));
+        assertEquals(1, event.getProductOrderItems().size());
+        assertNull(event.getProducts());
+        assertEquals("simpleOffer1", event.getProductOrderItems().get(0).getProductOfferingId());
+    }
+
+    @Test
+    public void EventBuilderAbortSimple() throws Exception {
+        Product product = new ProductBuilder("simpleOffer1", "PENDING_ACTIVATE", "simple1-price-trial").build();
+        EventBuilder eventBuilder = new EventBuilder("activation_aborted", product);
+        RequestEventDto event = eventBuilder.build();
+        log.debug("event: {}", event);
+        assertEquals("activation_aborted", event.getEvent().getEventType());
+        assert(event.getEvent().getEventDate().isBefore(OffsetDateTime.now().plusSeconds(1)));
+        assert(event.getEvent().getEventDate().isAfter(OffsetDateTime.now().minusSeconds(1)));
+        assertEquals(1, event.getProducts().size());
+        assertNull(event.getProductOrderItems());
+        assertEquals(product.getProductId(), event.getProducts().get(0).getProductId());
     }
 }

@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.qdrin.qfsm.machine.actions.AddActionAction;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.model.*;
 
@@ -32,8 +33,7 @@ public class PriceActiveEntry implements Action<String, String> {
     if(! context.getEvent().equals("complete_price")) {
       OffsetDateTime activeEndDate = nextPrice.getNextPayDate();
       product.setActiveEndDate(activeEndDate);
-      List<ActionSuit> actions = (List<ActionSuit>) context.getExtendedState().getVariables().get("actions");
-      actions.add(ActionSuit.PRICE_ENDED);  // activeEndDate.toInstant()
+      new AddActionAction(ActionSuit.PRICE_ENDED).execute(context);  // activeEndDate.toInstant()
       // TODO: Change direct task creation to post action variable here and everywhere
       // var postActions = context.getExtendedState().get("postActions", PostActions);
       // postActions.addNewTask("startPriceEndedTask", product.getProductId(), activeEndDate);

@@ -72,7 +72,6 @@ public class EventValidatorTest {
 
     @Test
     public void directDefaultEventTest() throws Exception {
-        ClientInfo clientInfo = new ClientInfo();
         Event event = new Event();
         List<ProductRequestDto> items = new ArrayList<>();
         for(int i = 0; i < 3; i++) {

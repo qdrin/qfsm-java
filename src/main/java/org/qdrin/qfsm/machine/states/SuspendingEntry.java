@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.qdrin.qfsm.machine.actions.AddActionAction;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.tasks.ActionSuit;
 import org.qdrin.qfsm.utils.PriceHelper;
@@ -27,7 +28,6 @@ public class SuspendingEntry implements Action<String, String> {
     price.setPeriod(0);
     log.debug("SuspendingEntry productPrice: {}", price);
     PriceHelper.setProductPrice(context, price);
-    List<ActionSuit> actions = (List<ActionSuit>) context.getExtendedState().getVariables().get("actions");
-    actions.add(ActionSuit.SUSPEND_EXTERNAL);  // Instant.now())
+    new AddActionAction(ActionSuit.SUSPEND_EXTERNAL).execute(context);  // Instant.now())
   }
 }

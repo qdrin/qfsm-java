@@ -16,6 +16,8 @@ import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -25,6 +27,7 @@ import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.ProductOrderItemRelationshipDto;
 import org.qdrin.qfsm.model.dto.ProductRequestDto;
+import org.qdrin.qfsm.persist.QStateMachineContextConverter;
 import org.qdrin.qfsm.repository.EventRepository;
 import org.qdrin.qfsm.repository.ProductRepository;
 import org.qdrin.qfsm.tasks.*;
@@ -43,22 +46,8 @@ public class FsmApp {
 	ProductRepository productRepository;
 
   // get stringified full-state
-  public String getMachineState(State<String, String> state) {
-		String mstate = state.getId();
-		if (state.isOrthogonal()) {
-			RegionState<String, String> rstate = (RegionState<String, String>) state;
-			mstate += "->[";
-			for(var r: rstate.getRegions()) {
-				// log.info("orthogonal region: {}, state: {}", r.getId(), r.getState().getId());
-				mstate += getMachineState(r.getState()) + ",";
-			}
-			mstate = mstate.substring(0, mstate.length()-1) + "]";
-		}
-		if(state.isSubmachineState()) {
-			StateMachine<String, String> submachine = ((AbstractState<String, String>) state).getSubmachine();
-			State<String, String> sstate = submachine.getState();
-			mstate = mstate + "->" + getMachineState(sstate);
-		}
+  public JsonNode getMachineState(State<String, String> state) {
+		JsonNode mstate = QStateMachineContextConverter.toJsonNode(state);
 		return mstate;
 	}
 
@@ -202,7 +191,7 @@ public class FsmApp {
 		for(ProductRequestDto orderItem: eventOrderItems) {
 			Optional<Product> dbProduct = productRepository.findById(orderItem.getProductId());
 			if(dbProduct.isEmpty()) {
-				String errString = String.format("Event contains productId: %s, that cannot be found");
+				String errString = String.format("Event contains productId: %s, that cannot be found", orderItem.getProductId());
 				log.error( errString);
 				throw new BadUserDataException(errString);
 			}
@@ -294,7 +283,7 @@ public class FsmApp {
 			List<ActionSuit> deleteActions = new ArrayList<>();
 
 			log.debug("machine acquired: {}", machine.getId());
-			String machineState = getMachineState(machine.getState());
+			JsonNode machineState = getMachineState(machine.getState());
 			var variables = machine.getExtendedState().getVariables();
 			variables.put("product", product);
 			variables.put("actions", actions);

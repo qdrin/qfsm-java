@@ -6,7 +6,7 @@ import org.springframework.statemachine.action.Action;
 
 import javax.sql.DataSource;
 
-import org.qdrin.qfsm.machine.actions.DeleteAction;
+import org.qdrin.qfsm.machine.actions.DeleteActionAction;
 import org.qdrin.qfsm.tasks.ActionSuit;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +19,6 @@ public class WaitingPaymentExit implements Action<String, String> {
   
   public void execute(StateContext<String, String> context) {
     log.debug("WaitingPaymentExit started. event: {}", context.getEvent());
-    new DeleteAction(ActionSuit.WAITING_PAY_ENDED).execute(context);
+    new DeleteActionAction(ActionSuit.WAITING_PAY_ENDED).execute(context);
   }
 }

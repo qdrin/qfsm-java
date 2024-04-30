@@ -15,7 +15,7 @@ import lombok.experimental.FieldDefaults;
 public class ProductResponseDto {
   @NonNull String productId;
   @NonNull String productOfferingId;
-  @NonNull String status;
+  String status;  // TODO: Make it @NonNull when we'll be able to set component statuses
   String productOrderItemId;  // Must present in activation_started response only
   Boolean isBundle;
   Boolean isCustom;

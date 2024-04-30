@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import org.qdrin.qfsm.model.*;
-import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties.Web.Client;
 
 @Data
 @ToString

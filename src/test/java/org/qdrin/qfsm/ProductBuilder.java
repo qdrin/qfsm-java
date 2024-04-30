@@ -44,6 +44,7 @@ public class ProductBuilder {
         productId = UUID.randomUUID().toString();
         status = status == null ? "PENDING_ACTIVATE" : status;
         OfferDef offer = new Helper().getTestOffers().getOffers().get(this.productOfferingId);
+        productOfferingName = offer.getName();
         Map<String, ProductPrice> prices = offer.getPrices();
         ProductPrice price = prices != null ? prices.get(priceId) : null;
         if(price != null) {

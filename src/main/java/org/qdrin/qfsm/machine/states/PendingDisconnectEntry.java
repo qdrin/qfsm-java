@@ -1,9 +1,9 @@
 package org.qdrin.qfsm.machine.states;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.qdrin.qfsm.machine.actions.DeleteAction;
+import org.qdrin.qfsm.machine.actions.AddActionAction;
+import org.qdrin.qfsm.machine.actions.DeleteActionAction;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductCharacteristic;
 import org.qdrin.qfsm.tasks.ActionSuit;
@@ -49,15 +49,14 @@ public class PendingDisconnectEntry implements Action<String, String> {
       .withPayload("price_off").build());
     var paymentRes = context.getStateMachine().sendEvent(paymentOff).collectList();
     var priceRes = context.getStateMachine().sendEvent(priceOff).collectList();
-    new DeleteAction(
+    new DeleteActionAction(
       ActionSuit.PRICE_ENDED,
       ActionSuit.SUSPEND_ENDED,
       ActionSuit.WAITING_PAY_ENDED,
       ActionSuit.CHANGE_PRICE,
       ActionSuit.RESUME_EXTERNAL
       ).execute(context);
-    List<ActionSuit> actions = (List<ActionSuit>) context.getExtendedState().getVariables().get("actions");
-    actions.add(ActionSuit.DISCONNECT);  // product.getActiveEndDate().toInstant() or characteristic-valued
+    new AddActionAction(ActionSuit.DISCONNECT).execute(context);  // product.getActiveEndDate().toInstant() or characteristic-valued
     paymentRes.block();
     priceRes.block();
   }

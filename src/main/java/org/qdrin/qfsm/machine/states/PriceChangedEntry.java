@@ -1,9 +1,8 @@
 package org.qdrin.qfsm.machine.states;
-import java.time.Instant;
-import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.qdrin.qfsm.machine.actions.AddActionAction;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.tasks.ActionSuit;
 import org.qdrin.qfsm.utils.PriceHelper;
@@ -27,7 +26,6 @@ public class PriceChangedEntry implements Action<String, String> {
     nextPrice.setPeriod(1);
     PriceHelper.setProductPrice(context, nextPrice);
     log.debug("PriceChangedEntry productPrice: {}", PriceHelper.getProductPrice(context));
-    List<ActionSuit> actions = (List<ActionSuit>) context.getExtendedState().getVariables().get("actions");
-    actions.add(ActionSuit.CHANGE_PRICE_EXTERNAL);  // Instant.now());
+    new AddActionAction(ActionSuit.CHANGE_PRICE_EXTERNAL).execute(context);  // Instant.now());
   }
 }

@@ -11,5 +11,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductOrderItemRelationshipDto {
   String productOrderItemId;
+  String productId;  // Для уже существующего продукта (relationshipType: "BELONGS")
   String relationshipType;
 }
