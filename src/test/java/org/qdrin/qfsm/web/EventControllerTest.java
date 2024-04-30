@@ -19,9 +19,11 @@ import org.mockserver.serialization.HttpRequestSerializer;
 import org.qdrin.qfsm.EventBuilder;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductBuilder;
+import org.qdrin.qfsm.ProductClasses;
 import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.controllers.EventController;
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.model.dto.*;
 import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +46,6 @@ import org.testcontainers.utility.DockerImageName;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.qdrin.qfsm.Helper.TestEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -199,10 +200,12 @@ public class EventControllerTest {
   class ActivationStarted {
     @Test
     public void activationStartedSimpleFailedNullOrderItems() throws Exception {
-      Helper.TestEvent event = new TestEvent.Builder().build();
-      assertEquals(null, event.requestEvent.getProductOrderItems());
-      log.debug("requestEvent: {}", event.requestEvent);
-      HttpEntity<RequestEventDto> request = new HttpEntity<>(event.requestEvent, headers);
+      String offerId = "simpleOffer1";
+      String priceId = "simple1-price-trial";
+      RequestEventDto event = new EventBuilder("activation_started", offerId, priceId).build();
+      event.setProductOrderItems(null);
+      log.debug("event: {}", event);
+      HttpEntity<RequestEventDto> request = new HttpEntity<>(event, headers);
       ResponseEntity<ErrorModel> resp = restTemplate.postForEntity(eventUrl, request, ErrorModel.class);
       log.debug(resp.toString());
       assertEquals(HttpStatus.BAD_REQUEST, resp.getStatusCode());
@@ -227,11 +230,13 @@ public class EventControllerTest {
 
     @Test
     public void activationStartedSimpleSuccess() throws Exception {
-      List<ProductActivateRequestDto> items = helper.buildOrderItems("simpleOffer1", "simple1-price-trial", null);
-      Helper.TestEvent event = new TestEvent.Builder().productOrderItems(items).build();
-      
-      log.debug("requestEvent: {}", event.requestEvent);
-      HttpEntity<RequestEventDto> request = new HttpEntity<>(event.requestEvent, headers);
+      String offerId = "simpleOffer1";
+      String priceId = "simple1-price-trial";
+      RequestEventDto event = new EventBuilder("activation_started", offerId, priceId).build();
+      ProductActivateRequestDto item0 = event.getProductOrderItems().get(0);
+      List<ProductPrice> prices = item0.getProductPrice();
+      log.debug("requestEvent: {}", event);
+      HttpEntity<RequestEventDto> request = new HttpEntity<>(event, headers);
       ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
       log.debug(resp.toString());
       assertEquals(HttpStatus.OK, resp.getStatusCode());
@@ -240,20 +245,31 @@ public class EventControllerTest {
       assertEquals(1, response.getProducts().size());
       ProductResponseDto resultProduct = response.getProducts().get(0);
       assertNotNull(resultProduct.getProductId());
-      assertNotNull(resultProduct.getProductOfferingId());
+      assertEquals(offerId, resultProduct.getProductOfferingId());
+      assertEquals(item0.getProductOfferingName(), resultProduct.getProductOfferingName());
       assertNotNull(resultProduct.getStatus());
       assertEquals("PENDING_ACTIVATE", resultProduct.getStatus());
       assertEquals(resultProduct.getProductRelationship(), null);
+
+      Product product = helper.getProduct(resultProduct.getProductId());
+      assertEquals(offerId, product.getProductOfferingId());
+      assertEquals(item0.getProductOfferingName(), product.getProductOfferingName());
+      assertEquals("PENDING_ACTIVATE", product.getStatus());
+      assertEquals(ProductClasses.SIMPLE.ordinal(), product.getProductClass());
+      assertEquals(false, product.getIsBundle());
+      assertEquals(false, product.getIsCustom());
+      assertEquals(prices, product.getProductPrice());
     }
 
     @Test
     public void activationStartedBundleSuccess() throws Exception {
-      List<ProductActivateRequestDto> items = helper.buildOrderItems("bundleOffer1", "bundle1-price-trial",
-       "component1", "component2", "component3");
-      Helper.TestEvent event = new TestEvent.Builder().productOrderItems(items).build();
-      
-      log.debug("requestEvent: {}", event.requestEvent);
-      HttpEntity<RequestEventDto> request = new HttpEntity<>(event.requestEvent, headers);
+      String offerId = "bundleOffer1";
+      String priceId = "bundle1-price-trial";      
+      RequestEventDto event = new EventBuilder("activation_started", offerId, priceId)
+                .componentIds("component1", "component2", "component3")
+                .build();
+      log.debug("requestEvent: {}", event);
+      HttpEntity<RequestEventDto> request = new HttpEntity<>(event, headers);
       ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
       log.debug(resp.toString());
       assertEquals(HttpStatus.OK, resp.getStatusCode());
@@ -292,16 +308,17 @@ public class EventControllerTest {
   class Disconnect {
     @Test
     public void disconnectSimpleFailedDeclined() throws Exception {
-      List<ProductActivateRequestDto> items = helper.buildOrderItems("simpleOffer1", "simple1-price-trial", null);
-      Helper.TestEvent event = new TestEvent.Builder().productOrderItems(items).build();
-      HttpEntity<RequestEventDto> request = new HttpEntity<>(event.requestEvent, headers);
+      String offerId = "simpleOffer1";
+      String priceId = "simple1-price-trial";
+      RequestEventDto event = new EventBuilder("activation_started", offerId, priceId).build();
+      HttpEntity<RequestEventDto> request = new HttpEntity<>(event, headers);
       ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
       assertEquals(HttpStatus.OK, resp.getStatusCode());
       ResponseEventDto response = resp.getBody();
-      ProductRequestDto prreq = new ProductRequestDto();
-      prreq.setProductId(response.getProducts().get(0).getProductId());
-      event = new TestEvent.Builder().eventType("disconnect").products(Arrays.asList(prreq)).build();
-      HttpEntity<RequestEventDto> requestError = new HttpEntity<>(event.requestEvent, headers);
+      Product product = helper.getProduct(response.getProducts().get(0).getProductId());
+      assertNotNull(product);
+      event = new EventBuilder("disconnect", product).build();
+      HttpEntity<RequestEventDto> requestError = new HttpEntity<>(event, headers);
       ResponseEntity<ErrorModel> respError = restTemplate.postForEntity(eventUrl, requestError, ErrorModel.class);
       assertEquals(HttpStatus.BAD_REQUEST, respError.getStatusCode());
       ErrorModel error = respError.getBody();

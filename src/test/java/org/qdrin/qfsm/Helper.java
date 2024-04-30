@@ -1,6 +1,7 @@
 package org.qdrin.qfsm;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.qdrin.qfsm.persist.QStateMachineContextConverter;
 import org.qdrin.qfsm.repository.*;
 import org.qdrin.qfsm.tasks.ActionSuit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
@@ -61,6 +63,14 @@ public class Helper {
   @Autowired
   StateMachineService<String, String> service;
 
+  @Value("${application.fsm.time.priceEndedBefore}")
+  Duration priceEndedBefore;
+  public Duration getPriceEndedBefore() { return priceEndedBefore; }
+
+  @Value("${application.fsm.time.waitingPayInterval}")
+  Duration waitingPayInterval;
+  public Duration getWaitingPayInterval() { return waitingPayInterval; } 
+
   final TestOffers testOffers = setTestOffers();
 
   private TestOffers setTestOffers() {
@@ -90,149 +100,8 @@ public class Helper {
     eventRepository.deleteAll();
   }
 
-  public static class TestEvent {
-    public final RequestEventDto requestEvent;
-
-    public static class Builder {
-      public String eventType = "activation_started";
-      public String sourceCode = "OMS";
-      public String refId = UUID.randomUUID().toString();
-      public String refIdType = "orderId";
-      public String partyRoleId = UUID.randomUUID().toString();
-      public String partyId = UUID.randomUUID().toString();
-      public List<ProductRequestDto> products = null;
-      public List<ProductActivateRequestDto> productOrderItems = null;
-      public List<Characteristic> characteristics = null;
-      public EventProperties eventProperties = null;
-
-      public Builder() {}
-
-      public Builder eventType(String val) { 
-        eventType = val;
-        return this;
-      }
-
-      public Builder sourceCode(String val) { 
-        sourceCode = val;
-        return this;
-      }
-      public Builder refId(String val) {
-        refId = val;
-        return this;
-      }
-      public Builder refIdType(String val) {
-        refIdType = val;
-        return this;
-      }
-      public Builder partyRoleId(String val) {
-        partyRoleId = val;
-        return this;
-      }
-      public Builder partyId(String val) {
-        partyId = val;
-        return this;
-      }
-      public Builder product(ProductRequestDto product) {
-        if(products == null) {
-          products = new ArrayList<>();
-        }
-        products.add(product);
-        return this;
-      }
-      public Builder products(List<ProductRequestDto> products) {
-        this.products = products;
-        return this;
-      }
-      public Builder productOrderItem(ProductActivateRequestDto item) {
-        if(productOrderItems == null) {
-          productOrderItems = new ArrayList<>();
-        }
-        productOrderItems.add(item);
-        return this;
-      }
-      public Builder productOrderItems(List<ProductActivateRequestDto> items) {
-        this.productOrderItems = items;
-        return this;
-      }
-      public Builder characteristics(List<Characteristic> chars) {
-        this.characteristics = chars;
-        return this;
-      }
-      public Builder eventProperties(EventProperties props) {
-        eventProperties = props;
-        return this;
-      }
-
-      public TestEvent build() {
-        return new TestEvent(this);
-      }
-    }
-
-    private TestEvent(Builder builder) {
-      requestEvent = new RequestEventDto();
-      EventDto event = new EventDto();
-      event.setEventType(builder.eventType);
-      event.setRefId(builder.refId);
-      event.setRefIdType(builder.refIdType);
-      event.setSourceCode(builder.sourceCode);
-      requestEvent.setEvent(event);
-      requestEvent.setCharacteristics(builder.characteristics);
-      requestEvent.setEventProperties(builder.eventProperties);
-      switch(builder.eventType) {
-        case "activation_started":
-            ClientInfo clientInfo = new ClientInfo();
-            clientInfo.setPartyId(builder.partyId);
-            clientInfo.setPartyRoleId(builder.partyRoleId);
-            requestEvent.setClientInfo(clientInfo);
-            requestEvent.setProductOrderItems(builder.productOrderItems);
-            break;
-        default:
-            requestEvent.setProducts(builder.products);
-      }
-    }
-  }
-
-  public List<ProductActivateRequestDto> buildOrderItems(
-        String mainOfferId,
-        String priceId,
-        String... componentOffers) {
-    Map<String, OfferDef> offers = getTestOffers().getOffers();
-    log.debug("componentOffers: {}", componentOffers);
-    ArrayList<ProductActivateRequestDto> items = new ArrayList<>();
-    ProductActivateRequestDto bundle = new ProductActivateRequestDto();
-    String bundleItemId = UUID.randomUUID().toString();
-    List<ProductOrderItemRelationshipDto> relations = new ArrayList<>();
-    OfferDef bundleOffer = offers.get(mainOfferId);
-    ProductPrice price = bundleOffer.getPrices().get(priceId);
-    price.setId(priceId);
-    String relationType = bundleOffer.getIsCustom() ? "CUSTOM_BUNDLES" : "BUNDLES";
-    bundle.setProductOrderItemId(bundleItemId);
-    bundle.setProductOfferingId(mainOfferId);
-    bundle.setProductOfferingName(bundleOffer.getName());
-    bundle.setFabricRef(bundleOffer.getFabricRef());
-    bundle.setIsBundle(bundleOffer.getIsBundle());
-    bundle.setIsCustom(bundleOffer.getIsCustom());
-    bundle.setProductPrice(Arrays.asList(price));
-    items.add(bundle);
-    if(componentOffers != null) {
-      bundle.setProductOrderItemRelationship(relations);
-      for(int i = 0; i < componentOffers.length; i++) {
-        OfferDef componentOffer = offers.get(componentOffers[i]);
-        ProductActivateRequestDto component = new ProductActivateRequestDto();
-        String componentItemId = UUID.randomUUID().toString();
-        component.setProductOrderItemId(componentItemId);
-        component.setProductOfferingName(componentOffer.getName());
-        component.setIsBundle(false);
-        component.setIsCustom(false);
-        component.setProductOfferingId(componentOffers[i]);
-        ProductOrderItemRelationshipDto rel = new ProductOrderItemRelationshipDto();
-        rel.setProductOrderItemId(componentItemId);
-        rel.setRelationshipType(relationType);  // TODO: CUSTOM_BUNDLES???
-        relations.add(rel);
-        items.add(component);
-      }
-    }
-    return items;
+  public Product getProduct(String productId) {
+    return productRepository.findById(productId).get();
   }
 
   public static final String[] stateSuit(String... states) {

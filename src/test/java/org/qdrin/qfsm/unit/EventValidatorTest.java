@@ -8,15 +8,15 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.qdrin.qfsm.EventBuilder;
 import org.qdrin.qfsm.Helper;
-import org.qdrin.qfsm.Helper.TestEvent;
 import org.qdrin.qfsm.event.EventValidator;
 import org.qdrin.qfsm.exception.BadUserDataException;
 import org.qdrin.qfsm.model.ClientInfo;
 import org.qdrin.qfsm.model.Event;
-import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.ProductRequestDto;
+import org.qdrin.qfsm.model.dto.RequestEventDto;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,8 +29,11 @@ public class EventValidatorTest {
     public void directActivateEventTest() throws Exception {
         ClientInfo clientInfo = new ClientInfo();
         Event event = new Event();
-        List<ProductActivateRequestDto> items = helper.buildOrderItems("bundleOffer1", "bundle1-price-active",
-                            "component1", "component2");
+
+        RequestEventDto incomingEvent = new EventBuilder("activation_started", "bundleOffer1", "bundle1-price-active")
+                        .componentIds("component1", "component2")
+                        .build();
+        List<ProductActivateRequestDto> items = incomingEvent.getProductOrderItems();
 
         BadUserDataException exc = assertThrows(BadUserDataException.class, () -> {EventValidator.validate(event);},
             "BadUserDataException was expected");              

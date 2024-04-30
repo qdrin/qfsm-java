@@ -34,7 +34,7 @@ public class EventBuilder {
     String productOfferingId = null;
     String bundleProductId = null;
     String priceId = null;
-    List<String> componentIds;
+    List<String> componentIds = new ArrayList<>();
     Product product = null;
     List<ProductRequestDto> products = null;
     List<ProductActivateRequestDto> productOrderItems = null;
@@ -151,10 +151,11 @@ public class EventBuilder {
     public EventBuilder characteristics(List<Characteristic> val) {characteristics = val; return this;}
     public EventBuilder eventProperties(EventProperties val) {eventProperties = val; return this;}
     public EventBuilder componentIds(String... componentIds) {
-        this.componentIds = new ArrayList<>();
+        this.componentIds.clear();
         for(String id: componentIds) {
             this.componentIds.add(id);
         }
+        recalc();
         return this;
     }
 

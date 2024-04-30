@@ -1,12 +1,15 @@
 package org.qdrin.qfsm.machine.states;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 
 import org.qdrin.qfsm.tasks.ActionSuit;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -24,6 +27,9 @@ public class PriceActiveEntry implements Action<String, String> {
   @Autowired
   DataSource dataSource;
 
+  @Value("${application.fsm.time.priceEndedBefore}")
+  Duration priceEndedBefore;
+
   @Override
   public void execute(StateContext<String, String> context) {
     log.debug("PriceActiveEntry started. event: {}", context.getEvent());
@@ -32,8 +38,12 @@ public class PriceActiveEntry implements Action<String, String> {
     ProductPrice nextPrice = context.getStateMachine().getExtendedState().get("nextPrice", ProductPrice.class);
     if(! context.getEvent().equals("complete_price")) {
       OffsetDateTime activeEndDate = nextPrice.getNextPayDate();
+      activeEndDate.minus(priceEndedBefore);
       product.setActiveEndDate(activeEndDate);
-      new AddActionAction(ActionSuit.PRICE_ENDED).execute(context);  // activeEndDate.toInstant()
+      log.debug("priceEndedBefore: {}", priceEndedBefore);
+      new AddActionAction(ActionSuit.PRICE_ENDED
+          .withWakeAt(activeEndDate.minus(priceEndedBefore)))
+          .execute(context);
       // TODO: Change direct task creation to post action variable here and everywhere
       // var postActions = context.getExtendedState().get("postActions", PostActions);
       // postActions.addNewTask("startPriceEndedTask", product.getProductId(), activeEndDate);

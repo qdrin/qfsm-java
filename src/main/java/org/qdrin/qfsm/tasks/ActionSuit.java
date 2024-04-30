@@ -1,6 +1,8 @@
 package org.qdrin.qfsm.tasks;
 // Действия, которыми может управлять StateMachine
 
+import java.time.OffsetDateTime;
+
 public enum ActionSuit {
   // tasks
   PRICE_ENDED,
@@ -18,5 +20,16 @@ public enum ActionSuit {
   // bundle convertions
   CREATE_CONTEXT,   // создать контекст у "ноги" и ждать по ней событий
   COPY_CONTEXT,     // Скопировать контекст с "головы" бандла (в части Usage, Payment и Price - ???)
-  REMOVE_CONTEXT,   // удалить контекст у "ноги"
+  REMOVE_CONTEXT;   // удалить контекст у "ноги"
+
+  private OffsetDateTime wakeAt = OffsetDateTime.now();
+
+  public ActionSuit withWakeAt(OffsetDateTime wakeAt) {
+    this.wakeAt = wakeAt;
+    return this;
+  }
+
+  public OffsetDateTime getWakeAt() {
+    return wakeAt;
+  }
 }

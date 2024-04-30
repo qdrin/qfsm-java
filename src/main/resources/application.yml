@@ -71,3 +71,9 @@ spring:
 # db-scheduler:
 #   threads: 3
 #   polling-interval: 5s
+application:
+  fsm:
+    time:
+      priceEndedBefore: ${PRICE_ENDED_BEFORE:PT1H}
+      waitingPayInterval: "${WAITING_PAY_INTERVAL:PT3H}"
+      suspendInterval: ${SUSPEND_INTERVAL:P30D}

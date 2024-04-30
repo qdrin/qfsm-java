@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+
 import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.model.*;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +27,7 @@ public class ProductBuilder {
     Boolean isBundle = false;
     Boolean isCustom = false;
     String status = null;
-    String machineState = null;
+    JsonNode machineState = null;
     int productClass = 1;
     int tarificationPeriod = 0;
     OffsetDateTime trialEndDate = null;
@@ -79,7 +82,7 @@ public class ProductBuilder {
     public ProductBuilder isBundle(Boolean val) {isBundle = val; recalc(); return this;}
     public ProductBuilder isCustom(Boolean val) {isCustom = val; recalc(); return this;}
     public ProductBuilder status(String val) {status = val; return this;}
-    public ProductBuilder machineState(String val) {machineState = val; return this;}
+    public ProductBuilder machineState(JsonNode val) {machineState = val; return this;}
     public ProductBuilder productClass(int val) {productClass = val; return this;}
     public ProductBuilder tarificationPeriod(int val) {tarificationPeriod = val; return this;}
     public ProductBuilder trialEndDate(OffsetDateTime val) {trialEndDate = val; return this;}

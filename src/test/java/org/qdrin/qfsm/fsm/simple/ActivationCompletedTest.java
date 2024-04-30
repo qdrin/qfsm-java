@@ -72,10 +72,16 @@ public class ActivationCompletedTest {
     plan.test();
     log.debug("states: {}", machine.getState().getIds());
     assertEquals(product.getStatus(), "ACTIVE_TRIAL");
+    assertEquals(price.getNextPayDate(), product.getActiveEndDate());
+    Map<Object, Object> variables = machine.getExtendedState().getVariables(); 
+    List<ActionSuit> actions = (List<ActionSuit>) variables.get("actions");
+    assertEquals(product.getActiveEndDate().minus(helper.getPriceEndedBefore()),
+                  actions.get(0).getWakeAt());
   }
 
   @Test
   public void testActiveSuccess() throws Exception {
+    OffsetDateTime t0 = OffsetDateTime.now();
     Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-active").build();
     ProductPrice price = product.getProductPrice().get(0);
     price.setNextPayDate(OffsetDateTime.now().plusDays(30));
@@ -84,6 +90,7 @@ public class ActivationCompletedTest {
     log.debug("start. actions: {}", machine.getExtendedState().getVariables().get("actions"));
     List<ActionSuit> expectedActions = Arrays.asList(ActionSuit.WAITING_PAY_ENDED, ActionSuit.PRICE_ENDED);
     List<ActionSuit> expectedDeleteActions = new  ArrayList<>();
+    OffsetDateTime expectedWaitingPayEnded = t0.plus(helper.getWaitingPayInterval());
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
@@ -99,5 +106,13 @@ public class ActivationCompletedTest {
     plan.test();
     log.debug("states: {}", machine.getState().getIds());
     assertEquals(product.getStatus(), "ACTIVE");
+    assertEquals(price.getNextPayDate(), product.getActiveEndDate());
+    Map<Object, Object> variables = machine.getExtendedState().getVariables(); 
+    List<ActionSuit> actions = (List<ActionSuit>) variables.get("actions");
+    OffsetDateTime waitingPayEnded = actions.get(0).getWakeAt();
+    OffsetDateTime priceEnded = actions.get(1).getWakeAt();
+    assertEquals(priceEnded, price.getNextPayDate().minus(helper.getPriceEndedBefore()));
+    assert(waitingPayEnded.isAfter(expectedWaitingPayEnded.minusSeconds(1)));
+    assert(waitingPayEnded.isBefore(expectedWaitingPayEnded.plusSeconds(1)));
   }
 }
