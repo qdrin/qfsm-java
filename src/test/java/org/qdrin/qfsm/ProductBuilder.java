@@ -17,7 +17,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PUBLIC)
 public class ProductBuilder {
-    String productId = null;
+    String productId = UUID.randomUUID().toString();
     String partyRoleId = UUID.randomUUID().toString();
     String productOfferingId = null;
     String productOfferingName = null;
@@ -44,7 +44,6 @@ public class ProductBuilder {
     String priceId = null;
 
     private void recalc() {
-        productId = UUID.randomUUID().toString();
         status = status == null ? "PENDING_ACTIVATE" : status;
         OfferDef offer = new Helper().getTestOffers().getOffers().get(this.productOfferingId);
         productOfferingName = offer.getName();

@@ -23,6 +23,7 @@ import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.qdrin.qfsm.persist.QStateMachineContextConverter;
 import org.qdrin.qfsm.repository.*;
 import org.qdrin.qfsm.tasks.ActionSuit;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -317,6 +318,45 @@ public class Helper {
           }
         }
       }
+    }
+
+    public static void assertProductEquals(Product expected, Product actual) throws Exception {
+      if(expected.getProductId() != null) 
+        { assertEquals(expected.getProductId(), actual.getProductId()); }
+      if(expected.getPartyRoleId() != null) 
+        { assertEquals(expected.getPartyRoleId(), actual.getPartyRoleId()); }
+      if(expected.getProductOfferingId() != null) 
+        { assertEquals(expected.getProductOfferingId(), actual.getProductOfferingId()); }
+      if(expected.getProductOfferingName() != null)
+        { assertEquals(expected.getProductOfferingName(), actual.getProductOfferingName()); }
+      if(expected.getStatus() != null)  
+      { assertEquals(expected.getStatus(), actual.getStatus()); }
+      if(expected.getProductClass() != 0)
+        { assertEquals(expected.getProductClass(), actual.getProductClass()); }
+      if(expected.getProductRelationship() != null)
+        { assertEquals(expected.getProductRelationship(), actual.getProductRelationship()); }
+      if(expected.getIsBundle() != null)
+        { assertEquals(expected.getIsBundle(), actual.getIsBundle()); }
+      if(expected.getIsCustom() != null)
+        { assertEquals(expected.getIsCustom(), actual.getIsCustom()); }
+      if(expected.getActiveEndDate() != null)
+        { assertEquals(expected.getActiveEndDate(), actual.getActiveEndDate()); }
+      if(expected.getTrialEndDate() != null)
+        { assertEquals(expected.getTrialEndDate(), actual.getTrialEndDate()); }
+      if(expected.getProductStartDate() != null)
+        { assertEquals(expected.getProductStartDate(), actual.getProductStartDate()); }
+      if(expected.getProductPrice() != null)
+        { assertEquals(expected.getProductPrice(), actual.getProductPrice()); }
+      if(expected.getCharacteristic() != null)
+        { assertEquals(expected.getCharacteristic(), actual.getCharacteristic()); }
+      if(expected.getFabricRef() != null)
+        { assertEquals(expected.getFabricRef(), actual.getFabricRef()); }
+      if(expected.getLabel() != null)
+        { assertEquals(expected.getLabel(), actual.getLabel()); }
+      if(expected.getMetaInfo() != null)
+        { assertEquals(expected.getMetaInfo(), actual.getMetaInfo()); }
+      if(expected.getMachineState() != null)
+        { JSONAssert.assertEquals(expected.getMachineState().toString(), actual.getMachineState().toString(), false); }
     }
   }
 }

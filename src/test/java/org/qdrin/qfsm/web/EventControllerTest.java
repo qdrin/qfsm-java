@@ -245,13 +245,14 @@ public class EventControllerTest {
       ProductResponseDto resultProduct = response.getProducts().get(0);
 
       Product product = helper.getProduct(resultProduct.getProductId());
-      assertEquals(offerId, product.getProductOfferingId());
-      assertEquals(item0.getProductOfferingName(), product.getProductOfferingName());
-      assertEquals("PENDING_ACTIVATE", product.getStatus());
-      assertEquals(ProductClasses.SIMPLE.ordinal(), product.getProductClass());
-      assertEquals(false, product.getIsBundle());
-      assertEquals(false, product.getIsCustom());
-      assertEquals(prices, product.getProductPrice());
+      Product expectedProduct = new ProductBuilder(offerId, "PENDING_ACTIVATE", priceId)
+              .productId(resultProduct.getProductId())
+              .partyRoleId(event.getClientInfo().getPartyRoleId())
+              .productClass(ProductClasses.SIMPLE.ordinal())
+              .isBundle(false)
+              .isCustom(false)
+              .build();
+      Helper.Assertions.assertProductEquals(expectedProduct, product);
     }
 
     @Test
