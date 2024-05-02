@@ -3,6 +3,10 @@ package org.qdrin.qfsm;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UncheckedIOException;
+import java.sql.Connection;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +16,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.mockserver.client.MockServerClient;
+import org.qdrin.qfsm.controller.CommonTest;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductRelationship;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
@@ -27,10 +33,16 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FileCopyUtils;
+import org.testcontainers.containers.MockServerContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.utility.DockerImageName;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -46,6 +58,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class Helper {
+  public static final DockerImageName MOCKSERVER_IMAGE = DockerImageName
+      .parse("mockserver/mockserver")
+      .withTag("mockserver-" + MockServerClient.class.getPackage().getImplementationVersion());
+
+  @Container
+  public static MockServerContainer mockServer = new MockServerContainer(MOCKSERVER_IMAGE);
   
   @Autowired
   ProductRepository productRepository;
@@ -68,9 +86,29 @@ public class Helper {
 
   @Value("${application.fsm.time.waitingPayInterval}")
   Duration waitingPayInterval;
-  public Duration getWaitingPayInterval() { return waitingPayInterval; } 
+  public Duration getWaitingPayInterval() { return waitingPayInterval; }
+
+  private static HttpHeaders headers = new HttpHeaders();
 
   final TestOffers testOffers = setTestOffers();
+
+  public static MockServerClient getMockServerClient() {
+    return new MockServerClient(mockServer.getHost(), mockServer.getServerPort());
+  }
+  
+  public static HttpHeaders getHeaders() {
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    return headers;
+  }
+
+  public static String readResourceAsString(ClassPathResource resource) {
+    try (Reader reader = new InputStreamReader(resource.getInputStream(), "UTF8")) {
+      return FileCopyUtils.copyToString(reader);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
 
   private TestOffers setTestOffers() {
     ClassPathResource resource = new ClassPathResource("/offers.yaml", getClass());
