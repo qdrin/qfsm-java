@@ -3,7 +3,7 @@ package org.qdrin.qfsm;
 import java.util.Arrays;
 import java.util.List;
 
-public enum ProductClasses {
+public enum ProductClass {
   VOID,
   SIMPLE,
   BUNDLE,

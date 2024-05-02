@@ -1,5 +1,6 @@
 package org.qdrin.qfsm.machine.actions;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.statemachine.StateContext;
@@ -31,8 +32,12 @@ public class StateStatus {
     String status = statusMap.getOrDefault(state.getId(), null);
     if(status != null) {
       Product product = (Product) extendedState.get("product", Product.class);
-      if(product != null) {
-        product.setStatus(status);
+      product.setStatus(status);
+      List<Product> components = (List<Product>) extendedState.getVariables().get("components");
+      if(components != null) {
+        for(Product component: components) {
+          component.setStatus(status);
+        }
       }
     }
   }

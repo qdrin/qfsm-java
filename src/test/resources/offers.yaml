@@ -3,6 +3,8 @@ offers:
     name: Simple offer 1
     isBundle: false
     isCustom: false
+    productClass:
+    - SIMPLE
     prices:
       simple1-price-trial:
         # name: Simple1 price trial
@@ -36,6 +38,8 @@ offers:
     name: Bundle offer 1
     isBundle: true
     isCustom: false
+    productClass:
+    - BUNDLE
     prices:
       bundle1-price-trial:
         # name: Bundle1 price trial
@@ -69,6 +73,8 @@ offers:
     name: Bundle offer 2
     isBundle: true
     isCustom: false
+    productClass:
+    - BUNDLE
     prices:
       bundle2-price-trial:
         # name: Bundle2 price trial
@@ -114,6 +120,8 @@ offers:
     name: Custom bundle offer1 (FPC)
     isBundle: true
     isCustom: true
+    productClass:
+    - CUSTOM_BUNDLE
     prices:
       custom1-price-trial:
         # name: Custom1 price trial
@@ -145,6 +153,8 @@ offers:
         priceAlterations: null
   simpleOffer2:   
     name: Simple offer 2 month duration and promo
+    productClass:
+    - BUNDLE
     prices:
       simple2-price-active:
         # name: Simple2 price active
@@ -178,6 +188,10 @@ offers:
   component1:
     name: VASP Component1
     isBundle: false
+    isCustom: false
+    productClass:
+    - BUNDLE_COMPONENT
+    - CUSTOM_BUNDLE_COMPONENT
     fabricRef:
     - fabricId: VASP
       fabricProductId: vaspServiceCode1
@@ -185,6 +199,10 @@ offers:
   component2:
     name: VASP Component2
     isBundle: false
+    isCustom: false
+    productClass:
+    - BUNDLE_COMPONENT
+    - CUSTOM_BUNDLE_COMPONENT
     fabricRef:
     - fabricId: VASP
       fabricProductId: vaspServiceCode2
@@ -192,6 +210,10 @@ offers:
   component3:
     name: BSS Component3
     isBundle: false
+    isCustom: false
+    productClass:
+    - BUNDLE_COMPONENT
+    - CUSTOM_BUNDLE_COMPONENT
     fabricRef:
     - fabricId: BSS
       fabricProductOfferingId: "900525"

@@ -3,6 +3,7 @@ package org.qdrin.qfsm.web;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.nullable;
 
 import java.io.*;
 import java.sql.Connection;
@@ -16,10 +17,12 @@ import org.mockserver.client.MockServerClient;
 import org.mockserver.model.Format;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.serialization.HttpRequestSerializer;
+import org.qdrin.qfsm.BundleBuilder.TestBundle;
+import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.EventBuilder;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductBuilder;
-import org.qdrin.qfsm.ProductClasses;
+import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.controllers.EventController;
 import org.qdrin.qfsm.model.Product;
@@ -233,8 +236,6 @@ public class EventControllerTest {
       String offerId = "simpleOffer1";
       String priceId = "simple1-price-trial";
       RequestEventDto event = new EventBuilder("activation_started", offerId, priceId).build();
-      ProductActivateRequestDto item0 = event.getProductOrderItems().get(0);
-      List<ProductPrice> prices = item0.getProductPrice();
       log.debug("requestEvent: {}", event);
       HttpEntity<RequestEventDto> request = new HttpEntity<>(event, headers);
       ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
@@ -245,20 +246,22 @@ public class EventControllerTest {
       ProductResponseDto resultProduct = response.getProducts().get(0);
 
       Product product = helper.getProduct(resultProduct.getProductId());
-      Product expectedProduct = new ProductBuilder(offerId, "PENDING_ACTIVATE", priceId)
-              .productId(resultProduct.getProductId())
-              .partyRoleId(event.getClientInfo().getPartyRoleId())
-              .productClass(ProductClasses.SIMPLE.ordinal())
-              .isBundle(false)
-              .isCustom(false)
-              .build();
+      TestBundle expectedBundle = new BundleBuilder(event)
+        .productIds(Arrays.asList(product))
+        .tarificationPeriod(0)
+        .build();
+      Product expectedProduct = expectedBundle.bundle;
+      log.debug("expect: {}", expectedProduct);
+      log.debug("actual: {}", product);
       Helper.Assertions.assertProductEquals(expectedProduct, product);
+      // Testing TestBundle
+      assertEquals(product.getProductId(), expectedProduct.getProductId());
     }
 
     @Test
     public void activationStartedBundleSuccess() throws Exception {
       String offerId = "bundleOffer1";
-      String priceId = "bundle1-price-trial";      
+      String priceId = "bundle1-price-trial";
       RequestEventDto event = new EventBuilder("activation_started", offerId, priceId)
                 .componentIds("component1", "component2", "component3")
                 .build();
@@ -269,8 +272,16 @@ public class EventControllerTest {
       assertEquals(HttpStatus.OK, resp.getStatusCode());
       ResponseEventDto response = resp.getBody();
       Helper.Assertions.assertResponseEquals(event, response);
-      // assertNotNull(response.getProducts());
-      // assertEquals(4, response.getProducts().size());
+      List<Product> actualProducts = helper.getResponseProducts(response);
+      TestBundle expectedBundle = new BundleBuilder(event)
+          .productIds(actualProducts)
+          .tarificationPeriod(0)
+          .build();
+      log.debug("expected bundle: {}", expectedBundle.bundle);
+      log.debug("expected components: {}", expectedBundle.components);
+      List<Product> expectedProducts = expectedBundle.products();
+      Helper.Assertions.assertProductEquals(expectedProducts, actualProducts);
+      
     }
   }
 

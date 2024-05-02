@@ -9,6 +9,8 @@ import java.util.UUID;
 
 import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.model.*;
+import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
+import org.qdrin.qfsm.model.dto.RequestEventDto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -28,8 +30,8 @@ public class ProductBuilder {
     Boolean isCustom = false;
     String status = null;
     JsonNode machineState = null;
-    int productClass = 1;
-    int tarificationPeriod = 0;
+    ProductClass productClass = null;
+    int tarificationPeriod = -1;
     OffsetDateTime trialEndDate = null;
     OffsetDateTime activeEndDate = null;
     OffsetDateTime productStartDate = null;
@@ -55,19 +57,34 @@ public class ProductBuilder {
         this.productPrice = price != null ? Arrays.asList(price) : null;
         this.isBundle = offer.getIsBundle() == null ? this.isBundle : offer.getIsBundle();
         this.isCustom = offer.getIsCustom() == null ? this.isCustom : offer.getIsCustom();
-        ProductClasses pclass = ProductClasses.SIMPLE;
-        if(isBundle) {
-            pclass = this.isCustom ? ProductClasses.CUSTOM_BUNDLE : ProductClasses.BUNDLE;
-        } else if(prices == null) {
-            pclass = this.isCustom ? ProductClasses.CUSTOM_BUNDLE_COMPONENT : ProductClasses.BUNDLE_COMPONENT;
+        List<ProductClass> pclasses = offer.getProductClass();
+        if(productClass == null && pclasses.size() == 1) {
+            this.productClass = pclasses.get(0);
         }
-        this.productClass = pclass.ordinal();
+    }
+
+    public ProductBuilder() {
+        recalc();
     }
 
     public ProductBuilder(String offerId, String status, String priceId) {
         this.productOfferingId = offerId;
         this.priceId = priceId;
         this.status = status;
+        recalc();
+    }
+
+    public ProductBuilder(ProductActivateRequestDto orderItem) {
+        this.productOfferingId = orderItem.getProductOfferingId();
+        this.productOfferingName = orderItem.getProductOfferingName();
+        this.isBundle = orderItem.getIsBundle();
+        this.isCustom = orderItem.getIsCustom();
+        this.productPrice = orderItem.getProductPrice();
+        this.characteristic = orderItem.getCharacteristic();
+        this.fabricRef = orderItem.getFabricRef();
+        this.metaInfo = orderItem.getMetaInfo();
+        this.label = orderItem.getLabel();
+        this.status = "PENDING_ACTIVATE";
         recalc();
     }
 
@@ -82,7 +99,7 @@ public class ProductBuilder {
     public ProductBuilder isCustom(Boolean val) {isCustom = val; recalc(); return this;}
     public ProductBuilder status(String val) {status = val; return this;}
     public ProductBuilder machineState(JsonNode val) {machineState = val; return this;}
-    public ProductBuilder productClass(int val) {productClass = val; return this;}
+    public ProductBuilder productClass(ProductClass val) {productClass = val; return this;}
     public ProductBuilder tarificationPeriod(int val) {tarificationPeriod = val; return this;}
     public ProductBuilder trialEndDate(OffsetDateTime val) {trialEndDate = val; return this;}
     public ProductBuilder activeEndDate(OffsetDateTime val) {activeEndDate = val; return this;}
@@ -114,7 +131,11 @@ public class ProductBuilder {
         product.setIsCustom(isCustom);
         product.setStatus(status);
         product.setMachineState(machineState);
-        product.setProductClass(productClass);
+        if(productClass != null) {
+            product.setProductClass(productClass.ordinal());
+        } else {
+            product.setProductClass(-1);
+        }
         product.setTarificationPeriod(tarificationPeriod);
         product.setTrialEndDate(trialEndDate);
         product.setActiveEndDate(activeEndDate);

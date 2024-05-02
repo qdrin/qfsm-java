@@ -331,7 +331,7 @@ public class Helper {
         { assertEquals(expected.getProductOfferingName(), actual.getProductOfferingName()); }
       if(expected.getStatus() != null)  
       { assertEquals(expected.getStatus(), actual.getStatus()); }
-      if(expected.getProductClass() != 0)
+      if(expected.getProductClass() != -1)
         { assertEquals(expected.getProductClass(), actual.getProductClass()); }
       if(expected.getProductRelationship() != null)
         { assertEquals(expected.getProductRelationship(), actual.getProductRelationship()); }
@@ -339,6 +339,8 @@ public class Helper {
         { assertEquals(expected.getIsBundle(), actual.getIsBundle()); }
       if(expected.getIsCustom() != null)
         { assertEquals(expected.getIsCustom(), actual.getIsCustom()); }
+      if(expected.getTarificationPeriod() != -1)
+        { assertEquals(expected.getTarificationPeriod(), actual.getTarificationPeriod()); }
       if(expected.getActiveEndDate() != null)
         { assertEquals(expected.getActiveEndDate(), actual.getActiveEndDate()); }
       if(expected.getTrialEndDate() != null)
@@ -358,5 +360,24 @@ public class Helper {
       if(expected.getMachineState() != null)
         { JSONAssert.assertEquals(expected.getMachineState().toString(), actual.getMachineState().toString(), false); }
     }
+
+    public static void assertProductEquals(List<Product> expected, List<Product> actual) throws Exception {
+      for(Product expectedProduct: expected) {
+        Product actualProduct = actual.stream()
+              .filter(p -> p.getProductOfferingId().equals(expectedProduct.getProductOfferingId()))
+              .findFirst().get();
+        assertNotNull(actualProduct);
+        assertProductEquals(expectedProduct, actualProduct);
+      }
+    }
+  }
+
+  public List<Product> getResponseProducts(ResponseEventDto response) {
+    List<Product> result = new ArrayList<>();
+    for(ProductResponseDto rproduct: response.getProducts()) {
+      Product product = productRepository.findById(rproduct.getProductId()).get();
+      result.add(product);
+    }
+    return result;
   }
 }

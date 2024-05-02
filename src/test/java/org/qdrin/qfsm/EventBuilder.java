@@ -107,7 +107,7 @@ public class EventBuilder {
     }
 
     private ProductActivateRequestDto toComponentProductActivateRequestDto(String offerId, String mainId) {
-        OfferDef offerDef = offers.get(productOfferingId);
+        OfferDef offerDef = offers.get(offerId);
         ProductActivateRequestDto orderItem = new ProductActivateRequestDto();
         orderItem.setProductOrderItemId(UUID.randomUUID().toString());
         if(mainId != null) {

@@ -109,7 +109,7 @@ public class FsmApp {
 				.collect(Collectors.toList());
 		
 		for(ProductActivateRequestDto head: heads) {
-			ProductClasses productClass = head.getIsCustom() ? ProductClasses.CUSTOM_BUNDLE : ProductClasses.BUNDLE;
+			ProductClass productClass = head.getIsCustom() ? ProductClass.CUSTOM_BUNDLE : ProductClass.BUNDLE;
 			ProductBundle productBundle = new ProductBundle();
 			Product product = new Product(head);
 			product.setPartyRoleId(partyRoleId);
@@ -131,7 +131,8 @@ public class FsmApp {
 				}
 				Product component = new Product(componentItem.get());
 				component.setPartyRoleId(partyRoleId);
-				// component.setProductOrderItemId(componentItem.get().getProductOrderItemId());
+				ProductClass pclass = productClass == ProductClass.BUNDLE ? ProductClass.BUNDLE_COMPONENT : ProductClass.CUSTOM_BUNDLE_COMPONENT;
+				component.setProductClass(pclass.ordinal());
 				components.add(component);
 				ProductRelationship pr = new ProductRelationship();
 				pr.setProductId(component.getProductId());
@@ -164,7 +165,7 @@ public class FsmApp {
 			Optional<ProductOrderItemRelationshipDto> headRelation = relations == null ?
 				Optional.empty() :
 				relations.stream().filter(r -> r.getRelationshipType().equals("BELONGS")).findFirst();
-			ProductClasses productClass = headRelation.isPresent() ? ProductClasses.CUSTOM_BUNDLE_COMPONENT : ProductClasses.SIMPLE;
+			ProductClass productClass = headRelation.isPresent() ? ProductClass.CUSTOM_BUNDLE_COMPONENT : ProductClass.SIMPLE;
 			product.setProductClass(productClass.ordinal());
 			orderItem.setProductId(product.getProductId());
 			orderItems.add(orderItem);
@@ -201,7 +202,7 @@ public class FsmApp {
 		}
 		ArrayList<Product> processedProducts = new ArrayList<>();  // нужен для фильтрации уже отработанных
 		List<Product> heads = products.stream()
-				.filter(p -> ProductClasses.getBundles().contains(p.getProductClass()))
+				.filter(p -> ProductClass.getBundles().contains(p.getProductClass()))
 				.collect(Collectors.toList());
 		for(Product head: heads) {
 			ProductBundle bundle = new ProductBundle();
@@ -229,7 +230,7 @@ public class FsmApp {
 		}
 		for(Product product: products) {
 			int index = product.getProductClass();
-			ProductClasses productClass = ProductClasses.values()[index];
+			ProductClass productClass = ProductClass.values()[index];
 			ProductBundle bundle = new ProductBundle();
 			switch(productClass) {
 				case BUNDLE_COMPONENT:
@@ -276,6 +277,8 @@ public class FsmApp {
 		}
 		for(ProductBundle bundle: bundles) {
 			Product product = bundle.getDrive();
+			Product productBundle = bundle.getBundle();
+			List<Product> components = bundle.getComponents();
 			String machineId = product.getProductId();
 			StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 			String eventType = event.getEventType();
@@ -286,6 +289,12 @@ public class FsmApp {
 			JsonNode machineState = getMachineState(machine.getState());
 			var variables = machine.getExtendedState().getVariables();
 			variables.put("product", product);
+			if(productBundle != null) {
+				variables.put("bundle", productBundle);
+			}
+			if(components != null) {
+				variables.put("components", components);
+			}
 			variables.put("actions", actions);
 			variables.put("deleteActions", deleteActions);
 			log.info("current state: {}, variables: {}", machineState, variables);
@@ -293,9 +302,10 @@ public class FsmApp {
 			machineState = getMachineState(machine.getState());
 			variables = machine.getExtendedState().getVariables();
 			variables.remove("product");
+			variables.remove("bundle");
+			variables.remove("components");
 			variables.remove("actions");
 			variables.remove("deleteActions");
-			productRepository.save(product);
 
 			FsmActions fsmActions = new FsmActions();
 			for(ActionSuit action: deleteActions) {
@@ -303,6 +313,17 @@ public class FsmApp {
 			}
 			for(ActionSuit action: actions) {
 				fsmActions.createTask(action);
+			}
+			productRepository.save(product);
+			if(productBundle != null && ! productBundle.getProductId().equals(product.getProductId())) {
+				productRepository.save(productBundle);
+			}
+			if(components != null) {
+				for(Product component: components) {
+					if(! component.getProductId().equals(product.getProductId())) {
+						productRepository.save(component);
+					}
+				}
 			}
 			log.info("new state: {}, variables: {}", machineState, variables);
 			stateMachineService.releaseStateMachine(machineId);

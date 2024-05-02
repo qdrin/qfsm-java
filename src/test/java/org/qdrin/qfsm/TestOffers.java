@@ -21,6 +21,7 @@ public class TestOffers {
         String name;
         Boolean isBundle;
         Boolean isCustom;
+        List<ProductClass> productClass;
         Map<String, ProductPrice> prices;
         List<FabricRef> fabricRef;
     }
