@@ -26,17 +26,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest
-public class ActivationCompletedTest {
-
-  @Autowired
-  Helper helper;
+public class ActivationCompletedTest extends Helper {
 
   StateMachine<String, String> machine = null;
   
   @BeforeEach
   public void setup() throws Exception {
     machine = null;
-    helper.clearDb();
+    clearDb();
   }
 
   @Test
@@ -44,7 +41,7 @@ public class ActivationCompletedTest {
     Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-trial").build();
     ProductPrice price = product.getProductPrice().get(0);
     price.setNextPayDate(OffsetDateTime.now().plusDays(30));
-    machine = helper.createMachine(null, product);
+    machine = createMachine(null, product);
     
     List<ActionSuit> expectedActions = Arrays.asList(ActionSuit.PRICE_ENDED);
     List<ActionSuit> expectedDeleteActions = new  ArrayList<>();
@@ -63,7 +60,7 @@ public class ActivationCompletedTest {
               .and()
           .step()
               .sendEvent("activation_completed")
-              .expectStates(Helper.stateSuit("ActiveTrial", "Paid", "PriceActive"))
+              .expectStates(stateSuit("ActiveTrial", "Paid", "PriceActive"))
               .expectVariable("deleteActions", expectedDeleteActions)
               .expectVariable("actions", expectedActions)
               .and()
@@ -74,7 +71,7 @@ public class ActivationCompletedTest {
     assertEquals(price.getNextPayDate(), product.getActiveEndDate());
     Map<Object, Object> variables = machine.getExtendedState().getVariables(); 
     List<ActionSuit> actions = (List<ActionSuit>) variables.get("actions");
-    assertEquals(product.getActiveEndDate().minus(helper.getPriceEndedBefore()),
+    assertEquals(product.getActiveEndDate().minus(getPriceEndedBefore()),
                   actions.get(0).getWakeAt());
   }
 
@@ -86,12 +83,12 @@ public class ActivationCompletedTest {
       .build();
     ProductPrice price = product.getProductPrice().get(0);
     price.setNextPayDate(OffsetDateTime.now().plusDays(30));
-    machine = helper.createMachine(Helper.buildMachineState("PendingActivate"), product);
+    machine = createMachine(buildMachineState("PendingActivate"), product);
     
     log.debug("start. actions: {}", machine.getExtendedState().getVariables().get("actions"));
     List<ActionSuit> expectedActions = Arrays.asList(ActionSuit.WAITING_PAY_ENDED, ActionSuit.PRICE_ENDED);
     List<ActionSuit> expectedDeleteActions = new  ArrayList<>();
-    OffsetDateTime expectedWaitingPayEnded = t0.plus(helper.getWaitingPayInterval());
+    OffsetDateTime expectedWaitingPayEnded = t0.plus(getWaitingPayInterval());
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
@@ -99,7 +96,7 @@ public class ActivationCompletedTest {
           .stateMachine(machine)
           .step()
               .sendEvent("activation_completed")
-              .expectStates(Helper.stateSuit("Active", "WaitingPayment", "PriceActive"))
+              .expectStates(stateSuit("Active", "WaitingPayment", "PriceActive"))
               .expectVariable("deleteActions", expectedDeleteActions)
               .expectVariable("actions", expectedActions)
               .and()
@@ -112,7 +109,7 @@ public class ActivationCompletedTest {
     List<ActionSuit> actions = (List<ActionSuit>) variables.get("actions");
     OffsetDateTime waitingPayEnded = actions.get(0).getWakeAt();
     OffsetDateTime priceEnded = actions.get(1).getWakeAt();
-    assertEquals(priceEnded, price.getNextPayDate().minus(helper.getPriceEndedBefore()));
+    assertEquals(priceEnded, price.getNextPayDate().minus(getPriceEndedBefore()));
     assert(waitingPayEnded.isAfter(expectedWaitingPayEnded.minusSeconds(5)));
     assert(waitingPayEnded.isBefore(expectedWaitingPayEnded.plusSeconds(5)));
   }

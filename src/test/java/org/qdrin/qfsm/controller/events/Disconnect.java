@@ -12,6 +12,7 @@ import org.mockserver.model.HttpRequest;
 import org.mockserver.serialization.HttpRequestSerializer;
 import org.qdrin.qfsm.EventBuilder;
 import org.qdrin.qfsm.Helper;
+import org.qdrin.qfsm.controller.ControllerHelper;
 import org.qdrin.qfsm.controllers.EventController;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.*;
@@ -34,15 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(webEnvironment =  WebEnvironment.RANDOM_PORT)
 @Slf4j
-@Testcontainers
-@Execution(ExecutionMode.SAME_THREAD)
-public class Disconnect {
+public class Disconnect extends ControllerHelper {
   
-  @Container
-  private static MockServerContainer mockServer = Helper.mockServer;
-
-  private MockServerClient mockServerClient = new MockServerClient(mockServer.getHost(), mockServer.getServerPort());
-
   @Value(value="${local.server.port}")
   private int port;
 
@@ -63,15 +57,6 @@ public class Disconnect {
   @Autowired
   private TestRestTemplate restTemplate;
 
-  @Autowired
-  private Helper helper;
-
-  private HttpRequest[] getMockRequests(HttpRequest request) {
-    var mockRequestsString = mockServerClient.retrieveRecordedRequests(request, Format.JSON);
-    var mreq = httpRequestSerializer.deserializeArray(mockRequestsString);
-    return mreq;
-  }
-
   static ObjectMapper mapper = new ObjectMapper();
   static HttpRequestSerializer httpRequestSerializer = new HttpRequestSerializer(null);
 
@@ -79,7 +64,7 @@ public class Disconnect {
   public void resetMock() {
     eventUrl = String.format("http://localhost:%d%s%s/event", port, basePath, apiVersion);
     mockServerClient.reset();
-    helper.clearDb();
+    clearDb();
   }
 
 
@@ -94,7 +79,7 @@ public class Disconnect {
       ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
       assertEquals(HttpStatus.OK, resp.getStatusCode());
       ResponseEventDto response = resp.getBody();
-      Product product = helper.getProduct(response.getProducts().get(0).getProductId());
+      Product product = getProduct(response.getProducts().get(0).getProductId());
       assertNotNull(product);
       event = new EventBuilder("disconnect", product).build();
       HttpEntity<RequestEventDto> requestError = new HttpEntity<>(event, headers);

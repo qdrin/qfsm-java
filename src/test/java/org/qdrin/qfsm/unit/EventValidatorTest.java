@@ -1,6 +1,7 @@
 package org.qdrin.qfsm.unit;
 
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.qdrin.qfsm.EventBuilder;
-import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.exception.BadUserDataException;
 import org.qdrin.qfsm.model.ClientInfo;
 import org.qdrin.qfsm.model.Event;
@@ -22,8 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class EventValidatorTest {
-
-    private Helper helper = new Helper();
     
     @Test
     public void directActivateEventTest() throws Exception {

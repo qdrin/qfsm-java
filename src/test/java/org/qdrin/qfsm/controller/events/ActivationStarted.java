@@ -14,10 +14,9 @@ import org.mockserver.serialization.HttpRequestSerializer;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.EventBuilder;
-import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.TestOffers.OfferDef;
-import org.qdrin.qfsm.controllers.EventController;
+import org.qdrin.qfsm.controller.ControllerHelper;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +31,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.statemachine.StateMachine;
-import org.testcontainers.containers.MockServerContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,14 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(webEnvironment =  WebEnvironment.RANDOM_PORT)
 @Slf4j
-@Testcontainers
-@Execution(ExecutionMode.SAME_THREAD)
-public class ActivationStarted {
-
-  @Container
-  private static MockServerContainer mockServer = Helper.mockServer;
-
-  private MockServerClient mockServerClient = new MockServerClient(mockServer.getHost(), mockServer.getServerPort());
+public class ActivationStarted extends ControllerHelper {
 
   @Value(value="${local.server.port}")
   private int port;
@@ -61,25 +50,13 @@ public class ActivationStarted {
   @Value(value="${management.endpoints.web.base-path}")
   private String managePath;
 
-  private static HttpHeaders headers = Helper.getHeaders();
+  private static HttpHeaders headers = getHeaders();
 
   private String apiVersion = "/v1";
   private String eventUrl;
 
   @Autowired
-  private EventController eventController;
-
-  @Autowired
   private TestRestTemplate restTemplate;
-
-  @Autowired
-  private Helper helper;
-
-  private HttpRequest[] getMockRequests(HttpRequest request) {
-    var mockRequestsString = mockServerClient.retrieveRecordedRequests(request, Format.JSON);
-    var mreq = httpRequestSerializer.deserializeArray(mockRequestsString);
-    return mreq;
-  }
 
   static ObjectMapper mapper = new ObjectMapper();
   static HttpRequestSerializer httpRequestSerializer = new HttpRequestSerializer(null);
@@ -94,7 +71,7 @@ public class ActivationStarted {
   public void resetMock() {
     eventUrl = String.format("http://localhost:%d%s%s/event", port, basePath, apiVersion);
     mockServerClient.reset();
-    helper.clearDb();
+    clearDb();
   }
 
   @Nested
@@ -140,10 +117,10 @@ public class ActivationStarted {
       log.debug(resp.toString());
       assertEquals(HttpStatus.OK, resp.getStatusCode());
       ResponseEventDto response = resp.getBody();
-      Helper.Assertions.assertResponseEquals(event, response);
+      Assertions.assertResponseEquals(event, response);
       ProductResponseDto resultProduct = response.getProducts().get(0);
 
-      Product product = helper.getProduct(resultProduct.getProductId());
+      Product product = getProduct(resultProduct.getProductId());
       TestBundle expectedBundle = new BundleBuilder(event)
         .productIds(Arrays.asList(product))
         .tarificationPeriod(0)
@@ -151,7 +128,7 @@ public class ActivationStarted {
       Product expectedProduct = expectedBundle.bundle;
       log.debug("expect: {}", expectedProduct);
       log.debug("actual: {}", product);
-      Helper.Assertions.assertProductEquals(expectedProduct, product);
+      Assertions.assertProductEquals(expectedProduct, product);
       // Testing TestBundle
       assertEquals(product.getProductId(), expectedProduct.getProductId());
     }
@@ -172,8 +149,8 @@ public class ActivationStarted {
       log.debug(resp.toString());
       assertEquals(HttpStatus.OK, resp.getStatusCode());
       ResponseEventDto response = resp.getBody();
-      Helper.Assertions.assertResponseEquals(event, response);
-      List<Product> actualProducts = helper.getResponseProducts(response);
+      Assertions.assertResponseEquals(event, response);
+      List<Product> actualProducts = getResponseProducts(response);
       TestBundle expectedBundle = new BundleBuilder(event)
           .productIds(actualProducts)
           .tarificationPeriod(0)
@@ -181,7 +158,7 @@ public class ActivationStarted {
       log.debug("expected bundle: {}", expectedBundle.bundle);
       log.debug("expected components: {}", expectedBundle.components);
       List<Product> expectedProducts = expectedBundle.products();
-      Helper.Assertions.assertProductEquals(expectedProducts, actualProducts);
+      Assertions.assertProductEquals(expectedProducts, actualProducts);
       
     }
   }
@@ -191,11 +168,11 @@ public class ActivationStarted {
     @Test
     public void abortSimpleFailedDeclined() throws Exception {
       String offerId = "simpleOffer1";
-      OfferDef offerDef = helper.getTestOffers().getOffers().get(offerId);
+      OfferDef offerDef = getTestOffers().getOffers().get(offerId);
       Product product = new ProductBuilder("simpleOffer1", "PENDING_ACTIVATE", "simple1-price-trial").build();
       log.debug("product: {}", product);
-      JsonNode machineState = Helper.buildMachineState("PendingActivate");
-      StateMachine<String, String> machine = helper.createMachine(machineState, product);
+      JsonNode machineState = buildMachineState("PendingActivate");
+      StateMachine<String, String> machine = createMachine(machineState, product);
       RequestEventDto event = new EventBuilder("activation_aborted", product).build();
       HttpEntity<RequestEventDto> request = new HttpEntity<>(event, headers);
       ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
@@ -222,7 +199,7 @@ public class ActivationStarted {
       ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
       assertEquals(HttpStatus.OK, resp.getStatusCode());
       ResponseEventDto response = resp.getBody();
-      Product product = helper.getProduct(response.getProducts().get(0).getProductId());
+      Product product = getProduct(response.getProducts().get(0).getProductId());
       assertNotNull(product);
       event = new EventBuilder("disconnect", product).build();
       HttpEntity<RequestEventDto> requestError = new HttpEntity<>(event, headers);

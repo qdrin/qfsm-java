@@ -13,6 +13,7 @@ import org.mockserver.model.Format;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.serialization.HttpRequestSerializer;
 import org.qdrin.qfsm.Helper;
+import org.qdrin.qfsm.controller.ControllerHelper;
 import org.qdrin.qfsm.controllers.EventController;
 import org.qdrin.qfsm.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,23 +27,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
-import org.testcontainers.containers.MockServerContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(webEnvironment =  WebEnvironment.RANDOM_PORT)
 @Slf4j
-@Testcontainers
-@Execution(ExecutionMode.SAME_THREAD)
-public class CommonTest {
-
-  @Container
-  private static MockServerContainer mockServer = Helper.mockServer;
-
-  private MockServerClient mockServerClient = new MockServerClient(mockServer.getHost(), mockServer.getServerPort());
+public class CommonTest extends ControllerHelper {
 
   @Value(value="${local.server.port}")
   private int port;
@@ -53,7 +44,7 @@ public class CommonTest {
   @Value(value="${management.endpoints.web.base-path}")
   private String managePath;
 
-  private static HttpHeaders headers = Helper.getHeaders();
+  private static HttpHeaders headers = getHeaders();
 
   private String apiVersion = "/v1";
   private String eventUrl;
@@ -64,23 +55,6 @@ public class CommonTest {
   @Autowired
   private TestRestTemplate restTemplate;
 
-  @Autowired
-  private Helper helper;
-
-  private static String readResourceAsString(ClassPathResource resource) {
-    try (Reader reader = new InputStreamReader(resource.getInputStream(), "UTF8")) {
-      return FileCopyUtils.copyToString(reader);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
-
-  private HttpRequest[] getMockRequests(HttpRequest request) {
-    var mockRequestsString = mockServerClient.retrieveRecordedRequests(request, Format.JSON);
-    var mreq = httpRequestSerializer.deserializeArray(mockRequestsString);
-    return mreq;
-  }
-
   static ObjectMapper mapper = new ObjectMapper();
   static HttpRequestSerializer httpRequestSerializer = new HttpRequestSerializer(null);
 
@@ -88,7 +62,7 @@ public class CommonTest {
   public void resetMock() {
     eventUrl = String.format("http://localhost:%d%s%s/event", port, basePath, apiVersion);
     mockServerClient.reset();
-    helper.clearDb();
+    clearDb();
   }
 
   @Nested

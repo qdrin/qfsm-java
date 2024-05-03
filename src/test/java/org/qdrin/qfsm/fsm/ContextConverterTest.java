@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest
-public class ContextConverterTest {
+public class ContextConverterTest extends Helper {
 
   @Resource(name = "stateMachinePersist")
   private ProductStateMachinePersist persist;
@@ -39,21 +39,18 @@ public class ContextConverterTest {
   @Autowired
   StateMachineService<String, String> service;
 
-  @Autowired
-  Helper helper;
-
   private StateMachine<String, String> machine;
 
   @BeforeEach
   public void setup() throws Exception {
-    helper.clearDb();
+    clearDb();
   }
 
   ObjectMapper mapper = new ObjectMapper();
 
   @Test
   public void testInitialState() throws Exception {
-    machine = helper.createMachine();
+    machine = createMachine();
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
@@ -82,7 +79,7 @@ public class ContextConverterTest {
     ClassPathResource resource = new ClassPathResource("/contexts/machinestate_sample.json", getClass());
     ObjectMapper mapper = new ObjectMapper();
     JsonNode machineState = mapper.readTree(resource.getInputStream());
-    machine = helper.createMachine(machineState);
+    machine = createMachine(machineState);
     JsonNode machineStateTarget = QStateMachineContextConverter.toJsonNode(machine.getState());
     log.debug("expected: {}", machineState.toString());
     JSONAssert.assertEquals(machineState.toString(), machineState.toString(), false);
@@ -119,7 +116,7 @@ public class ContextConverterTest {
   public void testSimpleStateSet() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode machineState = mapper.readTree("\"Aborted\"");
-    machine = helper.createMachine(machineState);
+    machine = createMachine(machineState);
     log.debug("machine: {}", machine);
 
     StateMachineTestPlan<String, String> plan =
@@ -138,16 +135,16 @@ public class ContextConverterTest {
     ClassPathResource resource = new ClassPathResource("/contexts/machinestate_sample.json", getClass());
     ObjectMapper mapper = new ObjectMapper();
     JsonNode machineState = mapper.readTree(resource.getInputStream());
-    machine = helper.createMachine(machineState);
+    machine = createMachine(machineState);
     log.debug("machine: {}", machine);
     log.debug("states: {}", machine.getState().getIds());
-    log.debug("search states: {}", Arrays.asList(Helper.stateSuit("Prolongation", "Paid", "PriceActive")));
+    log.debug("search states: {}", Arrays.asList(stateSuit("Prolongation", "Paid", "PriceActive")));
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
           .stateMachine(machine)
           .step()
-              .expectStates(Helper.stateSuit("Prolongation", "Paid", "PriceActive"))
+              .expectStates(stateSuit("Prolongation", "Paid", "PriceActive"))
               .and()
           .build();
         plan.test();
@@ -156,17 +153,17 @@ public class ContextConverterTest {
 
   @Test
   public void testOrthogonalStateSetMachineStateBuilder() throws Exception {
-    JsonNode machineState = Helper.buildMachineState("Prolongation", "Paid", "PriceActive");
-    machine = helper.createMachine(machineState);
+    JsonNode machineState = buildMachineState("Prolongation", "Paid", "PriceActive");
+    machine = createMachine(machineState);
     log.debug("machine: {}", machine);
     log.debug("states: {}", machine.getState().getIds());
-    log.debug("search states: {}", Arrays.asList(Helper.stateSuit("Prolongation", "Paid", "PriceActive")));
+    log.debug("search states: {}", Arrays.asList(stateSuit("Prolongation", "Paid", "PriceActive")));
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
           .stateMachine(machine)
           .step()
-              .expectStates(Helper.stateSuit("Prolongation", "Paid", "PriceActive"))
+              .expectStates(stateSuit("Prolongation", "Paid", "PriceActive"))
               .and()
           .build();
         plan.test();
@@ -174,10 +171,10 @@ public class ContextConverterTest {
 
   @Test
   public void testMachineStateSequence() throws Exception {
-    JsonNode machineState = Helper.buildMachineState("Prolongation", "Paid", "PriceActive");
-    machine = helper.createMachine(machineState);
+    JsonNode machineState = buildMachineState("Prolongation", "Paid", "PriceActive");
+    machine = createMachine(machineState);
     assertEquals("Provision", machine.getState().getId());
-    machine = helper.createMachine();
+    machine = createMachine();
     assertEquals(machine.getState().getId(), "Entry");
   }
 }

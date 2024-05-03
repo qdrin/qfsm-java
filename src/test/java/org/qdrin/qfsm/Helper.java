@@ -39,6 +39,7 @@ import org.springframework.util.FileCopyUtils;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
+import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -52,14 +53,13 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Component
 public class Helper {
-  public static final DockerImageName MOCKSERVER_IMAGE = DockerImageName
-      .parse("mockserver/mockserver")
-      .withTag("mockserver-" + MockServerClient.class.getPackage().getImplementationVersion());
+  // public static final DockerImageName MOCKSERVER_IMAGE = DockerImageName
+  //     .parse("mockserver/mockserver")
+  //     .withTag("mockserver-" + MockServerClient.class.getPackage().getImplementationVersion());
 
-  @Container
-  public static MockServerContainer mockServer = new MockServerContainer(MOCKSERVER_IMAGE);
+  // @Container
+  // public static MockServerContainer mockServer = new MockServerContainer(MOCKSERVER_IMAGE);
   
   @Autowired
   ProductRepository productRepository;
@@ -70,7 +70,7 @@ public class Helper {
   @Autowired
   ContextRepository contextRepository;
 
-    @Resource(name = "stateMachinePersist")
+  @Resource(name = "stateMachinePersist")
   private ProductStateMachinePersist persist;
 
   @Autowired
@@ -86,11 +86,7 @@ public class Helper {
 
   private static HttpHeaders headers = new HttpHeaders();
 
-  final TestOffers testOffers = setTestOffers();
-
-  public static MockServerClient getMockServerClient() {
-    return new MockServerClient(mockServer.getHost(), mockServer.getServerPort());
-  }
+  private static TestOffers testOffers = setTestOffers();
   
   public static HttpHeaders getHeaders() {
     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -105,14 +101,14 @@ public class Helper {
     }
   }
 
-
-  private TestOffers setTestOffers() {
-    ClassPathResource resource = new ClassPathResource("/offers.yaml", getClass());
+  private static TestOffers setTestOffers() {
+    ClassPathResource resource = new ClassPathResource("/offers.yaml", Yaml.class);
+    String offerString = readResourceAsString(resource);
     ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
                               // .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     TestOffers offers = null;
     try {
-      offers = yamlMapper.readValue(resource.getInputStream(), TestOffers.class);
+      offers = yamlMapper.readValue(offerString, TestOffers.class);
     } catch (StreamReadException e) {
       e.printStackTrace();
     } catch (DatabindException e) {

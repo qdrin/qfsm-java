@@ -24,10 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest
-public class ActivationStartedTest {
-
-  @Autowired
-  Helper helper;
+public class ActivationStartedTest extends Helper {
 
   StateMachine<String, String> machine = null;
 
@@ -39,13 +36,13 @@ public class ActivationStartedTest {
   @AfterEach
   public void tearDown() throws Exception {
     machine.stopReactively().block();
-    helper.clearDb();
+    clearDb();
   }
 
   @Test
   public void testTrialSuccess() throws Exception {
     Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-active").build();
-    machine = helper.createMachine(product);
+    machine = createMachine(product);
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
@@ -71,7 +68,7 @@ public class ActivationStartedTest {
     Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-trial").build();
     ProductPrice price = product.getProductPrice().get(0);
     price.setNextPayDate(OffsetDateTime.now().plusDays(30));
-    machine = helper.createMachine(product);
+    machine = createMachine(product);
 
     Map<Object, Object> variables = machine.getExtendedState().getVariables();
     List<ActionSuit> actions = (List<ActionSuit>) variables.get("actions");
@@ -91,7 +88,7 @@ public class ActivationStartedTest {
               .and()
           .step()
               .sendEvent("activation_completed")
-              .expectStates(Helper.stateSuit("ActiveTrial", "Paid", "PriceActive"))
+              .expectStates(stateSuit("ActiveTrial", "Paid", "PriceActive"))
               .and()
           .defaultAwaitTime(1)
           .build();
