@@ -1,11 +1,14 @@
 package org.qdrin.qfsm.machine.config;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.qdrin.qfsm.PriceType;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.qdrin.qfsm.service.QStateMachineService;
 import org.springframework.context.annotation.Bean;
@@ -211,6 +214,32 @@ public class StateMachineConfig {
           Product product = context.getExtendedState().get("product", Product.class);
           log.info("Clear product price. productId: {}", product.getProductId());
           product.setProductPrice(null);
+        }
+      };
+    }
+
+    @Bean
+    Action<String, String> resetTarificationPeriod() {
+      return new Action<String, String>() {
+        public void execute(StateContext<String, String> context) {
+          Product product = context.getExtendedState().get("product", Product.class);
+          log.info("Reset tarification period. productId: {}", product.getProductId());
+          product.setTarificationPeriod(0);
+        }
+      };
+    }
+
+    @Bean
+    Action<String, String> resetPricePeriod() {
+      return new Action<String, String>() {
+        public void execute(StateContext<String, String> context) {
+          Product product = context.getExtendedState().get("product", Product.class);
+          log.info("Reset price period. productId: {}", product.getProductId());
+          product.setTarificationPeriod(0);
+          List<ProductPrice> prices = product.getProductPrice(PriceType.RecurringCharge);
+          for(ProductPrice price: prices) {
+            price.setPeriod(0);
+          }
         }
       };
     }

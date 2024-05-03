@@ -4,8 +4,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.qdrin.qfsm.ProductBuilder;
+import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.EventBuilder;
@@ -28,7 +30,7 @@ public class HelperTest {
         assertEquals("simple1-price-active", product.getProductPrice().get(0).getId());
         assertEquals("simpleOffer1", product.getProductOfferingId());
         assertEquals(1, product.getProductClass());
-        assertEquals(0, product.getTarificationPeriod());
+        assertEquals(-1, product.getTarificationPeriod());
         assertEquals("ACTIVE", product.getStatus());
         assertNotNull(product.getPartyRoleId());
         assertNotNull(product.getProductId());
@@ -41,7 +43,7 @@ public class HelperTest {
                 .build();
         assertEquals("bundleOffer1", p1.getProductOfferingId());
         assertEquals("bundle1-price-trial", p1.getProductPrice().get(0).getId());
-        assertEquals(2, p1.getProductClass());
+        assertEquals(ProductClass.BUNDLE.ordinal(), p1.getProductClass());
         assertEquals(3, p1.getTarificationPeriod());
         assertEquals("PENDING_DISCONNECT", p1.getStatus());
         assertEquals(p1.getPartyRoleId(), product.getPartyRoleId());
@@ -56,7 +58,7 @@ public class HelperTest {
         assertEquals("custom1-price-active", product.getProductPrice().get(0).getId());
         assertEquals("customBundleOffer1", product.getProductOfferingId());
         assertEquals(4, product.getProductClass());
-        assertEquals(0, product.getTarificationPeriod());
+        assertEquals(-1, product.getTarificationPeriod());
         assertEquals("PENDING_ACTIVATE", product.getStatus());
         assertNotNull(product.getPartyRoleId());
         assertNotNull(product.getProductId());
@@ -72,18 +74,19 @@ public class HelperTest {
         log.debug("product: {}", product);
         assertNull(product.getProductPrice());
         assertEquals("component1", product.getProductOfferingId());
-        assertEquals(5, product.getProductClass());
-        assertEquals(0, product.getTarificationPeriod());
+        assertEquals(-1, product.getProductClass());
+        assertEquals(-1, product.getTarificationPeriod());
         assertEquals("PENDING_ACTIVATE", product.getStatus());
         assertEquals("subscriber1", product.getPartyRoleId());
         assertNotNull(product.getProductId());
 
         Product p1 = productBuilder
+            .productId(UUID.randomUUID().toString())
             .productOfferingId("component2")
             .isCustom(false)
             .build();
         assertEquals("component2", p1.getProductOfferingId());
-        assertEquals(3, p1.getProductClass());
+        assertEquals(-1, p1.getProductClass());
         assertNotEquals(product.getProductId(), p1.getProductId());
         assertEquals("subscriber1", p1.getPartyRoleId());
         assertNull(p1.getProductPrice());

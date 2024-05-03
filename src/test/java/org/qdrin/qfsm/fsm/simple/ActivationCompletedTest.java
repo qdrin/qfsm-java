@@ -46,7 +46,6 @@ public class ActivationCompletedTest {
     price.setNextPayDate(OffsetDateTime.now().plusDays(30));
     machine = helper.createMachine(null, product);
     
-    ExtendedState extendedState = machine.getExtendedState();
     List<ActionSuit> expectedActions = Arrays.asList(ActionSuit.PRICE_ENDED);
     List<ActionSuit> expectedDeleteActions = new  ArrayList<>();
 

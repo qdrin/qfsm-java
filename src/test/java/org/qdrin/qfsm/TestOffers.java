@@ -6,9 +6,6 @@ import java.util.Map;
 import org.qdrin.qfsm.model.FabricRef;
 import org.qdrin.qfsm.model.ProductPrice;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

@@ -1,7 +1,9 @@
 package org.qdrin.qfsm;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -10,8 +12,6 @@ import java.util.UUID;
 import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
-import org.qdrin.qfsm.model.dto.RequestEventDto;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AccessLevel;
@@ -35,15 +35,39 @@ public class ProductBuilder {
     OffsetDateTime trialEndDate = null;
     OffsetDateTime activeEndDate = null;
     OffsetDateTime productStartDate = null;
-    List<ProductPrice> productPrice = null;
-    List<ProductRelationship> productRelationship = null;
-    List<FabricRef> fabricRef = null;
-    List<ProductCharacteristic> characteristic = null;
-    List<Characteristic> label = null;
-    Map<String, Object> metaInfo = null;
-    Map<String, Object> quantity = null;
+    List<ProductPrice> productPrice = new ArrayList<>();
+    List<ProductRelationship> productRelationship = new ArrayList<>();
+    List<FabricRef> fabricRef = new ArrayList<>();
+    List<ProductCharacteristic> characteristic = new ArrayList<>();
+    List<Characteristic> label = new ArrayList<>();
+    Map<String, Object> metaInfo = new HashMap<>();
+    Map<String, Object> quantity = new HashMap<>();
 
     String priceId = null;
+
+    private void clear() {
+        productOfferingId = null;
+        productOfferingName = null;
+        productOfferingVersion = null;
+        productSpecificationId = null;
+        productSpecificationVersion = null;
+        isBundle = false;
+        isCustom = false;
+        status = null;
+        machineState = null;
+        productClass = null;
+        tarificationPeriod = -1;
+        trialEndDate = null;
+        activeEndDate = null;
+        productStartDate = null;
+        productPrice.clear();
+        productRelationship.clear();
+        fabricRef.clear();
+        characteristic.clear();
+        label.clear();
+        metaInfo.clear();
+        quantity.clear();
+    }
 
     private void recalc() {
         status = status == null ? "PENDING_ACTIVATE" : status;
@@ -53,8 +77,8 @@ public class ProductBuilder {
         ProductPrice price = prices != null ? prices.get(priceId) : null;
         if(price != null) {
             price.setId(priceId);
+            this.productPrice.add(price);
         }
-        this.productPrice = price != null ? Arrays.asList(price) : null;
         this.isBundle = offer.getIsBundle() == null ? this.isBundle : offer.getIsBundle();
         this.isCustom = offer.getIsCustom() == null ? this.isCustom : offer.getIsCustom();
         List<ProductClass> pclasses = offer.getProductClass();
@@ -90,7 +114,12 @@ public class ProductBuilder {
 
     public ProductBuilder productId(String val) {productId = val; return this;}
     public ProductBuilder partyRoleId(String val) {partyRoleId = val; return this;}
-    public ProductBuilder productOfferingId(String val) {productOfferingId = val; return this;}
+    public ProductBuilder productOfferingId(String val) {
+        clear();
+        productOfferingId = val;
+        recalc();
+        return this;
+    }
     public ProductBuilder productOfferingName(String val) {productOfferingName = val; return this;}
     public ProductBuilder productOfferingVersion(String val) {productOfferingVersion = val; return this;}
     public ProductBuilder productSpecificationId(String val) {productSpecificationId = val; return this;}

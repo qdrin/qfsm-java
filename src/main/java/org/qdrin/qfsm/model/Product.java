@@ -2,16 +2,20 @@ package org.qdrin.qfsm.model;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.qdrin.qfsm.PriceType;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.ProductRequestDto;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -38,26 +42,41 @@ public class Product {
   Boolean isCustom;
   String status;
   @JdbcTypeCode(SqlTypes.JSON)
-  JsonNode machineState;
+  @Builder.Default
+  JsonNode machineState = new ObjectMapper().createObjectNode();
   int productClass;
   int tarificationPeriod;
   OffsetDateTime trialEndDate;
   OffsetDateTime activeEndDate;
   OffsetDateTime productStartDate;
+  
   @JdbcTypeCode(SqlTypes.JSON)
-  List<ProductPrice> productPrice;
+  @Builder.Default
+  List<ProductPrice> productPrice = new ArrayList<>();
+  
   @JdbcTypeCode(SqlTypes.JSON)
-  List<ProductRelationship> productRelationship;
+  @Builder.Default
+  List<ProductRelationship> productRelationship = new ArrayList<>();
+  
   @JdbcTypeCode(SqlTypes.JSON)
-  List<FabricRef> fabricRef;
+  @Builder.Default
+  List<FabricRef> fabricRef = new ArrayList<>();
+  
   @JdbcTypeCode(SqlTypes.JSON)
-  List<ProductCharacteristic> characteristic;
+  @Builder.Default
+  List<ProductCharacteristic> characteristic = new ArrayList<>();
+  
   @JdbcTypeCode(SqlTypes.JSON)
-  List<Characteristic> label;
+  @Builder.Default
+  List<Characteristic> label = new ArrayList<>();
+
   @JdbcTypeCode(SqlTypes.JSON)
-  Map<String, Object> metaInfo;
+  @Builder.Default
+  Map<String, Object> metaInfo = new HashMap<>();
+
   @JdbcTypeCode(SqlTypes.JSON)
-  Map<String, Object> quantity;
+  @Builder.Default
+  Map<String, Object> quantity = new HashMap<>();
   // Map<String, Object> extraParams;
   public Product(ProductActivateRequestDto orderItem) {
     this.productId = UUID.randomUUID().toString();
@@ -89,6 +108,12 @@ public class Product {
     if(metaInfo != null && ! metaInfo.isEmpty()) {
       setMetaInfo(metaInfo);
     }
+  }
+
+  public List<ProductPrice> getProductPrice(PriceType priceType) {
+    return productPrice.stream()
+      .filter(p -> p.getPriceType().equals(priceType.name()))
+      .collect(Collectors.toList());
   }
 
   public final List<ProductRelationship> getProductRelationshipByRelationType(String relationType) {

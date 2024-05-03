@@ -1,14 +1,11 @@
 package org.qdrin.qfsm;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 
-import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.ProductRequestDto;
@@ -16,12 +13,10 @@ import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
-@FieldDefaults(level = AccessLevel.PUBLIC)
+// @FieldDefaults(level = AccessLevel.PUBLIC)
 public class BundleBuilder {
     final static List<Integer> mainClasses = Arrays.asList(
         ProductClass.SIMPLE.ordinal(), ProductClass.BUNDLE.ordinal(), ProductClass.CUSTOM_BUNDLE.ordinal());
