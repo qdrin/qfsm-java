@@ -10,13 +10,13 @@ import java.util.List;
 
 import org.qdrin.qfsm.EventBuilder;
 import org.qdrin.qfsm.Helper;
-import org.qdrin.qfsm.event.EventValidator;
 import org.qdrin.qfsm.exception.BadUserDataException;
 import org.qdrin.qfsm.model.ClientInfo;
 import org.qdrin.qfsm.model.Event;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.ProductRequestDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
+import org.qdrin.qfsm.utils.EventValidator;
 
 import lombok.extern.slf4j.Slf4j;
 

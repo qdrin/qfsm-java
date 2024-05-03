@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
-import org.qdrin.qfsm.event.EventValidator;
 import org.qdrin.qfsm.exception.*;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
@@ -31,6 +30,7 @@ import org.qdrin.qfsm.persist.QStateMachineContextConverter;
 import org.qdrin.qfsm.repository.EventRepository;
 import org.qdrin.qfsm.repository.ProductRepository;
 import org.qdrin.qfsm.tasks.*;
+import org.qdrin.qfsm.utils.EventValidator;
 
 @Slf4j
 @Configuration
