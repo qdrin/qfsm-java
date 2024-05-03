@@ -1,13 +1,8 @@
 package org.qdrin.qfsm.controller.events;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.nullable;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.*;
-import java.sql.Connection;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 import org.junit.jupiter.api.*;
@@ -17,35 +12,25 @@ import org.mockserver.client.MockServerClient;
 import org.mockserver.model.Format;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.serialization.HttpRequestSerializer;
-import org.qdrin.qfsm.BundleBuilder.TestBundle;
-import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.EventBuilder;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductBuilder;
-import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.TestOffers.OfferDef;
-import org.qdrin.qfsm.controllers.EventController;
 import org.qdrin.qfsm.model.Product;
-import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.model.dto.*;
-import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.util.FileCopyUtils;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

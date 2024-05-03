@@ -1,23 +1,19 @@
 package org.qdrin.qfsm;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
-import java.sql.Connection;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.mockserver.client.MockServerClient;
-import org.qdrin.qfsm.controller.CommonTest;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductRelationship;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
@@ -306,8 +302,7 @@ public class Helper {
           List<ProductResponseDto> lp = rproducts.stream()
               .filter(p -> p.getProductOrderItemId().equals(item.getProductOrderItemId()))
               .collect(Collectors.toList());
-          assertEquals(String.format("Expected 1 product corresponding to orderItem %s, actual: %d",
-                        item.getProductOrderItemId(), lp.size()), 1, lp.size());
+          assertEquals(1, lp.size());
           ProductResponseDto rproduct = lp.get(0);
           assertNotNull(rproduct.getProductId());
           assertEquals(item.getProductOfferingId(), rproduct.getProductOfferingId());
@@ -336,9 +331,7 @@ public class Helper {
           List<ProductResponseDto> lp = rproducts.stream()
               .filter(p -> p.getProductId().equals(item.getProductId()))
               .collect(Collectors.toList());
-          assertEquals(String.format("Expected 1 product corresponding to order product %s, actual: %d",
-                        item.getProductId(), lp.size()), 1, lp.size());
-          
+          assertEquals(1, lp.size());
         }
         for(ProductResponseDto rproduct: rproducts) {
           if(rproduct.getIsBundle()) {

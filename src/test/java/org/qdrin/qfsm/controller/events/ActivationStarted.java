@@ -1,11 +1,7 @@
 package org.qdrin.qfsm.controller.events;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.sql.Connection;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 import org.junit.jupiter.api.*;
@@ -39,7 +35,6 @@ import org.springframework.statemachine.StateMachine;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
