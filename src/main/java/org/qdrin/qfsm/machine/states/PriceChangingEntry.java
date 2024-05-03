@@ -4,11 +4,13 @@ import java.util.Map;
 
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
+import org.qdrin.qfsm.tasks.ActionSuit;
 import org.qdrin.qfsm.tasks.ExternalData;
-import org.qdrin.qfsm.utils.PriceHelper;
+import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
-
+import org.qdrin.qfsm.PriceType;
+import org.qdrin.qfsm.machine.actions.AddActionAction;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,22 +22,26 @@ public class PriceChangingEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
     log.debug("PriceChangingEntry started. event: {}, message: {}", context.getEvent(), context.getMessage());
-    Product product = context.getExtendedState().get("product", Product.class);
+    ExtendedState extendedState = context.getStateMachine().getExtendedState();
+    Product product = extendedState.get("product", Product.class);
     Map<Object, Object> variables = context.getExtendedState().getVariables();
     int tPeriod = product.getTarificationPeriod();
+    log.debug("tarificationPeriod: {}", tPeriod);
     ProductPrice nextPrice;
+    ProductPrice currentPrice = product.getProductPrice(PriceType.RecurringCharge).get();
     SignalAction paymentProcessed = null;
     if(tPeriod != 0) {
-      nextPrice = ExternalData.requestProductPrice();
+      new AddActionAction(ActionSuit.CHANGE_PRICE).execute(context);
+      return;
     } else {
-      nextPrice = PriceHelper.getProductPrice(context);
+      nextPrice = currentPrice;
       if(nextPrice.getProductStatus().equals("ACTIVE_TRIAL")) {
         log.debug("First trial period. Sending auto 'payment_processed'");
         paymentProcessed = new SignalAction("payment_processed");        
       }
     }
     variables.put("nextPrice", nextPrice);
-    log.debug("price: {}, nextPrice: {}", PriceHelper.getProductPrice(context), nextPrice);
+    log.debug("price: {}, nextPrice: {}", currentPrice, nextPrice);
     SignalAction changePrice = new SignalAction("change_price");
     changePrice.execute(context);
     if(paymentProcessed != null) {

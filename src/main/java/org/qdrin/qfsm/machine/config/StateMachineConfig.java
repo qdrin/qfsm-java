@@ -236,9 +236,9 @@ public class StateMachineConfig {
           Product product = context.getExtendedState().get("product", Product.class);
           log.info("Reset price period. productId: {}", product.getProductId());
           product.setTarificationPeriod(0);
-          List<ProductPrice> prices = product.getProductPrice(PriceType.RecurringCharge);
-          for(ProductPrice price: prices) {
-            price.setPeriod(0);
+          Optional<ProductPrice> price = product.getProductPrice(PriceType.RecurringCharge);
+          if(price.isPresent()) {
+            price.get().setPeriod(0);
           }
         }
       };

@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -82,13 +83,13 @@ public class Product {
     this.productId = UUID.randomUUID().toString();
     this.productOfferingId = orderItem.getProductOfferingId();
     this.productOfferingName = orderItem.getProductOfferingName();
-    this.characteristic = orderItem.getCharacteristic();
-    this.metaInfo = orderItem.getMetaInfo();
-    this.label = orderItem.getLabel();
-    this.fabricRef = orderItem.getFabricRef();
-    this.productPrice = orderItem.getProductPrice();
     this.isBundle = orderItem.getIsBundle();
     this.isCustom = orderItem.getIsCustom();
+    if(orderItem.getCharacteristic() != null) { this.characteristic = orderItem.getCharacteristic(); }
+    if(orderItem.getMetaInfo() != null) { this.metaInfo = orderItem.getMetaInfo(); }
+    if(orderItem.getLabel() != null) { this.label = orderItem.getLabel(); }
+    if(orderItem.getFabricRef() != null) { this.fabricRef = orderItem.getFabricRef(); }
+    if(orderItem.getProductPrice() != null) { this.productPrice = orderItem.getProductPrice(); }
   }
 
   public void updateUserData(ProductRequestDto orderItem) {
@@ -110,10 +111,11 @@ public class Product {
     }
   }
 
-  public List<ProductPrice> getProductPrice(PriceType priceType) {
+  public Optional<ProductPrice> getProductPrice(PriceType priceType) {
     return productPrice.stream()
       .filter(p -> p.getPriceType().equals(priceType.name()))
-      .collect(Collectors.toList());
+      .findFirst();
+      // .collect(Collectors.toList());
   }
 
   public final List<ProductRelationship> getProductRelationshipByRelationType(String relationType) {

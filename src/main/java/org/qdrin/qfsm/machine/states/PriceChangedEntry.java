@@ -1,11 +1,14 @@
 package org.qdrin.qfsm.machine.states;
 
+import java.util.List;
+
 import javax.sql.DataSource;
 
+import org.qdrin.qfsm.PriceType;
 import org.qdrin.qfsm.machine.actions.AddActionAction;
+import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.tasks.ActionSuit;
-import org.qdrin.qfsm.utils.PriceHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
@@ -21,11 +24,14 @@ public class PriceChangedEntry implements Action<String, String> {
 
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("PriceChangedEntry started. event: {}, message: {}", context.getEvent());
+    log.debug("event: {}, message: {}", context.getEvent());
+    Product product = context.getExtendedState().get("product", Product.class);
     ProductPrice nextPrice = context.getExtendedState().get("nextPrice", ProductPrice.class);
     nextPrice.setPeriod(1);
-    PriceHelper.setProductPrice(context, nextPrice);
-    log.debug("PriceChangedEntry productPrice: {}", PriceHelper.getProductPrice(context));
+    List<ProductPrice> currentPrices = product.getProductPrice();
+    currentPrices.removeIf(p -> p.getPriceType().equals(PriceType.RecurringCharge.name()));
+    currentPrices.add(nextPrice);
+    log.debug("productPrice: {}", product.getProductPrice());
     new AddActionAction(ActionSuit.CHANGE_PRICE_EXTERNAL).execute(context);  // Instant.now());
   }
 }

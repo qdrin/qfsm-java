@@ -364,7 +364,7 @@ public class Helper {
       { assertEquals(expected.getStatus(), actual.getStatus()); }
       if(expected.getProductClass() != -1)
         { assertEquals(expected.getProductClass(), actual.getProductClass()); }
-      if(expected.getProductRelationship() != null)
+      if(! expected.getProductRelationship().isEmpty())
         { assertEquals(expected.getProductRelationship(), actual.getProductRelationship()); }
       if(expected.getIsBundle() != null)
         { assertEquals(expected.getIsBundle(), actual.getIsBundle()); }
@@ -378,17 +378,17 @@ public class Helper {
         { assertEquals(expected.getTrialEndDate(), actual.getTrialEndDate()); }
       if(expected.getProductStartDate() != null)
         { assertEquals(expected.getProductStartDate(), actual.getProductStartDate()); }
-      if(expected.getProductPrice() != null)
+      if(! expected.getProductPrice().isEmpty())
         { assertEquals(expected.getProductPrice(), actual.getProductPrice()); }
-      if(expected.getCharacteristic() != null)
+      if(! expected.getCharacteristic().isEmpty())
         { assertEquals(expected.getCharacteristic(), actual.getCharacteristic()); }
-      if(expected.getFabricRef() != null)
+      if(! expected.getFabricRef().isEmpty())
         { assertEquals(expected.getFabricRef(), actual.getFabricRef()); }
-      if(expected.getLabel() != null)
+      if(! expected.getLabel().isEmpty())
         { assertEquals(expected.getLabel(), actual.getLabel()); }
-      if(expected.getMetaInfo() != null)
+      if(! expected.getMetaInfo().isEmpty())
         { assertEquals(expected.getMetaInfo(), actual.getMetaInfo()); }
-      if(expected.getMachineState() != null)
+      if(! expected.getMachineState().isEmpty())
         { JSONAssert.assertEquals(expected.getMachineState().toString(), actual.getMachineState().toString(), false); }
     }
 

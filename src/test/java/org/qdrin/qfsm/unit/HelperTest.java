@@ -4,11 +4,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.EventBuilder;
 import org.qdrin.qfsm.Helper;
@@ -72,7 +75,8 @@ public class HelperTest {
             .partyRoleId("subscriber1")
             .build();
         log.debug("product: {}", product);
-        assertNull(product.getProductPrice());
+        List<ProductPrice> empty = new ArrayList();
+        assertEquals(empty, product.getProductPrice());
         assertEquals("component1", product.getProductOfferingId());
         assertEquals(-1, product.getProductClass());
         assertEquals(-1, product.getTarificationPeriod());
@@ -89,7 +93,7 @@ public class HelperTest {
         assertEquals(-1, p1.getProductClass());
         assertNotEquals(product.getProductId(), p1.getProductId());
         assertEquals("subscriber1", p1.getPartyRoleId());
-        assertNull(p1.getProductPrice());
+        assertEquals(empty, p1.getProductPrice());
     }
 
     @Test

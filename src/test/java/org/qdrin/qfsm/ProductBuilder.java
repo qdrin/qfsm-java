@@ -2,7 +2,6 @@ package org.qdrin.qfsm;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,7 @@ import java.util.UUID;
 import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.*;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -29,7 +28,7 @@ public class ProductBuilder {
     Boolean isBundle = false;
     Boolean isCustom = false;
     String status = null;
-    JsonNode machineState = null;
+    JsonNode machineState = new ObjectMapper().createObjectNode();
     ProductClass productClass = null;
     int tarificationPeriod = -1;
     OffsetDateTime trialEndDate = null;
@@ -54,7 +53,7 @@ public class ProductBuilder {
         isBundle = false;
         isCustom = false;
         status = null;
-        machineState = null;
+        machineState = new ObjectMapper().createObjectNode();
         productClass = null;
         tarificationPeriod = -1;
         trialEndDate = null;
@@ -103,11 +102,11 @@ public class ProductBuilder {
         this.productOfferingName = orderItem.getProductOfferingName();
         this.isBundle = orderItem.getIsBundle();
         this.isCustom = orderItem.getIsCustom();
-        this.productPrice = orderItem.getProductPrice();
-        this.characteristic = orderItem.getCharacteristic();
-        this.fabricRef = orderItem.getFabricRef();
-        this.metaInfo = orderItem.getMetaInfo();
-        this.label = orderItem.getLabel();
+        if(orderItem.getProductPrice() != null) { this.productPrice = orderItem.getProductPrice(); }
+        if(orderItem.getCharacteristic() != null) { this.characteristic = orderItem.getCharacteristic(); }
+        if(orderItem.getFabricRef() != null) { this.fabricRef = orderItem.getFabricRef(); }
+        if(orderItem.getMetaInfo() != null) { this.metaInfo = orderItem.getMetaInfo(); }
+        if(orderItem.getLabel() != null) { this.label = orderItem.getLabel(); }
         this.status = "PENDING_ACTIVATE";
         recalc();
     }
@@ -126,7 +125,7 @@ public class ProductBuilder {
     public ProductBuilder productSpecificationVersion(String val) {productSpecificationVersion = val; return this;}
     public ProductBuilder isBundle(Boolean val) {isBundle = val; recalc(); return this;}
     public ProductBuilder isCustom(Boolean val) {isCustom = val; recalc(); return this;}
-    public ProductBuilder status(String val) {status = val; return this;}
+    public ProductBuilder status(String val) {status = val; return this;} 
     public ProductBuilder machineState(JsonNode val) {machineState = val; return this;}
     public ProductBuilder productClass(ProductClass val) {productClass = val; return this;}
     public ProductBuilder tarificationPeriod(int val) {tarificationPeriod = val; return this;}
@@ -142,7 +141,14 @@ public class ProductBuilder {
     public ProductBuilder priceId(String val) {this.priceId = val; recalc(); return this; }
     public ProductBuilder productRelationship(List<ProductRelationship> val) {productRelationship = val; return this;}
     public ProductBuilder fabricRef(List<FabricRef> val) {fabricRef = val; return this;}
-    public ProductBuilder characteristic(List<ProductCharacteristic> val) {characteristic = val; return this;}
+    public ProductBuilder characteristic(List<ProductCharacteristic> val) {
+        if(val == null) {
+            characteristic.clear();
+        } else {
+            characteristic = val;
+        }
+        return this;
+    }
     public ProductBuilder label(List<Characteristic> val) {label = val; return this;}
     public ProductBuilder metaInfo(Map<String, Object> val) {metaInfo = val; return this;}
     public ProductBuilder quantity(Map<String, Object> val) {quantity = val; return this;}

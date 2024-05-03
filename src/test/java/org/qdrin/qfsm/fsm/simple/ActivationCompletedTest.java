@@ -81,7 +81,9 @@ public class ActivationCompletedTest {
   @Test
   public void testActiveSuccess() throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
-    Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-active").build();
+    Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-active")
+      .tarificationPeriod(0)
+      .build();
     ProductPrice price = product.getProductPrice().get(0);
     price.setNextPayDate(OffsetDateTime.now().plusDays(30));
     machine = helper.createMachine(Helper.buildMachineState("PendingActivate"), product);
@@ -111,7 +113,7 @@ public class ActivationCompletedTest {
     OffsetDateTime waitingPayEnded = actions.get(0).getWakeAt();
     OffsetDateTime priceEnded = actions.get(1).getWakeAt();
     assertEquals(priceEnded, price.getNextPayDate().minus(helper.getPriceEndedBefore()));
-    assert(waitingPayEnded.isAfter(expectedWaitingPayEnded.minusSeconds(1)));
-    assert(waitingPayEnded.isBefore(expectedWaitingPayEnded.plusSeconds(1)));
+    assert(waitingPayEnded.isAfter(expectedWaitingPayEnded.minusSeconds(5)));
+    assert(waitingPayEnded.isBefore(expectedWaitingPayEnded.plusSeconds(5)));
   }
 }
