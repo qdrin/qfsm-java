@@ -76,6 +76,8 @@ public class Helper {
   @Autowired
   StateMachineService<String, String> service;
 
+  static public ObjectMapper mapper = new ObjectMapper();
+
   @Value("${application.fsm.time.priceEndedBefore}")
   Duration priceEndedBefore;
   public Duration getPriceEndedBefore() { return priceEndedBefore; }

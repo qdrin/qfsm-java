@@ -5,12 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
-import org.mockserver.client.MockServerClient;
-import org.mockserver.model.Format;
-import org.mockserver.model.HttpRequest;
-import org.mockserver.serialization.HttpRequestSerializer;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.EventBuilder;
@@ -20,57 +14,28 @@ import org.qdrin.qfsm.controller.ControllerHelper;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.statemachine.StateMachine;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest(webEnvironment =  WebEnvironment.RANDOM_PORT)
+// @SpringBootTest(webEnvironment =  WebEnvironment.RANDOM_PORT)
 @Slf4j
 public class ActivationStarted extends ControllerHelper {
-
-  @Value(value="${local.server.port}")
-  private int port;
-
-  @Value(value="${server.servlet.context-path}")
-  private String basePath;
-
-  @Value(value="${management.endpoints.web.base-path}")
-  private String managePath;
-
-  private static HttpHeaders headers = getHeaders();
-
-  private String apiVersion = "/v1";
-  private String eventUrl;
 
   @Autowired
   private TestRestTemplate restTemplate;
 
-  static ObjectMapper mapper = new ObjectMapper();
-  static HttpRequestSerializer httpRequestSerializer = new HttpRequestSerializer(null);
-
-  @BeforeAll
-  static void setEnvironment() {
-    headers.setContentType(MediaType.APPLICATION_JSON);
-  }
-
-
   @BeforeEach
   public void resetMock() {
     eventUrl = String.format("http://localhost:%d%s%s/event", port, basePath, apiVersion);
-    mockServerClient.reset();
+    // mockServerClient.reset();
     clearDb();
   }
 
