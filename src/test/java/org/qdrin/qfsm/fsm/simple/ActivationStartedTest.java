@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-@SpringBootTest
 public class ActivationStartedTest extends Helper {
 
   StateMachine<String, String> machine = null;

@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-@SpringBootTest
 public class ActivationCompletedTest extends Helper {
 
   StateMachine<String, String> machine = null;

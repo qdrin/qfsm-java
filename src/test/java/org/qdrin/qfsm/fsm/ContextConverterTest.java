@@ -30,7 +30,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@SpringBootTest
 public class ContextConverterTest extends Helper {
 
   @Resource(name = "stateMachinePersist")

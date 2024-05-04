@@ -28,6 +28,8 @@ import org.qdrin.qfsm.tasks.ActionSuit;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -53,13 +55,9 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Helper {
-  // public static final DockerImageName MOCKSERVER_IMAGE = DockerImageName
-  //     .parse("mockserver/mockserver")
-  //     .withTag("mockserver-" + MockServerClient.class.getPackage().getImplementationVersion());
 
-  // @Container
-  // public static MockServerContainer mockServer = new MockServerContainer(MOCKSERVER_IMAGE);
+@SpringBootTest(webEnvironment =  WebEnvironment.RANDOM_PORT)
+public class Helper {
   
   @Autowired
   ProductRepository productRepository;

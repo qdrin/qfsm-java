@@ -1,6 +1,5 @@
 package org.qdrin.qfsm.controller;
 
-import org.junit.jupiter.api.*;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.Format;
 import org.mockserver.model.HttpRequest;
@@ -12,11 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.utility.DockerImageName;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
-@SpringBootTest(webEnvironment =  WebEnvironment.RANDOM_PORT)
 public class ControllerHelper extends Helper {
 
   public static final DockerImageName MOCKSERVER_IMAGE = DockerImageName
