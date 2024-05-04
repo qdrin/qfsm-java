@@ -1,5 +1,6 @@
 package org.qdrin.qfsm.machine.config;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -219,12 +220,13 @@ public class StateMachineConfig {
     }
 
     @Bean
-    Action<String, String> resetTarificationPeriod() {
+    Action<String, String> resetTarificationPeriodAndStartDate() {
       return new Action<String, String>() {
         public void execute(StateContext<String, String> context) {
           Product product = context.getExtendedState().get("product", Product.class);
           log.info("Reset tarification period. productId: {}", product.getProductId());
           product.setTarificationPeriod(0);
+          product.setProductStartDate(OffsetDateTime.now());
         }
       };
     }

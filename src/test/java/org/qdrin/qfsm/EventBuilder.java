@@ -22,7 +22,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PUBLIC)
 public class EventBuilder {
-    private final Map<String, OfferDef> offers = new Helper().getTestOffers().getOffers();
+    private final Map<String, OfferDef> offers =Helper.testOffers.getOffers();
     private int mainIndex = 0;
     String refId = null;
     String refIdType = "orderId";

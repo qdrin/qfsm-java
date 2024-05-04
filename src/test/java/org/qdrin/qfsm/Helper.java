@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,42 +57,12 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 
-@SpringBootTest(webEnvironment =  WebEnvironment.RANDOM_PORT)
 public class Helper {
-  
-  @Autowired
-  ProductRepository productRepository;
 
-  @Autowired
-  EventRepository eventRepository;
-
-  @Autowired
-  ContextRepository contextRepository;
-
-  @Resource(name = "stateMachinePersist")
-  private ProductStateMachinePersist persist;
-
-  @Autowired
-  StateMachineService<String, String> service;
 
   static public ObjectMapper mapper = new ObjectMapper();
 
-  @Value("${application.fsm.time.priceEndedBefore}")
-  Duration priceEndedBefore;
-  public Duration getPriceEndedBefore() { return priceEndedBefore; }
-
-  @Value("${application.fsm.time.waitingPayInterval}")
-  Duration waitingPayInterval;
-  public Duration getWaitingPayInterval() { return waitingPayInterval; }
-
-  private static HttpHeaders headers = new HttpHeaders();
-
-  private static TestOffers testOffers = setTestOffers();
-  
-  public static HttpHeaders getHeaders() {
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    return headers;
-  }
+  public static TestOffers testOffers = setTestOffers();
 
   public static String readResourceAsString(ClassPathResource resource) {
     try (Reader reader = new InputStreamReader(resource.getInputStream(), "UTF8")) {
@@ -117,20 +88,6 @@ public class Helper {
       e.printStackTrace();
     }
     return offers;
-  }
-
-  public TestOffers getTestOffers() {
-    return testOffers;
-  }
-
-  public void clearDb() {
-    productRepository.deleteAll();
-    contextRepository.deleteAll();
-    eventRepository.deleteAll();
-  }
-
-  public Product getProduct(String productId) {
-    return productRepository.findById(productId).get();
   }
 
   public static final String[] stateSuit(String... states) {
@@ -249,41 +206,6 @@ public class Helper {
     return result;
   }
 
-  public StateMachine<String, String> createMachine(JsonNode machineState, Product product) {
-    String machineId = product.getProductId();
-    if(product != null) {
-      productRepository.save(product);
-    }
-    if(machineState != null) {
-      try {
-        // StateMachineContext<String, String> context = createContext(machineState);
-        StateMachineContext<String, String> context = QStateMachineContextConverter.toContext(machineState);
-        persist.write(context, machineId);
-      } catch(Exception e) {
-        log.error("cannot write context to DB: {}", e.getLocalizedMessage());
-      }
-    }
-    StateMachine<String, String> machine = service.acquireStateMachine(machineId);
-    Map<Object, Object> variables = machine.getExtendedState().getVariables();
-    variables.put("actions", new ArrayList<ActionSuit>());
-    variables.put("deleteActions", new ArrayList<ActionSuit>());
-    variables.put("product", product);
-    return machine;
-  }
-
-  public StateMachine<String, String> createMachine(JsonNode machineState) {
-    Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-trial").build();
-    return createMachine(machineState, product);
-  }
-
-  public StateMachine<String, String> createMachine(Product product) {
-    return createMachine(null, product);
-  }
-  public StateMachine<String, String> createMachine() {
-    Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-trial").build();
-    return createMachine(product);
-  }
-
   public static class Assertions {
 
     public static void assertResponseEquals(RequestEventDto request, ResponseEventDto response) {
@@ -347,43 +269,60 @@ public class Helper {
       }
     }
 
+    public static void assertDates(OffsetDateTime expected, OffsetDateTime real, String message, int delta) {
+      assert expected != null : "expeted " + message + " is null";
+      assert real != null : "real " + message + " is null";
+      OffsetDateTime t0 = expected.minusSeconds(delta);
+      OffsetDateTime t1 = expected.plusSeconds(delta);
+      assert(real.isBefore(t1)) : message + " not before";
+      assert(real.isAfter(t0)) : message + "not after";
+    }
+
+    public static void assertDates(OffsetDateTime expected, OffsetDateTime real) {
+      assertDates(expected, real, null, 10);
+    }
+
+    public static void assertDates(OffsetDateTime expected, OffsetDateTime real, String message) {
+      assertDates(expected, real, message, 10);
+    }
+
     public static void assertProductEquals(Product expected, Product actual) throws Exception {
       if(expected.getProductId() != null) 
-        { assertEquals(expected.getProductId(), actual.getProductId()); }
+        { assertEquals(expected.getProductId(), actual.getProductId(), "productId"); }
       if(expected.getPartyRoleId() != null) 
-        { assertEquals(expected.getPartyRoleId(), actual.getPartyRoleId()); }
+        { assertEquals(expected.getPartyRoleId(), actual.getPartyRoleId(), "partyRoleId"); }
       if(expected.getProductOfferingId() != null) 
-        { assertEquals(expected.getProductOfferingId(), actual.getProductOfferingId()); }
+        { assertEquals(expected.getProductOfferingId(), actual.getProductOfferingId(), "productOfferingId"); }
       if(expected.getProductOfferingName() != null)
-        { assertEquals(expected.getProductOfferingName(), actual.getProductOfferingName()); }
+        { assertEquals(expected.getProductOfferingName(), actual.getProductOfferingName(), "productOfferingName"); }
       if(expected.getStatus() != null)  
-      { assertEquals(expected.getStatus(), actual.getStatus()); }
+      { assertEquals(expected.getStatus(), actual.getStatus(), "status"); }
       if(expected.getProductClass() != -1)
-        { assertEquals(expected.getProductClass(), actual.getProductClass()); }
+        { assertEquals(expected.getProductClass(), actual.getProductClass(), "productClass"); }
       if(! expected.getProductRelationship().isEmpty())
-        { assertEquals(expected.getProductRelationship(), actual.getProductRelationship()); }
+        { assertEquals(expected.getProductRelationship(), actual.getProductRelationship(), "productRelationship"); }
       if(expected.getIsBundle() != null)
-        { assertEquals(expected.getIsBundle(), actual.getIsBundle()); }
+        { assertEquals(expected.getIsBundle(), actual.getIsBundle(), "isBundle"); }
       if(expected.getIsCustom() != null)
-        { assertEquals(expected.getIsCustom(), actual.getIsCustom()); }
+        { assertEquals(expected.getIsCustom(), actual.getIsCustom(), "isCustom"); }
       if(expected.getTarificationPeriod() != -1)
-        { assertEquals(expected.getTarificationPeriod(), actual.getTarificationPeriod()); }
+        { assertEquals(expected.getTarificationPeriod(), actual.getTarificationPeriod(), "tarificationPeriod"); }
       if(expected.getActiveEndDate() != null)
-        { assertEquals(expected.getActiveEndDate(), actual.getActiveEndDate()); }
+        { assertDates(expected.getActiveEndDate(), actual.getActiveEndDate(), "activeEndDate"); }
       if(expected.getTrialEndDate() != null)
-        { assertEquals(expected.getTrialEndDate(), actual.getTrialEndDate()); }
+        { assertDates(expected.getTrialEndDate(), actual.getTrialEndDate(), "trialEndDate"); }
       if(expected.getProductStartDate() != null)
-        { assertEquals(expected.getProductStartDate(), actual.getProductStartDate()); }
+        { assertDates(expected.getProductStartDate(), actual.getProductStartDate(), "productStartDate"); }
       if(! expected.getProductPrice().isEmpty())
-        { assertEquals(expected.getProductPrice(), actual.getProductPrice()); }
+        { assertEquals(expected.getProductPrice(), actual.getProductPrice(), "productPrice"); }
       if(! expected.getCharacteristic().isEmpty())
-        { assertEquals(expected.getCharacteristic(), actual.getCharacteristic()); }
+        { assertEquals(expected.getCharacteristic(), actual.getCharacteristic(), "characteristic"); }
       if(! expected.getFabricRef().isEmpty())
-        { assertEquals(expected.getFabricRef(), actual.getFabricRef()); }
+        { assertEquals(expected.getFabricRef(), actual.getFabricRef(), "fabricRef"); }
       if(! expected.getLabel().isEmpty())
-        { assertEquals(expected.getLabel(), actual.getLabel()); }
+        { assertEquals(expected.getLabel(), actual.getLabel(), "label"); }
       if(! expected.getMetaInfo().isEmpty())
-        { assertEquals(expected.getMetaInfo(), actual.getMetaInfo()); }
+        { assertEquals(expected.getMetaInfo(), actual.getMetaInfo(), "metaInfo"); }
       if(! expected.getMachineState().isEmpty())
         { JSONAssert.assertEquals(expected.getMachineState().toString(), actual.getMachineState().toString(), false); }
     }
@@ -397,14 +336,5 @@ public class Helper {
         assertProductEquals(expectedProduct, actualProduct);
       }
     }
-  }
-
-  public List<Product> getResponseProducts(ResponseEventDto response) {
-    List<Product> result = new ArrayList<>();
-    for(ProductResponseDto rproduct: response.getProducts()) {
-      Product product = productRepository.findById(rproduct.getProductId()).get();
-      result.add(product);
-    }
-    return result;
   }
 }

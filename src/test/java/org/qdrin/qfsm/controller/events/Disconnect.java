@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.*;
 import org.qdrin.qfsm.EventBuilder;
-import org.qdrin.qfsm.controller.ControllerHelper;
+import org.qdrin.qfsm.controller.ControllerStarter;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 // @SpringBootTest(webEnvironment =  WebEnvironment.RANDOM_PORT)
 @Slf4j
-public class Disconnect extends ControllerHelper {
+public class Disconnect extends ControllerStarter {
 
   @Autowired
   private TestRestTemplate restTemplate;

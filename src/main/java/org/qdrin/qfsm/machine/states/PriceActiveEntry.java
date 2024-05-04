@@ -40,7 +40,11 @@ public class PriceActiveEntry implements Action<String, String> {
       OffsetDateTime activeEndDate = nextPrice.getNextPayDate();
       activeEndDate.minus(priceEndedBefore);
       product.setActiveEndDate(activeEndDate);
-      log.debug("priceEndedBefore: {}", priceEndedBefore);
+      if(nextPrice.getProductStatus().equals("ACTIVE_TRIAL")) {
+        product.setTrialEndDate(activeEndDate);
+      }
+      log.debug("activeEndDate: {}, trialEndDate: {}, priceEndedBefore: {}",
+          product.getActiveEndDate(), product.getTrialEndDate(), priceEndedBefore);
       new AddActionAction(ActionSuit.PRICE_ENDED
           .withWakeAt(activeEndDate.minus(priceEndedBefore)))
           .execute(context);

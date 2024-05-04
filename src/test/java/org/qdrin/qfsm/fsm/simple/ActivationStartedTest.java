@@ -1,7 +1,5 @@
 package org.qdrin.qfsm.fsm.simple;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 
@@ -14,6 +12,7 @@ import java.util.Map;
 import org.junit.jupiter.api.*;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductBuilder;
+import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.tasks.ActionSuit;
 import org.springframework.statemachine.test.StateMachineTestPlan;
@@ -23,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class ActivationStartedTest extends Helper {
+public class ActivationStartedTest extends SpringStarter {
 
   StateMachine<String, String> machine = null;
 
@@ -38,28 +37,69 @@ public class ActivationStartedTest extends Helper {
     clearDb();
   }
 
-  @Test
-  public void testTrialSuccess() throws Exception {
-    Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-active").build();
-    machine = createMachine(product);
-    StateMachineTestPlan<String, String> plan =
-        StateMachineTestPlanBuilder.<String, String>builder()
-          .defaultAwaitTime(2)
-          .stateMachine(machine)
-          .step()
-              .expectState("Entry")
-              .and()
-          .step()
-              .sendEvent(MessageBuilder.withPayload("activation_started")
-                  .setHeader("product", product)
-                  .setHeader("datetime", OffsetDateTime.now())
-                  .build())
-              .expectState("PendingActivate")
-              .expectStateChanged(1)
-              .and()
-          .build();
-    plan.test();
-    assertEquals(product.getStatus(), "PENDING_ACTIVATE");
+  @Nested
+  class Simple {
+    @Test
+    public void testTrialSuccess() throws Exception {
+      Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-trial").build();
+      OffsetDateTime t0 = OffsetDateTime.now();
+      Product expectedProduct = new ProductBuilder(product)
+        .tarificationPeriod(0)
+        .status("PENDING_ACTIVATE")
+        .productStartDate(t0)
+        .build();
+      machine = createMachine(product);
+      StateMachineTestPlan<String, String> plan =
+          StateMachineTestPlanBuilder.<String, String>builder()
+            .defaultAwaitTime(2)
+            .stateMachine(machine)
+            .step()
+                .expectState("Entry")
+                .and()
+            .step()
+                .sendEvent(MessageBuilder.withPayload("activation_started")
+                    .setHeader("product", product)
+                    .setHeader("datetime", OffsetDateTime.now())
+                    .build())
+                .expectState("PendingActivate")
+                .expectStateChanged(1)
+                .and()
+            .build();
+      plan.test();
+      assertEquals(product.getStatus(), "PENDING_ACTIVATE");
+      Helper.Assertions.assertProductEquals(expectedProduct, product);
+    }
+
+    @Test
+    public void testActiveSuccess() throws Exception {
+      Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-active").build();
+      OffsetDateTime t0 = OffsetDateTime.now();
+      Product expectedProduct = new ProductBuilder(product)
+        .tarificationPeriod(0)
+        .status("PENDING_ACTIVATE")
+        .productStartDate(t0)
+        .build();
+      machine = createMachine(product);
+      StateMachineTestPlan<String, String> plan =
+          StateMachineTestPlanBuilder.<String, String>builder()
+            .defaultAwaitTime(2)
+            .stateMachine(machine)
+            .step()
+                .expectState("Entry")
+                .and()
+            .step()
+                .sendEvent(MessageBuilder.withPayload("activation_started")
+                    .setHeader("product", product)
+                    .setHeader("datetime", OffsetDateTime.now())
+                    .build())
+                .expectState("PendingActivate")
+                .expectStateChanged(1)
+                .and()
+            .build();
+      plan.test();
+      assertEquals(product.getStatus(), "PENDING_ACTIVATE");
+      Helper.Assertions.assertProductEquals(expectedProduct, product);
+    }
   }
 
   @Test
@@ -87,7 +127,7 @@ public class ActivationStartedTest extends Helper {
               .and()
           .step()
               .sendEvent("activation_completed")
-              .expectStates(stateSuit("ActiveTrial", "Paid", "PriceActive"))
+              .expectStates(Helper.stateSuit("ActiveTrial", "Paid", "PriceActive"))
               .and()
           .defaultAwaitTime(1)
           .build();

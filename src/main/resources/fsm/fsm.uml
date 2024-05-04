@@ -18,7 +18,7 @@
       <transition xmi:type="uml:Transition" xmi:id="_tSSasMlsEe6D_qDhyLHyWw" source="_mBTgYMlsEe6D_qDhyLHyWw" target="_Gay-IKAWEe6Sh616vaZpZA">
         <effect xmi:type="uml:OpaqueBehavior" xmi:id="_Z8opQAkVEe-IvNqTTW17lw">
           <language>bean</language>
-          <body>resetTarificationPeriod</body>
+          <body>resetTarificationPeriodAndStartDate</body>
         </effect>
         <trigger xmi:type="uml:Trigger" xmi:id="_0dVFEMlsEe6D_qDhyLHyWw" event="_HGxUkLCDEe6zeo6uvgVLWA"/>
       </transition>

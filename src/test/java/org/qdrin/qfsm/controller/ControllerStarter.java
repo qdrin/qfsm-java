@@ -4,7 +4,7 @@ import org.mockserver.client.MockServerClient;
 import org.mockserver.model.Format;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.serialization.HttpRequestSerializer;
-import org.qdrin.qfsm.Helper;
+import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.controllers.EventController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +13,7 @@ import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
-public class ControllerHelper extends Helper {
+public class ControllerStarter extends SpringStarter {
 
   public static final DockerImageName MOCKSERVER_IMAGE = DockerImageName
       .parse("mockserver/mockserver")

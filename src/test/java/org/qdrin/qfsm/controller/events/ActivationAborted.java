@@ -8,9 +8,10 @@ import java.util.*;
 import org.junit.jupiter.api.*;
 import org.mockserver.serialization.HttpRequestSerializer;
 import org.qdrin.qfsm.EventBuilder;
+import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.TestOffers.OfferDef;
-import org.qdrin.qfsm.controller.ControllerHelper;
+import org.qdrin.qfsm.controller.ControllerStarter;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ActivationAborted extends ControllerHelper {
+public class ActivationAborted extends ControllerStarter {
 
   @Autowired
   private TestRestTemplate restTemplate;
@@ -45,10 +46,10 @@ public class ActivationAborted extends ControllerHelper {
     @Test
     public void abortSimpleFailedDeclined() throws Exception {
       String offerId = "simpleOffer1";
-      OfferDef offerDef = getTestOffers().getOffers().get(offerId);
+      OfferDef offerDef = Helper.testOffers.getOffers().get(offerId);
       Product product = new ProductBuilder("simpleOffer1", "PENDING_ACTIVATE", "simple1-price-trial").build();
       log.debug("product: {}", product);
-      JsonNode machineState = buildMachineState("PendingActivate");
+      JsonNode machineState = Helper.buildMachineState("PendingActivate");
       StateMachine<String, String> machine = createMachine(machineState, product);
       RequestEventDto event = new EventBuilder("activation_aborted", product).build();
       HttpEntity<RequestEventDto> request = new HttpEntity<>(event, headers);

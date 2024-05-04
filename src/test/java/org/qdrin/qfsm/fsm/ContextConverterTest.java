@@ -1,7 +1,6 @@
 package org.qdrin.qfsm.fsm;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
@@ -15,6 +14,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.qdrin.qfsm.Helper;
+import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.qdrin.qfsm.persist.QStateMachineContextConverter;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -30,7 +30,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ContextConverterTest extends Helper {
+public class ContextConverterTest extends SpringStarter {
 
   @Resource(name = "stateMachinePersist")
   private ProductStateMachinePersist persist;
@@ -137,13 +137,13 @@ public class ContextConverterTest extends Helper {
     machine = createMachine(machineState);
     log.debug("machine: {}", machine);
     log.debug("states: {}", machine.getState().getIds());
-    log.debug("search states: {}", Arrays.asList(stateSuit("Prolongation", "Paid", "PriceActive")));
+    log.debug("search states: {}", Arrays.asList(Helper.stateSuit("Prolongation", "Paid", "PriceActive")));
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
           .stateMachine(machine)
           .step()
-              .expectStates(stateSuit("Prolongation", "Paid", "PriceActive"))
+              .expectStates(Helper.stateSuit("Prolongation", "Paid", "PriceActive"))
               .and()
           .build();
         plan.test();
@@ -152,17 +152,17 @@ public class ContextConverterTest extends Helper {
 
   @Test
   public void testOrthogonalStateSetMachineStateBuilder() throws Exception {
-    JsonNode machineState = buildMachineState("Prolongation", "Paid", "PriceActive");
+    JsonNode machineState = Helper.buildMachineState("Prolongation", "Paid", "PriceActive");
     machine = createMachine(machineState);
     log.debug("machine: {}", machine);
     log.debug("states: {}", machine.getState().getIds());
-    log.debug("search states: {}", Arrays.asList(stateSuit("Prolongation", "Paid", "PriceActive")));
+    log.debug("search states: {}", Arrays.asList(Helper.stateSuit("Prolongation", "Paid", "PriceActive")));
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
           .stateMachine(machine)
           .step()
-              .expectStates(stateSuit("Prolongation", "Paid", "PriceActive"))
+              .expectStates(Helper.stateSuit("Prolongation", "Paid", "PriceActive"))
               .and()
           .build();
         plan.test();
@@ -170,7 +170,7 @@ public class ContextConverterTest extends Helper {
 
   @Test
   public void testMachineStateSequence() throws Exception {
-    JsonNode machineState = buildMachineState("Prolongation", "Paid", "PriceActive");
+    JsonNode machineState = Helper.buildMachineState("Prolongation", "Paid", "PriceActive");
     machine = createMachine(machineState);
     assertEquals("Provision", machine.getState().getId());
     machine = createMachine();

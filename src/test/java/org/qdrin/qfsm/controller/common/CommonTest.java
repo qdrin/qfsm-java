@@ -4,11 +4,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.*;
-import org.qdrin.qfsm.controller.ControllerHelper;
-import org.qdrin.qfsm.controllers.EventController;
+import org.qdrin.qfsm.Helper;
+import org.qdrin.qfsm.controller.ControllerStarter;
 import org.qdrin.qfsm.model.dto.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -17,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class CommonTest extends ControllerHelper {
+public class CommonTest extends ControllerStarter {
 
   @BeforeEach
   public void resetMock() {
@@ -55,7 +53,7 @@ public class CommonTest extends ControllerHelper {
     public void checkPrometheus() throws Exception {
       ClassPathResource resource = new ClassPathResource("/body/request/activation_started.json", getClass());
       String eventPath = String.format("%s%s/event", basePath, apiVersion);
-      RequestEventDto body = mapper.readValue(resource.getInputStream(), RequestEventDto.class);
+      RequestEventDto body = Helper.mapper.readValue(resource.getInputStream(), RequestEventDto.class);
       HttpEntity<RequestEventDto> request = new HttpEntity<>(body, headers);
       ResponseEntity<String> resp = restTemplate.postForEntity(eventUrl, request, String.class);
       log.debug(resp.toString());

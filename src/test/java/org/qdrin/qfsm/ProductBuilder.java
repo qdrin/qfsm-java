@@ -14,8 +14,10 @@ import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import com.fasterxml.jackson.databind.*;
 
 import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PUBLIC)
 public class ProductBuilder {
     String productId = UUID.randomUUID().toString();
@@ -33,7 +35,7 @@ public class ProductBuilder {
     int tarificationPeriod = -1;
     OffsetDateTime trialEndDate = null;
     OffsetDateTime activeEndDate = null;
-    OffsetDateTime productStartDate = null;
+    OffsetDateTime productStartDate = OffsetDateTime.now();
     List<ProductPrice> productPrice = new ArrayList<>();
     List<ProductRelationship> productRelationship = new ArrayList<>();
     List<FabricRef> fabricRef = new ArrayList<>();
@@ -70,7 +72,7 @@ public class ProductBuilder {
 
     private void recalc() {
         status = status == null ? "PENDING_ACTIVATE" : status;
-        OfferDef offer = new Helper().getTestOffers().getOffers().get(this.productOfferingId);
+        OfferDef offer = Helper.testOffers.getOffers().get(this.productOfferingId);
         productOfferingName = offer.getName();
         Map<String, ProductPrice> prices = offer.getPrices();
         ProductPrice price = prices != null ? prices.get(priceId) : null;
@@ -86,10 +88,6 @@ public class ProductBuilder {
         }
     }
 
-    public ProductBuilder() {
-        recalc();
-    }
-
     public ProductBuilder(String offerId, String status, String priceId) {
         this.productOfferingId = offerId;
         this.priceId = priceId;
@@ -98,6 +96,7 @@ public class ProductBuilder {
     }
 
     public ProductBuilder(ProductActivateRequestDto orderItem) {
+        this();
         this.productOfferingId = orderItem.getProductOfferingId();
         this.productOfferingName = orderItem.getProductOfferingName();
         this.isBundle = orderItem.getIsBundle();
@@ -108,6 +107,35 @@ public class ProductBuilder {
         if(orderItem.getMetaInfo() != null) { this.metaInfo = orderItem.getMetaInfo(); }
         if(orderItem.getLabel() != null) { this.label = orderItem.getLabel(); }
         this.status = "PENDING_ACTIVATE";
+        recalc();
+    }
+
+    public ProductBuilder(Product product) {
+        this();
+        this.productId = product.getProductId();
+        this.partyRoleId = product.getPartyRoleId();
+        this.productOfferingId = product.getProductOfferingId();
+        this.productOfferingName = product.getProductOfferingName();
+        this.productSpecificationId = product.getProductSpecificationId();
+        this.productSpecificationVersion = product.getProductSpecificationVersion();
+        this.isBundle = product.getIsBundle();
+        this.isCustom = product.getIsCustom();
+        this.status = product.getStatus();
+        this.productClass = ProductClass.values()[product.getProductClass()];
+        this.tarificationPeriod = product.getTarificationPeriod();
+        this.productStartDate = product.getProductStartDate();
+        this.activeEndDate = product.getActiveEndDate();
+        this. trialEndDate = product.getTrialEndDate();
+        if(product.getProductPrice() != null) { this.productPrice = product.getProductPrice(); }
+        if(product.getProductRelationship() != null) { this.productRelationship = product.getProductRelationship(); }
+        if(product.getCharacteristic() != null) { this.characteristic = product.getCharacteristic(); }
+        if(product.getFabricRef() != null) { this.fabricRef = product.getFabricRef(); }
+        if(product.getMetaInfo() != null) { this.metaInfo = product.getMetaInfo(); }
+        if(product.getLabel() != null) { this.label = product.getLabel(); }
+        if(product.getQuantity() != null) { this.quantity = product.getQuantity(); }
+        if(product.getMachineState() != null) { this.machineState = product.getMachineState(); }
+
+        priceId = product.getProductPrice(PriceType.RecurringCharge).get().getId();
         recalc();
     }
 
@@ -139,6 +167,7 @@ public class ProductBuilder {
         return this;
     }
     public ProductBuilder priceId(String val) {this.priceId = val; recalc(); return this; }
+    public ProductBuilder pricePeriod(int val) {this.productPrice.get(0).setPeriod(val); return this; }
     public ProductBuilder productRelationship(List<ProductRelationship> val) {productRelationship = val; return this;}
     public ProductBuilder fabricRef(List<FabricRef> val) {fabricRef = val; return this;}
     public ProductBuilder characteristic(List<ProductCharacteristic> val) {
