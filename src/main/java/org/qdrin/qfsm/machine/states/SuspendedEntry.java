@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.qdrin.qfsm.machine.actions.AddActionAction;
-import org.qdrin.qfsm.tasks.ActionSuit;
+import org.qdrin.qfsm.tasks.ActionSuite;
 import javax.sql.DataSource;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +19,6 @@ public class SuspendedEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
     log.debug("event: {}", context.getEvent());
-    new AddActionAction(ActionSuit.SUSPEND_ENDED).execute(context);  // Instant.now().plusSeconds(30*86400)
+    new AddActionAction(ActionSuite.SUSPEND_ENDED).execute(context);  // Instant.now().plusSeconds(30*86400)
   }
 }

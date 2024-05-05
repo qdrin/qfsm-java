@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 
-import org.qdrin.qfsm.tasks.ActionSuit;
+import org.qdrin.qfsm.tasks.ActionSuite;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -45,7 +45,7 @@ public class PriceActiveEntry implements Action<String, String> {
       }
       log.debug("activeEndDate: {}, trialEndDate: {}, priceEndedBefore: {}",
           product.getActiveEndDate(), product.getTrialEndDate(), priceEndedBefore);
-      new AddActionAction(ActionSuit.PRICE_ENDED
+      new AddActionAction(ActionSuite.PRICE_ENDED
           .withWakeAt(activeEndDate.minus(priceEndedBefore)))
           .execute(context);
       // TODO: Change direct task creation to post action variable here and everywhere

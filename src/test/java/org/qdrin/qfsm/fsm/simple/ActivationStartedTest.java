@@ -14,7 +14,7 @@ import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.model.*;
-import org.qdrin.qfsm.tasks.ActionSuit;
+import org.qdrin.qfsm.tasks.ActionSuite;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
@@ -110,8 +110,8 @@ public class ActivationStartedTest extends SpringStarter {
     machine = createMachine(product);
 
     Map<Object, Object> variables = machine.getExtendedState().getVariables();
-    List<ActionSuit> actions = (List<ActionSuit>) variables.get("actions");
-    List<ActionSuit> deleteActions = (List<ActionSuit>) variables.get("deleteActions");
+    List<ActionSuite> actions = (List<ActionSuite>) variables.get("actions");
+    List<ActionSuite> deleteActions = (List<ActionSuite>) variables.get("deleteActions");
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
@@ -135,8 +135,8 @@ public class ActivationStartedTest extends SpringStarter {
     log.debug("states: {}", machine.getState().getIds());
     log.debug("actions: {}, deleteActions: {}", actions, deleteActions);
     assertEquals(product.getStatus(), "ACTIVE_TRIAL");
-    assert(actions.contains(ActionSuit.PRICE_ENDED));
-    assert(! actions.contains(ActionSuit.WAITING_PAY_ENDED));
-    assert(! deleteActions.contains(ActionSuit.WAITING_PAY_ENDED));
+    assert(actions.contains(ActionSuite.PRICE_ENDED));
+    assert(! actions.contains(ActionSuite.WAITING_PAY_ENDED));
+    assert(! deleteActions.contains(ActionSuite.WAITING_PAY_ENDED));
   }
 }

@@ -282,8 +282,8 @@ public class FsmApp {
 			String machineId = product.getProductId();
 			StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 			String eventType = event.getEventType();
-			List<ActionSuit> actions = new ArrayList<>();
-			List<ActionSuit> deleteActions = new ArrayList<>();
+			List<ActionSuite> actions = new ArrayList<>();
+			List<ActionSuite> deleteActions = new ArrayList<>();
 
 			log.debug("machine acquired: {}", machine.getId());
 			JsonNode machineState = getMachineState(machine.getState());
@@ -308,10 +308,10 @@ public class FsmApp {
 			variables.remove("deleteActions");
 
 			FsmActions fsmActions = new FsmActions();
-			for(ActionSuit action: deleteActions) {
+			for(ActionSuite action: deleteActions) {
 				fsmActions.deleteTask(action);
 			}
-			for(ActionSuit action: actions) {
+			for(ActionSuite action: actions) {
 				fsmActions.createTask(action);
 			}
 			productRepository.save(product);

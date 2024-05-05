@@ -1,11 +1,9 @@
 package org.qdrin.qfsm.machine.states;
-import java.time.Instant;
 import java.util.Map;
 
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
-import org.qdrin.qfsm.tasks.ActionSuit;
-import org.qdrin.qfsm.tasks.ExternalData;
+import org.qdrin.qfsm.tasks.ActionSuite;
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
@@ -31,7 +29,7 @@ public class PriceChangingEntry implements Action<String, String> {
     ProductPrice currentPrice = product.getProductPrice(PriceType.RecurringCharge).get();
     SignalAction paymentProcessed = null;
     if(tPeriod != 0) {
-      new AddActionAction(ActionSuit.CHANGE_PRICE).execute(context);
+      new AddActionAction(ActionSuite.CHANGE_PRICE).execute(context);
       return;
     } else {
       nextPrice = currentPrice;

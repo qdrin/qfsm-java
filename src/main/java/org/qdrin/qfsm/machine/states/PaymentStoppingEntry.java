@@ -4,7 +4,7 @@ import javax.sql.DataSource;
 
 import org.qdrin.qfsm.machine.actions.AddActionAction;
 import org.qdrin.qfsm.model.Product;
-import org.qdrin.qfsm.tasks.ActionSuit;
+import org.qdrin.qfsm.tasks.ActionSuite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
@@ -21,6 +21,6 @@ public class PaymentStoppingEntry implements Action<String, String> {
   public void execute(StateContext<String, String> context) {
     Product product = context.getExtendedState().get("product", Product.class);
     log.debug("event: {}, message: {}", context.getEvent());
-    new AddActionAction(ActionSuit.DISCONNECT_EXTERNAL_EXTERNAL).execute(context);  // Instant.now()
+    new AddActionAction(ActionSuite.DISCONNECT_EXTERNAL_EXTERNAL).execute(context);  // Instant.now()
   }
 }

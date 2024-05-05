@@ -16,7 +16,7 @@ import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.model.*;
-import org.qdrin.qfsm.tasks.ActionSuit;
+import org.qdrin.qfsm.tasks.ActionSuite;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
@@ -55,8 +55,8 @@ public class ActivationCompletedTest extends SpringStarter {
         .build();
       machine = createMachine(null, product);
       
-      List<ActionSuit> expectedActions = Arrays.asList(ActionSuit.PRICE_ENDED);
-      List<ActionSuit> expectedDeleteActions = new  ArrayList<>();
+      List<ActionSuite> expectedActions = Arrays.asList(ActionSuite.PRICE_ENDED);
+      List<ActionSuite> expectedDeleteActions = new  ArrayList<>();
 
       StateMachineTestPlan<String, String> plan =
           StateMachineTestPlanBuilder.<String, String>builder()
@@ -102,8 +102,8 @@ public class ActivationCompletedTest extends SpringStarter {
       machine = createMachine(Helper.buildMachineState("PendingActivate"), product);
       
       log.debug("start. actions: {}", machine.getExtendedState().getVariables().get("actions"));
-      List<ActionSuit> expectedActions = Arrays.asList(ActionSuit.WAITING_PAY_ENDED, ActionSuit.PRICE_ENDED);
-      List<ActionSuit> expectedDeleteActions = new  ArrayList<>();
+      List<ActionSuite> expectedActions = Arrays.asList(ActionSuite.WAITING_PAY_ENDED, ActionSuite.PRICE_ENDED);
+      List<ActionSuite> expectedDeleteActions = new  ArrayList<>();
       OffsetDateTime expectedWaitingPayEnded = t0.plus(getWaitingPayInterval());
 
       StateMachineTestPlan<String, String> plan =
@@ -122,7 +122,7 @@ public class ActivationCompletedTest extends SpringStarter {
       Helper.Assertions.assertProductEquals(expectedProduct, product);
       
       Map<Object, Object> variables = machine.getExtendedState().getVariables(); 
-      List<ActionSuit> actions = (List<ActionSuit>) variables.get("actions");
+      List<ActionSuite> actions = (List<ActionSuite>) variables.get("actions");
       OffsetDateTime waitingPayEnded = actions.get(0).getWakeAt();
       OffsetDateTime priceEnded = actions.get(1).getWakeAt();
       assertEquals(priceEnded, price.getNextPayDate().minus(getPriceEndedBefore()));

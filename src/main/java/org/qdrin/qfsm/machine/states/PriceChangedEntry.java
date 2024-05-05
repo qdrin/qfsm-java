@@ -8,7 +8,7 @@ import org.qdrin.qfsm.PriceType;
 import org.qdrin.qfsm.machine.actions.AddActionAction;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
-import org.qdrin.qfsm.tasks.ActionSuit;
+import org.qdrin.qfsm.tasks.ActionSuite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
@@ -32,6 +32,6 @@ public class PriceChangedEntry implements Action<String, String> {
     currentPrices.removeIf(p -> p.getPriceType().equals(PriceType.RecurringCharge.name()));
     currentPrices.add(nextPrice);
     log.debug("productPrice: {}", product.getProductPrice());
-    new AddActionAction(ActionSuit.CHANGE_PRICE_EXTERNAL).execute(context);  // Instant.now());
+    new AddActionAction(ActionSuite.CHANGE_PRICE_EXTERNAL).execute(context);  // Instant.now());
   }
 }

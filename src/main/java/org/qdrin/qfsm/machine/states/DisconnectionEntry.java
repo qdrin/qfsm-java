@@ -3,7 +3,7 @@ package org.qdrin.qfsm.machine.states;
 import javax.sql.DataSource;
 
 import org.qdrin.qfsm.machine.actions.AddActionAction;
-import org.qdrin.qfsm.tasks.ActionSuit;
+import org.qdrin.qfsm.tasks.ActionSuite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
@@ -20,6 +20,6 @@ public class DisconnectionEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
     log.debug("event: {}, message: {}", context.getEvent());
-    new AddActionAction(ActionSuit.DISCONNECT_EXTERNAL).execute(context); // Instant.now()
+    new AddActionAction(ActionSuite.DISCONNECT_EXTERNAL).execute(context); // Instant.now()
   }
 }

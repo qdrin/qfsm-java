@@ -24,7 +24,7 @@ import org.qdrin.qfsm.model.dto.ResponseEventDto;
 import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.qdrin.qfsm.persist.QStateMachineContextConverter;
 import org.qdrin.qfsm.repository.*;
-import org.qdrin.qfsm.tasks.ActionSuit;
+import org.qdrin.qfsm.tasks.ActionSuite;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -115,8 +115,8 @@ public class SpringStarter {
     }
     StateMachine<String, String> machine = service.acquireStateMachine(machineId);
     Map<Object, Object> variables = machine.getExtendedState().getVariables();
-    variables.put("actions", new ArrayList<ActionSuit>());
-    variables.put("deleteActions", new ArrayList<ActionSuit>());
+    variables.put("actions", new ArrayList<ActionSuite>());
+    variables.put("deleteActions", new ArrayList<ActionSuite>());
     variables.put("product", product);
     return machine;
   }
