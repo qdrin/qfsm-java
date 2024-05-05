@@ -1,5 +1,8 @@
 package org.qdrin.qfsm;
 
+import static org.mockito.ArgumentMatchers.nullable;
+
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -86,6 +89,17 @@ public class BundleBuilder {
         createFromProducts(products);
     }
 
+    public BundleBuilder(String mainOfferId, String priceId, String... componentOfferIds) {
+        Product product = new ProductBuilder(mainOfferId, "", priceId).build();
+        List<Product> products = new ArrayList<>();  // Arrays.asList(product);
+        products.add(product);
+        for(String componentOfferId: componentOfferIds) {
+            Product component = new ProductBuilder(componentOfferId, "", null).build();
+            products.add(component);
+        }
+        createFromProducts(products);
+    }
+
     public BundleBuilder(RequestEventDto event) {
         String eventType = event.getEvent().getEventType();
         this.eventType = eventType;
@@ -138,7 +152,7 @@ public class BundleBuilder {
             .partyRoleId(partyRoleId)
             .productClass(componentClass)
             .build();
-        components.add(product);
+        addComponent(product);
         return this;
     }
 
@@ -170,6 +184,22 @@ public class BundleBuilder {
         bundle.setTarificationPeriod(tarificationPeriod);
         for(Product component: components) {
             component.setTarificationPeriod(tarificationPeriod);
+        }
+        return this;
+    }
+
+    public BundleBuilder productStartDate(OffsetDateTime startDate) {
+        bundle.setProductStartDate(startDate);
+        for(Product component: components) {
+            component.setProductStartDate(startDate);
+        }
+        return this;
+    }
+
+    public BundleBuilder status(String status) {
+        bundle.setStatus(status);
+        for(Product component: components) {
+            component.setStatus(status);
         }
         return this;
     }

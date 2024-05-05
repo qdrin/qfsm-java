@@ -1,4 +1,4 @@
-package org.qdrin.qfsm.fsm.simple;
+package org.qdrin.qfsm.fsm;
 
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.*;
+import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.SpringStarter;
+import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.tasks.ActionSuite;
 import org.springframework.statemachine.test.StateMachineTestPlan;
@@ -100,6 +102,77 @@ public class ActivationStartedTest extends SpringStarter {
       assertEquals(product.getStatus(), "PENDING_ACTIVATE");
       Helper.Assertions.assertProductEquals(expectedProduct, product);
     }
+  }
+
+  @Nested
+  class Bundle {
+    @Test
+    public void testTrialSuccess() throws Exception {
+      OffsetDateTime t0 = OffsetDateTime.now();
+      TestBundle bundle = new BundleBuilder("bundleOffer1", "bundle1-price-trial",
+        "component1", "component2", "component3")
+        .tarificationPeriod(0)
+        .build();
+      Product product = bundle.bundle;
+      List<Product> components = bundle.components;
+      TestBundle expectedBundle = new BundleBuilder(bundle.products())
+        .tarificationPeriod(0)
+        .productStartDate(t0)
+        .status("PENDING_ACTIVATE")
+        .build();
+      machine = createMachine(bundle);
+      StateMachineTestPlan<String, String> plan =
+          StateMachineTestPlanBuilder.<String, String>builder()
+            .defaultAwaitTime(2)
+            .stateMachine(machine)
+            .step()
+                .expectState("Entry")
+                .and()
+            .step()
+                .sendEvent(MessageBuilder.withPayload("activation_started")
+                    .setHeader("product", product)
+                    .setHeader("datetime", OffsetDateTime.now())
+                    .build())
+                .expectState("PendingActivate")
+                .expectStateChanged(1)
+                .and()
+            .build();
+      plan.test();
+      assertEquals(product.getStatus(), "PENDING_ACTIVATE");
+      Helper.Assertions.assertProductEquals(expectedBundle.bundle, product);
+      Helper.Assertions.assertProductEquals(expectedBundle.components, components);
+    }
+
+    @Test
+    public void testActiveSuccess() throws Exception {
+      Product product = new ProductBuilder("bundleOffer1", "", "bundle1-price-active").build();
+      OffsetDateTime t0 = OffsetDateTime.now();
+      Product expectedProduct = new ProductBuilder(product)
+        .tarificationPeriod(0)
+        .status("PENDING_ACTIVATE")
+        .productStartDate(t0)
+        .build();
+      machine = createMachine(product);
+      StateMachineTestPlan<String, String> plan =
+          StateMachineTestPlanBuilder.<String, String>builder()
+            .defaultAwaitTime(2)
+            .stateMachine(machine)
+            .step()
+                .expectState("Entry")
+                .and()
+            .step()
+                .sendEvent(MessageBuilder.withPayload("activation_started")
+                    .setHeader("product", product)
+                    .setHeader("datetime", OffsetDateTime.now())
+                    .build())
+                .expectState("PendingActivate")
+                .expectStateChanged(1)
+                .and()
+            .build();
+      plan.test();
+      assertEquals(product.getStatus(), "PENDING_ACTIVATE");
+      Helper.Assertions.assertProductEquals(expectedProduct, product);
+    }    
   }
 
   @Test

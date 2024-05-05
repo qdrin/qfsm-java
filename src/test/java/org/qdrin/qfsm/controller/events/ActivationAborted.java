@@ -50,7 +50,8 @@ public class ActivationAborted extends ControllerStarter {
       Product product = new ProductBuilder("simpleOffer1", "PENDING_ACTIVATE", "simple1-price-trial").build();
       log.debug("product: {}", product);
       JsonNode machineState = Helper.buildMachineState("PendingActivate");
-      StateMachine<String, String> machine = createMachine(machineState, product);
+      product.setMachineState(machineState);
+      StateMachine<String, String> machine = createMachine(product);
       RequestEventDto event = new EventBuilder("activation_aborted", product).build();
       HttpEntity<RequestEventDto> request = new HttpEntity<>(event, headers);
       ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);

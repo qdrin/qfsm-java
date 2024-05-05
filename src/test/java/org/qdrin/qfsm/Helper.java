@@ -52,6 +52,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.github.cliftonlabs.json_simple.JsonArray;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -205,6 +206,21 @@ public class Helper {
       provisions.add(usage).add(payment).add(price);
     }  
     return result;
+  }
+
+  public static JsonNode buildComponentMachineState(JsonNode bundleMachineState) {
+    ObjectNode res;
+    if(bundleMachineState.has("Provision")) {
+      res = mapper.createObjectNode();
+      JsonNode usage = bundleMachineState.get("Provision").get(0);
+      ArrayNode provision = res.putArray("Provision");
+      provision.add(usage);
+      provision.add("PaymentFinal");
+      provision.add("PriceFinal");
+    } else {
+      res = bundleMachineState.deepCopy();
+    }
+    return res;
   }
 
   public static class Assertions {

@@ -1,4 +1,4 @@
-package org.qdrin.qfsm.fsm.simple;
+package org.qdrin.qfsm.fsm;
 
 import org.springframework.statemachine.StateMachine;
 
@@ -53,7 +53,7 @@ public class ActivationCompletedTest extends SpringStarter {
         .trialEndDate(t1)
         .activeEndDate(t1)
         .build();
-      machine = createMachine(null, product);
+      machine = createMachine(product);
       
       List<ActionSuite> expectedActions = Arrays.asList(ActionSuite.PRICE_ENDED);
       List<ActionSuite> expectedDeleteActions = new  ArrayList<>();
@@ -99,7 +99,8 @@ public class ActivationCompletedTest extends SpringStarter {
         .activeEndDate(t1)
         .build();
       
-      machine = createMachine(Helper.buildMachineState("PendingActivate"), product);
+      product.setMachineState(Helper.buildMachineState("PendingActivate"));
+      machine = createMachine(product);
       
       log.debug("start. actions: {}", machine.getExtendedState().getVariables().get("actions"));
       List<ActionSuite> expectedActions = Arrays.asList(ActionSuite.WAITING_PAY_ENDED, ActionSuite.PRICE_ENDED);

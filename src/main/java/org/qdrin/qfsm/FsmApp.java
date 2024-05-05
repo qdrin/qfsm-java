@@ -12,8 +12,6 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineEventResult;
 import org.springframework.statemachine.service.StateMachineService;
-import org.springframework.statemachine.state.AbstractState;
-import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
 
 import com.fasterxml.jackson.databind.JsonNode;
