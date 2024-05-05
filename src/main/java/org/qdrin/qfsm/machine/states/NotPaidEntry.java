@@ -18,7 +18,7 @@ public class NotPaidEntry implements Action<String, String> {
   DataSource dataSource;
   
   public void execute(StateContext<String, String> context) {
-    log.debug("NotPaidEntry started. event: {}", context.getEvent());
+    log.debug("event: {}", context.getEvent());
     new DeleteActionAction(ActionSuit.PRICE_ENDED).execute(context);
   }
 }

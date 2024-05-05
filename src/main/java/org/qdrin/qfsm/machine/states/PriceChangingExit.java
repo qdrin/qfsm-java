@@ -15,7 +15,7 @@ public class PriceChangingExit implements Action<String, String> {
   
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("PriceChangingExit started. event: {}, message: {}", context.getEvent(), context.getMessage());
+    log.debug("event: {}, message: {}", context.getEvent(), context.getMessage());
     Product product = context.getExtendedState().get("product", Product.class);
     // При выходе из Suspended мы обнуляем прайс, а здесь выставляем его равным nextPrice
     if(product.getProductPrice() == null || product.getProductPrice().isEmpty()) {

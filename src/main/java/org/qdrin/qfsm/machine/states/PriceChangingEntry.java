@@ -21,7 +21,7 @@ public class PriceChangingEntry implements Action<String, String> {
   
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("PriceChangingEntry started. event: {}, message: {}", context.getEvent(), context.getMessage());
+    log.debug("event: {}, message: {}", context.getEvent(), context.getMessage());
     ExtendedState extendedState = context.getStateMachine().getExtendedState();
     Product product = extendedState.get("product", Product.class);
     Map<Object, Object> variables = context.getExtendedState().getVariables();

@@ -22,7 +22,7 @@ public class ActivatedGuard implements Guard<String, String> {
       .getProductPrice(PriceType.RecurringCharge)
       .get();
     String prstatus = price.getProductStatus();
-    // log.debug("ActivatedGuard productStatus: {}, match: {}", prstatus, match);
+    // log.debug("productStatus: {}, match: {}", prstatus, match);
     return ObjectUtils.nullSafeEquals(match, prstatus);
   }
   

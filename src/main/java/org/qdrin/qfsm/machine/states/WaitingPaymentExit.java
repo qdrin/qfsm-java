@@ -18,7 +18,7 @@ public class WaitingPaymentExit implements Action<String, String> {
   DataSource dataSource;
   
   public void execute(StateContext<String, String> context) {
-    log.debug("WaitingPaymentExit started. event: {}", context.getEvent());
+    log.debug("event: {}", context.getEvent());
     new DeleteActionAction(ActionSuit.WAITING_PAY_ENDED).execute(context);
   }
 }

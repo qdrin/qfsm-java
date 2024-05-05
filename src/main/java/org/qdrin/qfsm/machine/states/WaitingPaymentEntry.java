@@ -19,7 +19,7 @@ public class WaitingPaymentEntry implements Action<String, String> {
 
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("WaitingPaymentEntry started. event: {}", context.getEvent());
+    log.debug("event: {}", context.getEvent());
     new AddActionAction(ActionSuit.WAITING_PAY_ENDED
                         .withWakeAt(OffsetDateTime.now().plus(waitingPayInterval)))
                         .execute(context);

@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PriceNotChangedEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("PriceNotChangedEntry started. event: {}, message: {}", context.getEvent());
+    log.debug("event: {}, message: {}", context.getEvent());
     Product product = context.getStateMachine().getExtendedState().get("product", Product.class);
     ProductPrice price = product.getProductPrice(PriceType.RecurringCharge).get();
     int pPeriod = (int) price.getPeriod();
@@ -23,6 +23,6 @@ public class PriceNotChangedEntry implements Action<String, String> {
     price.setPeriod(pPeriod);
     // product.getProductPrice().removeIf(p -> p.getPriceType().equals(PriceType.RecurringCharge.name()));
     // product.getProductPrice().add(price);
-    log.debug("PriceNotChangedEntry productPrice: {}", price);
+    log.debug("productPrice: {}", price);
   }
 }

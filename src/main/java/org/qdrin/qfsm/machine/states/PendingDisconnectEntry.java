@@ -40,7 +40,7 @@ public class PendingDisconnectEntry implements Action<String, String> {
         .findFirst();
     }
     String productMode = ch.isPresent() ? ch.get().getValue().toString() : "Postponed";
-    log.debug("PendingActivateEntry deactivation mode: {}", productMode);
+    log.debug("deactivation mode: {}", productMode);
 
 
     Mono<Message<String>> paymentOff = Mono.just(MessageBuilder

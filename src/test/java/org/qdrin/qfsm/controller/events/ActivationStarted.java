@@ -122,10 +122,11 @@ public class ActivationStarted extends ControllerStarter {
           .productIds(actualProducts)
           .tarificationPeriod(0)
           .build();
-      log.debug("expected bundle: {}", expectedBundle.bundle);
-      log.debug("expected components: {}", expectedBundle.components);
-      List<Product> expectedProducts = expectedBundle.products();
-      Assertions.assertProductEquals(expectedProducts, actualProducts);
+      log.debug("bundle expected: {}\nbundle actual: {}", expectedBundle.bundle, actualProducts.get(0));
+      Assertions.assertProductEquals(expectedBundle.bundle, actualProducts.get(0));
+      log.debug("components expected: {}\n, components actual: {}",
+        expectedBundle.components, actualProducts.subList(1, actualProducts.size() - 1));
+      Assertions.assertProductEquals(expectedBundle.components, actualProducts.subList(1, actualProducts.size()-1));
       
     }
   }

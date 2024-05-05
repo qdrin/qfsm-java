@@ -18,7 +18,7 @@ public class SuspendedExit implements Action<String, String> {
   DataSource dataSource;
   
   public void execute(StateContext<String, String> context) {
-    log.debug("SuspendedExit started. event: {}", context.getEvent());
+    log.debug("event: {}", context.getEvent());
     new DeleteActionAction(ActionSuit.SUSPEND_ENDED).execute(context);
   }
 }

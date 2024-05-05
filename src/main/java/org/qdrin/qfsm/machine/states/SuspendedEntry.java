@@ -18,7 +18,7 @@ public class SuspendedEntry implements Action<String, String> {
 
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("SuspendedEntry started. event: {}", context.getEvent());
+    log.debug("event: {}", context.getEvent());
     new AddActionAction(ActionSuit.SUSPEND_ENDED).execute(context);  // Instant.now().plusSeconds(30*86400)
   }
 }

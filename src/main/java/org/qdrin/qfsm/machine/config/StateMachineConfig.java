@@ -1,10 +1,12 @@
 package org.qdrin.qfsm.machine.config;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.qdrin.qfsm.PriceType;
+import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
@@ -276,6 +278,20 @@ public class StateMachineConfig {
     @Bean
     public Guard<String, String> samePrice() {
       return new PriceGuard(Optional.of(true), Optional.of(true));
+    }
+
+    @Bean
+    public Guard<String, String> isTarificated() {
+      return new ProductClassGuard(Arrays.asList(
+        ProductClass.SIMPLE, ProductClass.BUNDLE, ProductClass.CUSTOM_BUNDLE
+      ));
+    }
+
+    @Bean
+    public Guard<String, String> isNotTarificated() {
+      return new ProductClassGuard(Arrays.asList(
+        ProductClass.BUNDLE_COMPONENT, ProductClass.CUSTOM_BUNDLE_COMPONENT
+      ));
     }
   }
 }

@@ -17,7 +17,7 @@ public class AddActionAction implements Action<String, String> {
   }
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("AddActionAction.execute actionsToDelete: {}", actionsToAdd);
+    log.debug("actionsToDelete: {}", actionsToAdd);
     Map<Object, Object> variables = context.getExtendedState().getVariables();
     List<ActionSuit> actions = (List<ActionSuit>) variables.get("actions");
     for(ActionSuit a: actionsToAdd) {

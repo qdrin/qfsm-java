@@ -17,7 +17,7 @@ public class DeleteActionAction implements Action<String, String> {
   }
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("DeleteActionAction.execute actionsToDelete: {}", actionsToDelete);
+    log.debug("actionsToDelete: {}", actionsToDelete);
     Map<Object, Object> variables = context.getExtendedState().getVariables();
     List<ActionSuit> actions = (List<ActionSuit>) variables.get("actions");
     List<ActionSuit> deleteActions = (List<ActionSuit>) variables.get("deleteActions");

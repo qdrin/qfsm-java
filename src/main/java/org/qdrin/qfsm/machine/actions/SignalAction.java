@@ -16,7 +16,7 @@ public class SignalAction implements Action<String, String> {
   }
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("SignalAction.execute signal: {}", signal);
+    log.debug("signal: {}", signal);
     Mono<Message<String>> msg = Mono.just(MessageBuilder
       .withPayload(signal).build());
     var res = context.getStateMachine().sendEvent(msg).collectList();

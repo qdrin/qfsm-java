@@ -19,7 +19,7 @@ public class ResumingEntry implements Action<String, String> {
   
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("ResumingEntry started. event: {}, message: {}", context.getEvent(), context.getMessage());
+    log.debug("event: {}, message: {}", context.getEvent(), context.getMessage());
     new AddActionAction(ActionSuit.RESUME_EXTERNAL).execute(context);  // Instant.now()
   }
 }

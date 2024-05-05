@@ -32,7 +32,7 @@ public class PriceActiveEntry implements Action<String, String> {
 
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("PriceActiveEntry started. event: {}", context.getEvent());
+    log.debug("event: {}", context.getEvent());
     new SignalAction("prolong").execute(context);
     Product product = context.getExtendedState().get("product", Product.class);
     ProductPrice nextPrice = context.getStateMachine().getExtendedState().get("nextPrice", ProductPrice.class);

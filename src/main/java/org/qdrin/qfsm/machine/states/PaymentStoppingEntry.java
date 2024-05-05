@@ -20,7 +20,7 @@ public class PaymentStoppingEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
     Product product = context.getExtendedState().get("product", Product.class);
-    log.debug("PaymentStoppingEntry started. event: {}, message: {}", context.getEvent());
+    log.debug("event: {}, message: {}", context.getEvent());
     new AddActionAction(ActionSuit.DISCONNECT_EXTERNAL_EXTERNAL).execute(context);  // Instant.now()
   }
 }
