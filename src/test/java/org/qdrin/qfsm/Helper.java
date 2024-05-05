@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.mockserver.client.MockServerClient;
@@ -329,11 +330,11 @@ public class Helper {
 
     public static void assertProductEquals(List<Product> expected, List<Product> actual) throws Exception {
       for(Product expectedProduct: expected) {
-        Product actualProduct = actual.stream()
+        Optional<Product> oactualProduct = actual.stream()
               .filter(p -> p.getProductOfferingId().equals(expectedProduct.getProductOfferingId()))
-              .findFirst().get();
-        assertNotNull(actualProduct);
-        assertProductEquals(expectedProduct, actualProduct);
+              .findFirst();
+        assert(oactualProduct.isPresent()) : String.format("product not found: %s", expectedProduct.getProductId());
+        assertProductEquals(expectedProduct, oactualProduct.get());
       }
     }
   }

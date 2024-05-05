@@ -114,7 +114,7 @@ public class FsmApp {
 			Product product = new Product(head);
 			product.setPartyRoleId(partyRoleId);
 			product.setProductClass(productClass.ordinal());
-			ArrayList<Product> components = new ArrayList<>();
+			List<Product> components = productBundle.getComponents();
 			List<ProductRelationship> productRelations = new ArrayList<>(); 
 			List<ProductOrderItemRelationshipDto> itemRelations = head.getProductOrderItemRelationship();
 			log.debug("searching bundle relationship for components {}", itemRelations);
@@ -147,7 +147,6 @@ public class FsmApp {
 			head.setProductId(product.getProductId());
 			productBundle.setDrive(product);
 			productBundle.setBundle(product);
-			productBundle.setComponents(components);
 			orderItems.add(head);
 			bundles.add(productBundle);
 		}  // End of bundle processing, orderItems contain bundles now
@@ -171,7 +170,6 @@ public class FsmApp {
 			orderItems.add(orderItem);
 			productBundle.setBundle(product);
 			productBundle.setDrive(product);
-			productBundle.setComponents(null);
 			bundles.add(productBundle);
 		}
 		FsmResult result = new FsmResult();
@@ -209,7 +207,7 @@ public class FsmApp {
 			bundle.setDrive(head);
 			bundle.setBundle(head);
 
-			List<Product> components = new ArrayList<>();
+			List<Product> components = bundle.getComponents();
 			for(ProductRelationship relationship: head.getProductRelationship()) {
 				Optional<Product> component = products.stream()  // Ищем по продуктам, заявленным в ордере
 					.filter(p->p.getProductId().equals(relationship.getProductId()))
@@ -224,7 +222,6 @@ public class FsmApp {
 				processedProducts.add(component.get());
 				components.add(component.get());
 			}
-			bundle.setComponents(components);
 			bundles.add(bundle);
 			processedProducts.add(head);
 		}
@@ -251,7 +248,6 @@ public class FsmApp {
 					}
 					bundle.setDrive(product);
 					bundle.setBundle(ohead.get());
-					bundle.setComponents(null);
 					bundles.add(bundle);
 					break;
 				default:

@@ -125,8 +125,8 @@ public class ActivationStarted extends ControllerStarter {
       log.debug("bundle expected: {}\nbundle actual: {}", expectedBundle.bundle, actualProducts.get(0));
       Assertions.assertProductEquals(expectedBundle.bundle, actualProducts.get(0));
       log.debug("components expected: {}\n, components actual: {}",
-        expectedBundle.components, actualProducts.subList(1, actualProducts.size() - 1));
-      Assertions.assertProductEquals(expectedBundle.components, actualProducts.subList(1, actualProducts.size()-1));
+        expectedBundle.components, actualProducts.subList(1, actualProducts.size()));
+      Assertions.assertProductEquals(expectedBundle.components, actualProducts.subList(1, actualProducts.size()));
       
     }
   }

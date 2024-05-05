@@ -16,6 +16,7 @@ import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.qdrin.qfsm.service.QStateMachineService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -225,10 +226,19 @@ public class StateMachineConfig {
     Action<String, String> resetTarificationPeriodAndStartDate() {
       return new Action<String, String>() {
         public void execute(StateContext<String, String> context) {
-          Product product = context.getExtendedState().get("product", Product.class);
-          log.info("Reset tarification period. productId: {}", product.getProductId());
+          ExtendedState extendedState = context.getStateMachine().getExtendedState();
+          Product product = extendedState.get("product", Product.class);
+          List<Product> components = (List<Product>) extendedState.getVariables().get("components");
+          log.debug("components: {}", components);
+          OffsetDateTime t0 = OffsetDateTime.now();
+          log.info("Reset tarification period. productId: {}, tarificationPeriod: {}, productStartDate: {}",
+              product.getProductId(), 0, t0);
+          product.setProductStartDate(t0);
           product.setTarificationPeriod(0);
-          product.setProductStartDate(OffsetDateTime.now());
+          components.forEach((c) -> {
+            c.setTarificationPeriod(0);
+            c.setProductStartDate(t0);
+          });
         }
       };
     }

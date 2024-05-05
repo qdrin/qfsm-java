@@ -118,6 +118,7 @@ public class SpringStarter {
     variables.put("actions", new ArrayList<ActionSuite>());
     variables.put("deleteActions", new ArrayList<ActionSuite>());
     variables.put("product", product);
+    variables.put("components", new ArrayList<Product>());
     return machine;
   }
 
