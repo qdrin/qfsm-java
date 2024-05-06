@@ -1,5 +1,4 @@
 package org.qdrin.qfsm.machine.states;
-import java.util.Map;
 
 import javax.sql.DataSource;
 

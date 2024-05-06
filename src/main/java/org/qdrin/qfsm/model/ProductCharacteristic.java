@@ -1,7 +1,5 @@
 package org.qdrin.qfsm.model;
 
-import java.time.OffsetDateTime;
-
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;

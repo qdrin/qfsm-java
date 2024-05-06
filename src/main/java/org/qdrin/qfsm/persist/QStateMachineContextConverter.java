@@ -5,13 +5,11 @@ import org.springframework.statemachine.StateMachineContext;
 import java.util.List;
 
 import org.springframework.statemachine.ExtendedState;
-import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.kryo.StateMachineContextSerializer;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
-import org.springframework.statemachine.support.AbstractStateMachine;
 import org.springframework.statemachine.support.DefaultExtendedState;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 

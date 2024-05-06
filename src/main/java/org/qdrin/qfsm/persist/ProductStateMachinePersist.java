@@ -5,17 +5,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.qdrin.qfsm.model.ContextEntity;
-import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.repository.ContextRepository;
-import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.StateMachinePersist;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Configuration
 public class ProductStateMachinePersist implements StateMachinePersist<String, String, String> {
   Map<String, StateMachineContext<String, String>> contexts = new HashMap<>();

@@ -10,8 +10,6 @@ import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.EventBuilder;
 import org.qdrin.qfsm.Helper;
-import org.qdrin.qfsm.ProductBuilder;
-import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.controller.ControllerStarter;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.*;
@@ -21,9 +19,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.statemachine.StateMachine;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.extern.slf4j.Slf4j;
 

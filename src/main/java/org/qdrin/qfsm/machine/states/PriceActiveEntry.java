@@ -10,7 +10,6 @@ import org.qdrin.qfsm.tasks.ActionSuite;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.time.temporal.TemporalUnit;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -40,7 +39,6 @@ public class PriceActiveEntry implements Action<String, String> {
     ProductPrice nextPrice = extendedState.get("nextPrice", ProductPrice.class);
     if(! context.getEvent().equals("complete_price")) {
       OffsetDateTime activeEndDate = nextPrice.getNextPayDate();
-      activeEndDate.minus(priceEndedBefore);
       product.setActiveEndDate(activeEndDate);
       List<Product> components = (List<Product>) extendedState.getVariables().get("components");
       components.forEach((c) -> {c.setActiveEndDate(activeEndDate);});

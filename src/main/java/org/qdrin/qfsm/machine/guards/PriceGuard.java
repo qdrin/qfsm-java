@@ -4,14 +4,11 @@ import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.guard.Guard;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Optional;
 
 import org.qdrin.qfsm.PriceType;
 import org.qdrin.qfsm.model.*;
 
-@Slf4j
 public class PriceGuard implements Guard<String, String> {
   private boolean equalDir;
   private boolean fullDir;

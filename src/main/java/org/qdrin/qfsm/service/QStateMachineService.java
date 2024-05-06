@@ -6,15 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.Lifecycle;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
-import org.springframework.statemachine.StateMachineException;
-import org.springframework.statemachine.StateMachinePersist;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.persist.StateMachinePersister;

@@ -6,9 +6,6 @@ import org.springframework.util.ObjectUtils;
 import org.qdrin.qfsm.PriceType;
 import org.qdrin.qfsm.model.*;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class ActivatedGuard implements Guard<String, String> {
   private final String match;
 

@@ -33,7 +33,7 @@ public class PriceChangingEntry implements Action<String, String> {
       return;
     } else {
       nextPrice = currentPrice;
-      if(nextPrice.getProductStatus().equals("ACTIVE_TRIAL")) {
+      if(nextPrice.getProductStatus().equals("ACTIVE_TRIAL") && nextPrice.getNextPayDate() != null) {
         log.debug("First trial period. Sending auto 'payment_processed'");
         paymentProcessed = new SignalAction("payment_processed");        
       }

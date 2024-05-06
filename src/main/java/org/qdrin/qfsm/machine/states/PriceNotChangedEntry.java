@@ -1,5 +1,4 @@
 package org.qdrin.qfsm.machine.states;
-import java.util.Map;
 
 import org.qdrin.qfsm.PriceType;
 import org.qdrin.qfsm.model.Product;

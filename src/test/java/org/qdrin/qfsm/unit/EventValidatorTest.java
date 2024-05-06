@@ -1,8 +1,6 @@
 package org.qdrin.qfsm.unit;
 
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.OffsetDateTime;
@@ -18,9 +16,6 @@ import org.qdrin.qfsm.model.dto.ProductRequestDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.utils.EventValidator;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class EventValidatorTest {
     
     @Test

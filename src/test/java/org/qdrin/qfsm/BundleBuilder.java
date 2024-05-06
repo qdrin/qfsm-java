@@ -122,13 +122,15 @@ public class BundleBuilder {
         Product product = new ProductBuilder(mainOfferId, "", priceId).build();
         drive = product;
         products.add(product);
-        if(componentOfferIds != null) {
-            for(String componentOfferId: componentOfferIds) {
-                Product component = new ProductBuilder(componentOfferId, "", null).build();
-                products.add(component);
-            }
+        for(String componentOfferId: componentOfferIds) {
+            Product component = new ProductBuilder(componentOfferId, "", null).build();
+            products.add(component);
         }
         createFromProducts();
+    }
+
+    public BundleBuilder(String offerId, String priceId) {
+        this(offerId, priceId, new String[]{});
     }
 
     public BundleBuilder(RequestEventDto event) {

@@ -5,9 +5,6 @@ import org.springframework.statemachine.guard.Guard;
 
 import java.util.Collection;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class ActiveStatesGuard implements Guard<String, String> {
   private final Collection<String> stateIds;
 

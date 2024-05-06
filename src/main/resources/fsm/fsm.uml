@@ -16,6 +16,12 @@
       <transition xmi:type="uml:Transition" xmi:id="_WtcHoL9OEe65db1_bM-TwQ" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_z6iD0ArEEe-F_I8jzb-Dqg"/>
       <transition xmi:type="uml:Transition" xmi:id="_EwcgQMBDEe64IK3ZTfm97w" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_vh29AMDOEe6ubM7h2HVYrA"/>
       <transition xmi:type="uml:Transition" xmi:id="_tSSasMlsEe6D_qDhyLHyWw" source="_mBTgYMlsEe6D_qDhyLHyWw" target="_Gay-IKAWEe6Sh616vaZpZA">
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_eWb4EAunEe-zt_IWkBmQJw">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_eWb4EQunEe-zt_IWkBmQJw">
+            <language>bean</language>
+            <body>isIndependedlyActivated</body>
+          </specification>
+        </ownedRule>
         <effect xmi:type="uml:OpaqueBehavior" xmi:id="_Z8opQAkVEe-IvNqTTW17lw">
           <language>bean</language>
           <body>resetTarificationPeriodAndStartDate</body>

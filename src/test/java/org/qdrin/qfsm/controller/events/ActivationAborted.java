@@ -1,16 +1,12 @@
 package org.qdrin.qfsm.controller.events;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.time.OffsetDateTime;
 import java.util.*;
 
 import org.junit.jupiter.api.*;
-import org.mockserver.serialization.HttpRequestSerializer;
 import org.qdrin.qfsm.EventBuilder;
 import org.qdrin.qfsm.Helper;
-import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.TestOffers.OfferDef;
@@ -18,9 +14,6 @@ import org.qdrin.qfsm.controller.ControllerStarter;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -55,7 +48,7 @@ public class ActivationAborted extends ControllerStarter {
 
       OffsetDateTime t0 = OffsetDateTime.now();
       JsonNode machineState = Helper.buildMachineState("PendingActivate");
-      TestBundle bundle = new BundleBuilder(offerId, priceId, null)
+      TestBundle bundle = new BundleBuilder(offerId, priceId)
         .machineState(machineState)
         .tarificationPeriod(0)
         .build();
@@ -80,7 +73,6 @@ public class ActivationAborted extends ControllerStarter {
         .status("ABORTED")
         .tarificationPeriod(0)
         .build();
-      Product expectedProduct = expectedBundle.drive;
       log.debug("expected: {}\nactual: {}", expectedBundle.drive, bundle.drive);
       assertProductEquals(expectedBundle.drive, product);
     }

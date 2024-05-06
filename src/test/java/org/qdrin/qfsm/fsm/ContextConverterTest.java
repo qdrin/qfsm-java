@@ -11,7 +11,6 @@ import static org.junit.Assert.*;
 import java.util.function.Consumer;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,7 +52,7 @@ public class ContextConverterTest extends SpringStarter {
 
   @Test
   public void testInitialState() throws Exception {
-    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-trial", null).build();
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-trial").build();
     machine = createMachine(bundle);
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
@@ -83,7 +82,7 @@ public class ContextConverterTest extends SpringStarter {
     ClassPathResource resource = new ClassPathResource("/contexts/machinestate_sample.json", getClass());
     ObjectMapper mapper = new ObjectMapper();
     JsonNode machineState = mapper.readTree(resource.getInputStream());
-    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null)
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active")
       .machineState(machineState)
       .build();
     machine = createMachine(bundle);
@@ -123,7 +122,7 @@ public class ContextConverterTest extends SpringStarter {
   public void testSimpleStateSet() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode machineState = mapper.readTree("\"Aborted\"");
-    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null)
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active")
       .machineState(machineState)
       .build();
     machine = createMachine(bundle);
@@ -144,7 +143,7 @@ public class ContextConverterTest extends SpringStarter {
   public void testOrthogonalStateSet() throws Exception {
     ClassPathResource resource = new ClassPathResource("/contexts/machinestate_sample.json", getClass());
     ObjectMapper mapper = new ObjectMapper();
-    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null).build();
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active").build();
     JsonNode machineState = mapper.readTree(resource.getInputStream());
     bundle.drive.setMachineState(machineState);
     machine = createMachine(bundle);
@@ -166,7 +165,7 @@ public class ContextConverterTest extends SpringStarter {
   @Test
   public void testOrthogonalStateSetMachineStateBuilder() throws Exception {
     JsonNode machineState = Helper.buildMachineState("Prolongation", "Paid", "PriceActive");
-    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null).build();
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active").build();
     bundle.drive.setMachineState(machineState);
     machine = createMachine(bundle);
     log.debug("machine: {}", machine);
@@ -185,12 +184,12 @@ public class ContextConverterTest extends SpringStarter {
 
   @Test
   public void testMachineStateSequence() throws Exception {
-    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null)
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active")
       .machineState(Helper.buildMachineState("Prolongation", "Paid", "PriceActive"))
       .build();
     machine = createMachine(bundle);
     assertEquals("Provision", machine.getState().getId());
-    bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null).build();
+    bundle = new BundleBuilder("simpleOffer1", "simple1-price-active").build();
     machine = createMachine(bundle);
     assertEquals("Entry", machine.getState().getId());
   }

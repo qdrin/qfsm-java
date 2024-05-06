@@ -1,6 +1,4 @@
 package org.qdrin.qfsm.machine.states;
-import java.time.Instant;
-import java.util.List;
 
 import javax.sql.DataSource;
 

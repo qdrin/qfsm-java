@@ -12,7 +12,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import lombok.*;
-import lombok.Builder.Default;
 import lombok.experimental.FieldDefaults;
 import org.qdrin.qfsm.model.dto.*;
 

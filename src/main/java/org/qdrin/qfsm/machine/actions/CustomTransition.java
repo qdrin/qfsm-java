@@ -3,7 +3,6 @@ package org.qdrin.qfsm.machine.actions;
 import java.util.Collection;
 import java.util.function.Function;
 
-import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.annotation.*;

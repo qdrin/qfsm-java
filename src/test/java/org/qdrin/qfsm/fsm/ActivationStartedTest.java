@@ -1,23 +1,19 @@
 package org.qdrin.qfsm.fsm;
 
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 
 import static org.junit.Assert.*;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.*;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.Helper;
-import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.model.*;
-import org.qdrin.qfsm.tasks.ActionSuite;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
@@ -45,7 +41,7 @@ public class ActivationStartedTest extends SpringStarter {
     @Test
     public void testTrialSuccess() throws Exception {
       OffsetDateTime t0 = OffsetDateTime.now();
-      TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-trial", null)
+      TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-trial")
         .productStartDate(t0.minusSeconds(30))
         .build();
       TestBundle expectedBundle = new BundleBuilder(bundle)
@@ -75,7 +71,7 @@ public class ActivationStartedTest extends SpringStarter {
     @Test
     public void testActiveSuccess() throws Exception {
       OffsetDateTime t0 = OffsetDateTime.now();
-      TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null)
+      TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active")
         .productStartDate(t0.minusSeconds(30))
         .build();
       TestBundle expectedBundle = new BundleBuilder(bundle)
@@ -177,11 +173,6 @@ public class ActivationStartedTest extends SpringStarter {
       Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
       Helper.Assertions.assertProductEquals(expectedBundle.components(), components);
     }
-
-    @Test
-    public void testFailAddComponent() throws Exception {
-      assert(false);
-    }
   }
 
   @Nested
@@ -268,7 +259,50 @@ public class ActivationStartedTest extends SpringStarter {
         .tarificationPeriod(0)
         .build();
 
-      TestBundle bundle = new BundleBuilder("component3", null, null)
+      TestBundle bundle = new BundleBuilder("component3", null)
+        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
+        .addBundle(preBundle.bundle)
+        .build();
+      log.debug("bundle: {}", bundle);
+      Product product = bundle.drive;
+      TestBundle expectedBundle = new BundleBuilder(bundle)
+        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
+        .tarificationPeriod(0)
+        .productStartDate(t0)
+        .status("PENDING_ACTIVATE")
+        .build();
+      machine = createMachine(bundle);
+      assertEquals(bundle.bundle.getProductId(), preBundle.bundle.getProductId());
+      StateMachineTestPlan<String, String> plan =
+          StateMachineTestPlanBuilder.<String, String>builder()
+            .defaultAwaitTime(2)
+            .stateMachine(machine)
+            .step()
+                .expectState("Entry")
+                .and()
+            .step()
+                .sendEvent("activation_started")
+                .expectState("PendingActivate")
+                .expectStateChanged(1)
+                .and()
+            .build();
+      plan.test();
+      assertEquals(product.getStatus(), "PENDING_ACTIVATE");
+      Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
+      Helper.Assertions.assertProductEquals(expectedBundle.bundle, bundle.bundle);
+      Helper.Assertions.assertProductEquals(expectedBundle.components(), bundle.components());
+    }
+
+    @Test
+    public void testSuccessToActive() throws Exception {
+      OffsetDateTime t0 = OffsetDateTime.now();
+      TestBundle preBundle = new BundleBuilder("customBundleOffer1", "custom1-price-trial",
+        "component1", "component2")
+        .machineState(Helper.buildMachineState("Active", "Paid", "PriceActive"))
+        .tarificationPeriod(0)
+        .build();
+
+      TestBundle bundle = new BundleBuilder("component3", null)
         .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
         .addBundle(preBundle.bundle)
         .build();
