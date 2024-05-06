@@ -74,9 +74,9 @@ public class SpringStarter {
   }
 
   public StateMachine<String, String> createMachine(TestBundle bundle) {
-    String machineId = bundle.bundle.getProductId();
-    Product product = bundle.bundle;
-    List<Product> components = bundle.components == null ? new ArrayList<>() : bundle.components;
+    String machineId = bundle.drive.getProductId();
+    Product product = bundle.drive;
+    List<Product> components = bundle.components;
     if(product.getMachineState() == null) {
       product.setMachineState(Helper.buildMachineState("PendingActivate"));
     }
@@ -102,7 +102,7 @@ public class SpringStarter {
     variables.put("deleteActions", new ArrayList<ActionSuite>());
     variables.put("product", product);
     variables.put("components", components);
-    // variables.put("bundle", null);
+    if(bundle.bundle != null) { variables.put("bundle", bundle.bundle); }
     return machine;
   }
 

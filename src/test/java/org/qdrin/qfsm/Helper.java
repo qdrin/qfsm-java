@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.mockserver.client.MockServerClient;
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.model.ProductRelationship;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.ProductRequestDto;
@@ -209,18 +210,17 @@ public class Helper {
   }
 
   public static JsonNode buildComponentMachineState(JsonNode bundleMachineState) {
-    ObjectNode res;
     if(bundleMachineState.has("Provision")) {
-      res = mapper.createObjectNode();
+      ObjectNode res = mapper.createObjectNode();
       JsonNode usage = bundleMachineState.get("Provision").get(0);
       ArrayNode provision = res.putArray("Provision");
       provision.add(usage);
       provision.add("PaymentFinal");
       provision.add("PriceFinal");
+      return res;
     } else {
-      res = bundleMachineState.deepCopy();
+      return bundleMachineState.deepCopy();
     }
-    return res;
   }
 
   public static class Assertions {
@@ -303,6 +303,57 @@ public class Helper {
       assertDates(expected, real, message, 10);
     }
 
+    public static void assertPriceEquals(ProductPrice expected, ProductPrice actual) {
+      if(expected.getId() != null)
+        { assertEquals(expected.getId(), actual.getId(), "id"); }
+      if(expected.getName() != null)
+        { assertEquals(expected.getName(), actual.getName(), "name"); }
+      if(expected.getPriceType() != null)
+        { assertEquals(expected.getPriceType(), actual.getPriceType(), "priceType"); }
+      if(expected.getProductStatus() != null)
+        { assertEquals(expected.getProductStatus(), actual.getProductStatus(), "productStatus"); }
+      if(expected.getRecurringChargePeriodType() != null)
+        { assertEquals(expected.getRecurringChargePeriodType(), actual.getRecurringChargePeriodType(), "recurringChargePeriodType"); }
+      if(expected.getRecurringChargePeriodLength() != -1)
+        { assertEquals(expected.getRecurringChargePeriodLength(), actual.getRecurringChargePeriodLength(), "recurringChargePeriodLength"); }
+      if(expected.getDuration() != -1)
+        { assertEquals(expected.getDuration(), actual.getDuration(), "duration"); }
+      if(expected.getPeriod() != -1)
+        { assertEquals(expected.getPeriod(), actual.getPeriod(), "period"); }
+      if(expected.getNextPayDate() != null)
+        { assertDates(expected.getNextPayDate(), actual.getNextPayDate(), "nextPayDate"); }
+      if(expected.getTarificationTag() != null)
+        { assertEquals(expected.getTarificationTag(), actual.getTarificationTag(), "tarificationTag"); }
+      if(expected.getNextEntity() != null)
+        { assertEquals(expected.getNextEntity(), actual.getNextEntity(), "nextEntity"); }
+      if(expected.getPriceAlterations() != null)
+        { assertEquals(expected.getPriceAlterations(), actual.getPriceAlterations(), "priceAlterations"); }
+      if(expected.getTax() != null)
+        { assertEquals(expected.getTax(), actual.getTax(), "tax"); }
+      if(expected.getPrice() != null)
+        { assertEquals(expected.getPrice(), actual.getPrice(), "price"); }
+      if(expected.getUnitOfMeasure() != null)
+        { assertEquals(expected.getUnitOfMeasure(), actual.getUnitOfMeasure(), "unitOfMeasure"); }
+      if(expected.getValidFor() != null)
+        { assertEquals(expected.getValidFor(), actual.getValidFor(), "validFor"); }
+      if(expected.getHref() != null)
+        { assertEquals(expected.getHref(), actual.getHref(), "href"); }
+      if(expected.getPsiSpecific() != null)
+        { assertEquals(expected.getPsiSpecific(), actual.getPsiSpecific(), "psiSpecific"); }
+      if(expected.getValue() != null)
+        { assertEquals(expected.getValue(), actual.getValue(), "value"); }
+    }
+
+    public static void assertPriceEquals(List<ProductPrice> expected, List<ProductPrice> actual) {
+      for(ProductPrice expectedPrice: expected) {
+        Optional<ProductPrice> oactualPrice = actual.stream()
+              .filter(p -> p.getId().equals(expectedPrice.getId()))
+              .findFirst();
+        assert(oactualPrice.isPresent()) : String.format("price not found: %s", expectedPrice.getId());
+        assertPriceEquals(expectedPrice, oactualPrice.get());
+      }
+    }
+
     public static void assertProductEquals(Product expected, Product actual) throws Exception {
       if(expected.getProductId() != null) 
         { assertEquals(expected.getProductId(), actual.getProductId(), "productId"); }
@@ -331,7 +382,7 @@ public class Helper {
       if(expected.getProductStartDate() != null)
         { assertDates(expected.getProductStartDate(), actual.getProductStartDate(), "productStartDate"); }
       if(! expected.getProductPrice().isEmpty())
-        { assertEquals(expected.getProductPrice(), actual.getProductPrice(), "productPrice"); }
+        { assertPriceEquals(expected.getProductPrice(), actual.getProductPrice()); }
       if(! expected.getCharacteristic().isEmpty())
         { assertEquals(expected.getCharacteristic(), actual.getCharacteristic(), "characteristic"); }
       if(! expected.getFabricRef().isEmpty())

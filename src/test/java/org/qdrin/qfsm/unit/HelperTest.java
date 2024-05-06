@@ -78,7 +78,7 @@ public class HelperTest {
         List<ProductPrice> empty = new ArrayList();
         assertEquals(empty, product.getProductPrice());
         assertEquals("component1", product.getProductOfferingId());
-        assertEquals(-1, product.getProductClass());
+        assertEquals(ProductClass.VOID.ordinal(), product.getProductClass());
         assertEquals(-1, product.getTarificationPeriod());
         assertEquals("PENDING_ACTIVATE", product.getStatus());
         assertEquals("subscriber1", product.getPartyRoleId());
@@ -90,7 +90,7 @@ public class HelperTest {
             .isCustom(false)
             .build();
         assertEquals("component2", p1.getProductOfferingId());
-        assertEquals(-1, p1.getProductClass());
+        assertEquals(ProductClass.VOID.ordinal(), p1.getProductClass());
         assertNotEquals(product.getProductId(), p1.getProductId());
         assertEquals("subscriber1", p1.getPartyRoleId());
         assertEquals(empty, p1.getProductPrice());

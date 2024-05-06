@@ -45,7 +45,8 @@ public class Product {
   @JdbcTypeCode(SqlTypes.JSON)
   @Builder.Default
   JsonNode machineState = new ObjectMapper().createObjectNode();
-  int productClass;
+  @Builder.Default
+  int productClass = 0;
   int tarificationPeriod;
   OffsetDateTime trialEndDate;
   OffsetDateTime activeEndDate;

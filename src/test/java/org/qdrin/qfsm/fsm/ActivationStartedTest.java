@@ -113,7 +113,7 @@ public class ActivationStartedTest extends SpringStarter {
         "component1", "component2", "component3")
         .tarificationPeriod(0)
         .build();
-      Product product = bundle.bundle;
+      Product product = bundle.drive;
       List<Product> components = bundle.components;
       TestBundle expectedBundle = new BundleBuilder(bundle.products())
         .tarificationPeriod(0)
@@ -139,7 +139,7 @@ public class ActivationStartedTest extends SpringStarter {
             .build();
       plan.test();
       assertEquals(product.getStatus(), "PENDING_ACTIVATE");
-      Helper.Assertions.assertProductEquals(expectedBundle.bundle, product);
+      Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
       Helper.Assertions.assertProductEquals(expectedBundle.components, components);
     }
 

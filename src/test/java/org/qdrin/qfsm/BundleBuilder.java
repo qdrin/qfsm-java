@@ -16,8 +16,7 @@ import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
+import com.fasterxml.jackson.databind.JsonNode;
 
 // @FieldDefaults(level = AccessLevel.PUBLIC)
 public class BundleBuilder {
@@ -25,6 +24,7 @@ public class BundleBuilder {
         ProductClass.SIMPLE.ordinal(), ProductClass.BUNDLE.ordinal(), ProductClass.CUSTOM_BUNDLE.ordinal());
 
     public class TestBundle {
+        public Product drive;
         public Product bundle;
         public List<Product> components;
 
@@ -34,9 +34,14 @@ public class BundleBuilder {
 
         public List<Product> products() {
             List<Product> res = new ArrayList<>();
-            res.add(bundle);
+            if(drive != null) { res.add(drive); }
+            if(bundle != null && ! bundle.getProductOfferingId().equals(drive.getProductOfferingId())) {
+                res.add(bundle);
+            }
             for(Product component: components) {
-                res.add(component);
+                if(! component.getProductOfferingId().equals(drive.getProductOfferingId())) {
+                    res.add(component);
+                }
             }
             return res;
         }
@@ -49,6 +54,7 @@ public class BundleBuilder {
     ProductClass componentClass = null;
     ProductClass bundleClass = null;
 
+    Product drive = null;   // Working product. Can be bundle or custom_bundle component or simple
     Product bundle = null;
     List<Product> components = new ArrayList<>();
 
@@ -62,22 +68,29 @@ public class BundleBuilder {
 
     private void createFromProducts(List<Product> products) {
         for(Product product: products) {
-            if(mainClasses.contains(product.getProductClass())) {
-                assert(bundle == null);
-                bundle = product;
-                bundleClass = ProductClass.values()[product.getProductClass()];
-                switch(bundleClass) {
-                    case BUNDLE:
-                        componentClass = ProductClass.BUNDLE_COMPONENT;
-                        break;
-                    case CUSTOM_BUNDLE:
-                        componentClass = ProductClass.CUSTOM_BUNDLE_COMPONENT;
-                        break;
-                    default:
-                        componentClass = null;
-                }
-            } else {
-                components.add(product);
+            ProductClass pclass = ProductClass.values()[product.getProductClass()];
+            switch(pclass) {
+                case SIMPLE:
+                    assert(bundle == null);
+                    assert(drive == null);
+                    drive = product;
+                    break;
+                case BUNDLE:
+                    assert(bundle == null);
+                    assert(drive == null);
+                    drive = product;
+                    bundle = product;
+                    componentClass = ProductClass.BUNDLE_COMPONENT;
+                    break;
+                case CUSTOM_BUNDLE:
+                    assert(bundle == null);
+                    assert(drive == null);
+                    drive = product;
+                    bundle = product;
+                    componentClass = ProductClass.CUSTOM_BUNDLE_COMPONENT;
+                    break;
+                default:
+                    components.add(product);
             }
         }
         if(componentClass != null) {
@@ -166,7 +179,10 @@ public class BundleBuilder {
 
     public BundleBuilder productIds(List<Product> products) {
         for(Product product: products) {
-            if(bundle.getProductOfferingId().equals(product.getProductOfferingId())) {
+            if(drive.getProductOfferingId().equals(product.getProductOfferingId())) {
+                drive.setProductId(product.getProductId());
+            }
+            if(bundle != null && bundle.getProductOfferingId().equals(product.getProductOfferingId())) {
                 bundle.setProductId(product.getProductId());
             } else {
                 for(Product component: components) {
@@ -181,7 +197,8 @@ public class BundleBuilder {
     }
 
     public BundleBuilder tarificationPeriod(int tarificationPeriod) {
-        bundle.setTarificationPeriod(tarificationPeriod);
+        drive.setTarificationPeriod(tarificationPeriod);
+        if(bundle != null) { bundle.setTarificationPeriod(tarificationPeriod); }
         for(Product component: components) {
             component.setTarificationPeriod(tarificationPeriod);
         }
@@ -204,8 +221,14 @@ public class BundleBuilder {
         return this;
     }
 
+    public BundleBuilder machineState(JsonNode machineState) {
+        drive.setMachineState(machineState);
+        return this;
+    }
+
     public TestBundle build() {
         TestBundle testBundle = new TestBundle();
+        testBundle.drive = this.drive;
         testBundle.bundle = this.bundle;
         testBundle.components = this.components;
         return testBundle;

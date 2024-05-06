@@ -31,7 +31,7 @@ public class ProductBuilder {
     Boolean isCustom = false;
     String status = null;
     JsonNode machineState = new ObjectMapper().createObjectNode();
-    ProductClass productClass = null;
+    ProductClass productClass = ProductClass.VOID;
     int tarificationPeriod = -1;
     OffsetDateTime trialEndDate = null;
     OffsetDateTime activeEndDate = null;
@@ -56,7 +56,7 @@ public class ProductBuilder {
         isCustom = false;
         status = null;
         machineState = new ObjectMapper().createObjectNode();
-        productClass = null;
+        productClass = ProductClass.VOID;
         tarificationPeriod = -1;
         trialEndDate = null;
         activeEndDate = null;
@@ -83,7 +83,7 @@ public class ProductBuilder {
         this.isBundle = offer.getIsBundle() == null ? this.isBundle : offer.getIsBundle();
         this.isCustom = offer.getIsCustom() == null ? this.isCustom : offer.getIsCustom();
         List<ProductClass> pclasses = offer.getProductClass();
-        if(productClass == null && pclasses.size() == 1) {
+        if(productClass == ProductClass.VOID && pclasses.size() == 1) {
             this.productClass = pclasses.get(0);
         }
     }
@@ -195,11 +195,7 @@ public class ProductBuilder {
         product.setIsCustom(isCustom);
         product.setStatus(status);
         product.setMachineState(machineState);
-        if(productClass != null) {
-            product.setProductClass(productClass.ordinal());
-        } else {
-            product.setProductClass(-1);
-        }
+        product.setProductClass(productClass.ordinal());
         product.setTarificationPeriod(tarificationPeriod);
         product.setTrialEndDate(trialEndDate);
         product.setActiveEndDate(activeEndDate);

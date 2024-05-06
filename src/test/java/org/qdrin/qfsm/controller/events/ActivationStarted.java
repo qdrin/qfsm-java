@@ -92,7 +92,7 @@ public class ActivationStarted extends ControllerStarter {
         .productIds(Arrays.asList(product))
         .tarificationPeriod(0)
         .build();
-      Product expectedProduct = expectedBundle.bundle;
+      Product expectedProduct = expectedBundle.drive;
       log.debug("expect: {}", expectedProduct);
       log.debug("actual: {}", product);
       Assertions.assertProductEquals(expectedProduct, product);
@@ -122,8 +122,8 @@ public class ActivationStarted extends ControllerStarter {
           .productIds(actualProducts)
           .tarificationPeriod(0)
           .build();
-      log.debug("bundle expected: {}\nbundle actual: {}", expectedBundle.bundle, actualProducts.get(0));
-      Assertions.assertProductEquals(expectedBundle.bundle, actualProducts.get(0));
+      log.debug("bundle expected: {}\nbundle actual: {}", expectedBundle.drive, actualProducts.get(0));
+      Assertions.assertProductEquals(expectedBundle.drive, actualProducts.get(0));
       log.debug("components expected: {}\n, components actual: {}",
         expectedBundle.components, actualProducts.subList(1, actualProducts.size()));
       Assertions.assertProductEquals(expectedBundle.components, actualProducts.subList(1, actualProducts.size()));
