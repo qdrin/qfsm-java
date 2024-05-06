@@ -11,10 +11,14 @@ import static org.junit.Assert.*;
 import java.util.function.Consumer;
 
 import java.util.Arrays;
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.SpringStarter;
+import org.qdrin.qfsm.BundleBuilder;
+import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.qdrin.qfsm.persist.QStateMachineContextConverter;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -49,7 +53,8 @@ public class ContextConverterTest extends SpringStarter {
 
   @Test
   public void testInitialState() throws Exception {
-    machine = createMachine();
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-trial", null).build();
+    machine = createMachine(bundle);
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
@@ -78,7 +83,10 @@ public class ContextConverterTest extends SpringStarter {
     ClassPathResource resource = new ClassPathResource("/contexts/machinestate_sample.json", getClass());
     ObjectMapper mapper = new ObjectMapper();
     JsonNode machineState = mapper.readTree(resource.getInputStream());
-    machine = createMachine(machineState);
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null)
+      .machineState(machineState)
+      .build();
+    machine = createMachine(bundle);
     JsonNode machineStateTarget = QStateMachineContextConverter.toJsonNode(machine.getState());
     log.debug("expected: {}", machineState.toString());
     JSONAssert.assertEquals(machineState.toString(), machineState.toString(), false);
@@ -115,7 +123,10 @@ public class ContextConverterTest extends SpringStarter {
   public void testSimpleStateSet() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode machineState = mapper.readTree("\"Aborted\"");
-    machine = createMachine(machineState);
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null)
+      .machineState(machineState)
+      .build();
+    machine = createMachine(bundle);
     log.debug("machine: {}", machine);
 
     StateMachineTestPlan<String, String> plan =
@@ -133,8 +144,10 @@ public class ContextConverterTest extends SpringStarter {
   public void testOrthogonalStateSet() throws Exception {
     ClassPathResource resource = new ClassPathResource("/contexts/machinestate_sample.json", getClass());
     ObjectMapper mapper = new ObjectMapper();
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null).build();
     JsonNode machineState = mapper.readTree(resource.getInputStream());
-    machine = createMachine(machineState);
+    bundle.drive.setMachineState(machineState);
+    machine = createMachine(bundle);
     log.debug("machine: {}", machine);
     log.debug("states: {}", machine.getState().getIds());
     log.debug("search states: {}", Arrays.asList(Helper.stateSuit("Prolongation", "Paid", "PriceActive")));
@@ -153,7 +166,9 @@ public class ContextConverterTest extends SpringStarter {
   @Test
   public void testOrthogonalStateSetMachineStateBuilder() throws Exception {
     JsonNode machineState = Helper.buildMachineState("Prolongation", "Paid", "PriceActive");
-    machine = createMachine(machineState);
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null).build();
+    bundle.drive.setMachineState(machineState);
+    machine = createMachine(bundle);
     log.debug("machine: {}", machine);
     log.debug("states: {}", machine.getState().getIds());
     log.debug("search states: {}", Arrays.asList(Helper.stateSuit("Prolongation", "Paid", "PriceActive")));
@@ -170,10 +185,13 @@ public class ContextConverterTest extends SpringStarter {
 
   @Test
   public void testMachineStateSequence() throws Exception {
-    JsonNode machineState = Helper.buildMachineState("Prolongation", "Paid", "PriceActive");
-    machine = createMachine(machineState);
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null)
+      .machineState(Helper.buildMachineState("Prolongation", "Paid", "PriceActive"))
+      .build();
+    machine = createMachine(bundle);
     assertEquals("Provision", machine.getState().getId());
-    machine = createMachine();
-    assertEquals(machine.getState().getId(), "Entry");
+    bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null).build();
+    machine = createMachine(bundle);
+    assertEquals("Entry", machine.getState().getId());
   }
 }

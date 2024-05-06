@@ -27,17 +27,17 @@ public class StateStatus {
   @OnStateEntry
   public void setStatus(StateContext<String, String> context) {
     State<String, String> state = context.getTarget();
-    log.debug("entry state '{}'", state.getId());
+    log.debug("enter state '{}'", state.getId());
     var extendedState = context.getExtendedState();
     String status = statusMap.getOrDefault(state.getId(), null);
     if(status != null) {
+      log.debug("setting status to {}", status);
       Product product = (Product) extendedState.get("product", Product.class);
       product.setStatus(status);
+      log.debug("productId: {}, new status: {}", product.getProductId(), product.getStatus());
       List<Product> components = (List<Product>) extendedState.getVariables().get("components");
-      if(components != null) {
-        for(Product component: components) {
+      for(Product component: components) {
           component.setStatus(status);
-        }
       }
     }
   }

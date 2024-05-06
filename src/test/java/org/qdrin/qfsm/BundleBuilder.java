@@ -1,11 +1,9 @@
 package org.qdrin.qfsm;
 
-import static org.mockito.ArgumentMatchers.nullable;
-
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -20,30 +18,25 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 // @FieldDefaults(level = AccessLevel.PUBLIC)
 public class BundleBuilder {
-    final static List<Integer> mainClasses = Arrays.asList(
-        ProductClass.SIMPLE.ordinal(), ProductClass.BUNDLE.ordinal(), ProductClass.CUSTOM_BUNDLE.ordinal());
 
     public class TestBundle {
         public Product drive;
         public Product bundle;
-        public List<Product> components;
-
-        public Product getByOfferId(String offerId) {
-            return products().stream().filter(p -> p.getProductOfferingId().equals(offerId)).findFirst().get();
-        }
-
-        public List<Product> products() {
+        public List<Product> products;
+        public List<Product> components() {
             List<Product> res = new ArrayList<>();
-            if(drive != null) { res.add(drive); }
-            if(bundle != null && ! bundle.getProductOfferingId().equals(drive.getProductOfferingId())) {
-                res.add(bundle);
-            }
-            for(Product component: components) {
-                if(! component.getProductOfferingId().equals(drive.getProductOfferingId())) {
-                    res.add(component);
+            for(Product product: products) {
+                if(product == drive || product == bundle) {
+                    continue;
+                } else {
+                    res.add(product);
                 }
             }
             return res;
+        }
+
+        public Product getByOfferId(String offerId) {
+            return products.stream().filter(p -> p.getProductOfferingId().equals(offerId)).findFirst().get();
         }
     }
     @Autowired
@@ -54,41 +47,42 @@ public class BundleBuilder {
     ProductClass componentClass = null;
     ProductClass bundleClass = null;
 
+    List<Product> products = new ArrayList<>();  // ful product set of bundle
     Product drive = null;   // Working product. Can be bundle or custom_bundle component or simple
     Product bundle = null;
-    List<Product> components = new ArrayList<>();
+    List<Product> components = new ArrayList<>();  // sublist of Products
 
     private void setComponentClass(ProductClass cclass) {
-        if(components != null) {
-            for(Product component: components) {
-                component.setProductClass(cclass.ordinal());     
-            }
+        for(Product component: components) {
+            component.setProductClass(cclass.ordinal());     
         }
     }
 
-    private void createFromProducts(List<Product> products) {
+    private void createFromProducts() {
         for(Product product: products) {
             ProductClass pclass = ProductClass.values()[product.getProductClass()];
             switch(pclass) {
                 case SIMPLE:
-                    assert(bundle == null);
-                    assert(drive == null);
+                    assert(products.size() == 1);
+                    bundle = null;
                     drive = product;
                     break;
                 case BUNDLE:
                     assert(bundle == null);
-                    assert(drive == null);
                     drive = product;
                     bundle = product;
                     componentClass = ProductClass.BUNDLE_COMPONENT;
                     break;
                 case CUSTOM_BUNDLE:
                     assert(bundle == null);
-                    assert(drive == null);
                     drive = product;
                     bundle = product;
                     componentClass = ProductClass.CUSTOM_BUNDLE_COMPONENT;
                     break;
+                case CUSTOM_BUNDLE_COMPONENT:
+                    if(drive == product) {
+                        break;
+                    }
                 default:
                     components.add(product);
             }
@@ -99,24 +93,47 @@ public class BundleBuilder {
     }
 
     public BundleBuilder(List<Product> products) {
-        createFromProducts(products);
+        for(Product p: products) {
+            Product product = new ProductBuilder(p).build();
+            this.products.add(product);
+        }
+        createFromProducts();
+    }
+
+    public BundleBuilder(TestBundle testBundle) {
+        boolean isBundleInProducts = false;
+        for(Product product: testBundle.products) {
+            Product copy = new ProductBuilder(product).build();
+            products.add(copy);
+            if(product == testBundle.drive) {
+                drive = copy;
+            }
+            if(product == testBundle.bundle) {
+                isBundleInProducts = true;
+            }
+        }
+        if(! isBundleInProducts && testBundle.bundle != null) {
+            this.bundle = new ProductBuilder(testBundle.bundle).build();
+        }
+        createFromProducts();
     }
 
     public BundleBuilder(String mainOfferId, String priceId, String... componentOfferIds) {
         Product product = new ProductBuilder(mainOfferId, "", priceId).build();
-        List<Product> products = new ArrayList<>();  // Arrays.asList(product);
+        drive = product;
         products.add(product);
-        for(String componentOfferId: componentOfferIds) {
-            Product component = new ProductBuilder(componentOfferId, "", null).build();
-            products.add(component);
+        if(componentOfferIds != null) {
+            for(String componentOfferId: componentOfferIds) {
+                Product component = new ProductBuilder(componentOfferId, "", null).build();
+                products.add(component);
+            }
         }
-        createFromProducts(products);
+        createFromProducts();
     }
 
     public BundleBuilder(RequestEventDto event) {
         String eventType = event.getEvent().getEventType();
         this.eventType = eventType;
-        List<Product> products = new ArrayList<>();
         if(eventType.equals("activation_started")) {
             this.partyRoleId = event.getClientInfo().getPartyRoleId();
             for(ProductActivateRequestDto item: event.getProductOrderItems()) {
@@ -133,7 +150,7 @@ public class BundleBuilder {
                 products.add(product);
             }        
         }
-        createFromProducts(products);
+        createFromProducts();
     }
 
     public BundleBuilder componentClass(ProductClass componentClass) {
@@ -142,8 +159,14 @@ public class BundleBuilder {
         return this;
     }
 
-    public BundleBuilder bundleClass(ProductClass bundleClass) {
-        bundle.setProductClass(bundleClass.ordinal());
+    public BundleBuilder driveClass(ProductClass driveClass) {
+        drive.setProductClass(driveClass.ordinal());
+        return this;
+    }
+
+    public BundleBuilder addBundle(Product bundle) {
+        assert(this.bundle == null);
+        this.bundle = bundle;
         return this;
     }
 
@@ -177,19 +200,13 @@ public class BundleBuilder {
         return this;
     }
 
-    public BundleBuilder productIds(List<Product> products) {
-        for(Product product: products) {
-            if(drive.getProductOfferingId().equals(product.getProductOfferingId())) {
-                drive.setProductId(product.getProductId());
-            }
-            if(bundle != null && bundle.getProductOfferingId().equals(product.getProductOfferingId())) {
-                bundle.setProductId(product.getProductId());
-            } else {
-                for(Product component: components) {
-                    if(component.getProductOfferingId().equals(product.getProductOfferingId())) {
-                        component.setProductId(product.getProductId());
-                        continue;
-                    }
+    public BundleBuilder productIds(List<Product> idsProducts) {
+        assert(idsProducts.size() == products.size());
+        for(Product idProduct: idsProducts) {
+            for(Product product: products) {
+                if(product.getProductOfferingId().equals(idProduct.getProductOfferingId())) {
+                    product.setProductId(idProduct.getProductId());
+                    continue;
                 }
             }
         }
@@ -197,27 +214,51 @@ public class BundleBuilder {
     }
 
     public BundleBuilder tarificationPeriod(int tarificationPeriod) {
-        drive.setTarificationPeriod(tarificationPeriod);
-        if(bundle != null) { bundle.setTarificationPeriod(tarificationPeriod); }
-        for(Product component: components) {
-            component.setTarificationPeriod(tarificationPeriod);
+        for(Product product: products) {
+            product.setTarificationPeriod(tarificationPeriod);
         }
         return this;
     }
 
     public BundleBuilder productStartDate(OffsetDateTime startDate) {
-        bundle.setProductStartDate(startDate);
-        for(Product component: components) {
-            component.setProductStartDate(startDate);
+        for(Product product: products) {
+            product.setProductStartDate(startDate);
         }
         return this;
     }
 
     public BundleBuilder status(String status) {
-        bundle.setStatus(status);
-        for(Product component: components) {
-            component.setStatus(status);
+        for(Product product: products) {
+            product.setStatus(status);
         }
+        return this;
+    }
+
+    public BundleBuilder trialEndDate(OffsetDateTime date) {
+        for(Product product: products) {
+            product.setTrialEndDate(date);
+        }
+        return this;
+    }
+
+    public BundleBuilder activeEndDate(OffsetDateTime date) {
+        for(Product product: products) {
+            product.setActiveEndDate(date);
+        }
+        return this;
+    }
+
+    public BundleBuilder pricePeriod(int period) {
+        Optional<ProductPrice> price = drive.getProductPrice(PriceType.RecurringCharge);
+        assert(price.isPresent());
+        price.get().setPeriod(period);
+        return this;
+    }
+
+    public BundleBuilder priceNextPayDate(OffsetDateTime date) {
+        Optional<ProductPrice> price = drive.getProductPrice(PriceType.RecurringCharge);
+        assert(price.isPresent());
+        price.get().setNextPayDate(date);
         return this;
     }
 
@@ -226,11 +267,18 @@ public class BundleBuilder {
         return this;
     }
 
+    public BundleBuilder save() {
+        for(Product product: products) {
+            productRepository.save(product);
+        }
+        return this;
+    }
+
     public TestBundle build() {
         TestBundle testBundle = new TestBundle();
         testBundle.drive = this.drive;
         testBundle.bundle = this.bundle;
-        testBundle.components = this.components;
+        testBundle.products = this.products;
         return testBundle;
     }
 }

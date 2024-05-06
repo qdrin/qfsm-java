@@ -76,7 +76,7 @@ public class SpringStarter {
   public StateMachine<String, String> createMachine(TestBundle bundle) {
     String machineId = bundle.drive.getProductId();
     Product product = bundle.drive;
-    List<Product> components = bundle.components;
+    List<Product> components = bundle.components();
     if(product.getMachineState() == null) {
       product.setMachineState(Helper.buildMachineState("PendingActivate"));
     }
@@ -104,22 +104,6 @@ public class SpringStarter {
     variables.put("components", components);
     if(bundle.bundle != null) { variables.put("bundle", bundle.bundle); }
     return machine;
-  }
-
-  public StateMachine<String, String> createMachine(JsonNode machineState) {
-    Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-trial").build();
-    product.setMachineState(machineState);
-    TestBundle bundle = new BundleBuilder(Arrays.asList(product)).build();
-    return createMachine(bundle);
-  }
-
-  public StateMachine<String, String> createMachine(Product product) {
-    TestBundle bundle = new BundleBuilder(Arrays.asList(product)).build();
-    return createMachine(bundle);
-  }
-  public StateMachine<String, String> createMachine() {
-    Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-trial").build();
-    return createMachine(product);
   }
 
   public List<Product> getResponseProducts(ResponseEventDto response) {

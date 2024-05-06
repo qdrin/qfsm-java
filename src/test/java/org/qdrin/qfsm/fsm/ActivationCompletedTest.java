@@ -2,7 +2,7 @@ package org.qdrin.qfsm.fsm;
 
 import org.springframework.statemachine.StateMachine;
 
-import static org.junit.Assert.*;
+import static org.qdrin.qfsm.Helper.Assertions.*;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -12,8 +12,9 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Nested;
+import org.qdrin.qfsm.BundleBuilder;
+import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
-import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.tasks.ActionSuite;
@@ -40,20 +41,20 @@ public class ActivationCompletedTest extends SpringStarter {
     public void testActiveTrialSuccess() throws Exception {
       OffsetDateTime t0 = OffsetDateTime.now();
       OffsetDateTime t1 = t0.plusDays(30);
-      Product product = new ProductBuilder("simpleOffer1", "PENDING_ACTIVATE", "simple1-price-trial")
-        .productStartDate(t0)  // cause we startin product now
+      TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-trial", null)
+        .productStartDate(t0)
         .build();
-      ProductPrice price = product.getProductPrice().get(0);
+      ProductPrice price = bundle.drive.getProductPrice().get(0);
       price.setNextPayDate(t1);
       price.setPeriod(0);
-      Product expectedProduct = new ProductBuilder(product)
+      TestBundle expectedBundle = new BundleBuilder(bundle)
         .status("ACTIVE_TRIAL")
         .tarificationPeriod(1)
         .pricePeriod(1)
         .trialEndDate(t1)
         .activeEndDate(t1)
         .build();
-      machine = createMachine(product);
+      machine = createMachine(bundle);
       
       List<ActionSuite> expectedActions = Arrays.asList(ActionSuite.PRICE_ENDED);
       List<ActionSuite> expectedDeleteActions = new  ArrayList<>();
@@ -79,28 +80,27 @@ public class ActivationCompletedTest extends SpringStarter {
             .build();
       plan.test();
       log.debug("states: {}", machine.getState().getIds());
-      Helper.Assertions.assertProductEquals(expectedProduct, product);
+      Helper.Assertions.assertProductEquals(expectedBundle.drive, bundle.drive);
     }
 
     @Test
     public void testActiveSuccess() throws Exception {
-      Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-active")
-        .tarificationPeriod(0)
-        .build();
       OffsetDateTime t0 = OffsetDateTime.now();
       OffsetDateTime t1 = t0.plusDays(30);
-      ProductPrice price = product.getProductPrice().get(0);
-      price.setNextPayDate(t1);
+      TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null)
+        .tarificationPeriod(0)
+        .priceNextPayDate(t1)
+        .machineState(Helper.buildMachineState("PendingActivate"))
+        .build();
 
-      Product expectedProduct = new ProductBuilder(product)
+      TestBundle expectedBundle = new BundleBuilder(bundle)
         .status("ACTIVE")
         .tarificationPeriod(0)
         .pricePeriod(1)
         .activeEndDate(t1)
         .build();
       
-      product.setMachineState(Helper.buildMachineState("PendingActivate"));
-      machine = createMachine(product);
+      machine = createMachine(bundle);
       
       log.debug("start. actions: {}", machine.getExtendedState().getVariables().get("actions"));
       List<ActionSuite> expectedActions = Arrays.asList(ActionSuite.WAITING_PAY_ENDED, ActionSuite.PRICE_ENDED);
@@ -120,15 +120,14 @@ public class ActivationCompletedTest extends SpringStarter {
             .build();
       plan.test();
       log.debug("states: {}", machine.getState().getIds());
-      Helper.Assertions.assertProductEquals(expectedProduct, product);
+      Helper.Assertions.assertProductEquals(expectedBundle.drive, bundle.drive);
       
       Map<Object, Object> variables = machine.getExtendedState().getVariables(); 
       List<ActionSuite> actions = (List<ActionSuite>) variables.get("actions");
       OffsetDateTime waitingPayEnded = actions.get(0).getWakeAt();
       OffsetDateTime priceEnded = actions.get(1).getWakeAt();
-      assertEquals(priceEnded, price.getNextPayDate().minus(getPriceEndedBefore()));
-      assert(waitingPayEnded.isAfter(expectedWaitingPayEnded.minusSeconds(5)));
-      assert(waitingPayEnded.isBefore(expectedWaitingPayEnded.plusSeconds(5)));
+      assertDates(priceEnded, t1.minus(getPriceEndedBefore()));
+      assertDates(expectedWaitingPayEnded, waitingPayEnded);
     }
   }
 }

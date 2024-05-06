@@ -125,35 +125,9 @@ public class ActivationStarted extends ControllerStarter {
       log.debug("bundle expected: {}\nbundle actual: {}", expectedBundle.drive, actualProducts.get(0));
       Assertions.assertProductEquals(expectedBundle.drive, actualProducts.get(0));
       log.debug("components expected: {}\n, components actual: {}",
-        expectedBundle.components, actualProducts.subList(1, actualProducts.size()));
-      Assertions.assertProductEquals(expectedBundle.components, actualProducts.subList(1, actualProducts.size()));
+        expectedBundle.components(), actualProducts.subList(1, actualProducts.size()));
+      Assertions.assertProductEquals(expectedBundle.components(), actualProducts.subList(1, actualProducts.size()));
       
-    }
-  }
-
-  @Nested
-  class ActivationAborted {
-    @Test
-    public void abortSimpleFailedDeclined() throws Exception {
-      String offerId = "simpleOffer1";
-      OfferDef offerDef = Helper.testOffers.getOffers().get(offerId);
-      Product product = new ProductBuilder("simpleOffer1", "PENDING_ACTIVATE", "simple1-price-trial").build();
-      log.debug("product: {}", product);
-      JsonNode machineState = Helper.buildMachineState("PendingActivate");
-      product.setMachineState(machineState);
-      StateMachine<String, String> machine = createMachine(product);
-      RequestEventDto event = new EventBuilder("activation_aborted", product).build();
-      HttpEntity<RequestEventDto> request = new HttpEntity<>(event, headers);
-      ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
-      log.debug(resp.toString());
-      assertEquals(HttpStatus.OK, resp.getStatusCode());
-      ResponseEventDto response = resp.getBody();
-      assertEquals(event.getEvent().getRefId(), response.getRefId());
-      List<ProductResponseDto> products = response.getProducts();
-      assertEquals(product.getProductId(), products.get(0).getProductId());
-      assertEquals("ABORTED", products.get(0).getStatus());
-      assertEquals(offerId, products.get(0).getProductOfferingId());
-      assertEquals(offerDef.getName(), products.get(0).getProductOfferingName());
     }
   }
 

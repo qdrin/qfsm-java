@@ -44,14 +44,16 @@ public class ActivationStartedTest extends SpringStarter {
   class Simple {
     @Test
     public void testTrialSuccess() throws Exception {
-      Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-trial").build();
       OffsetDateTime t0 = OffsetDateTime.now();
-      Product expectedProduct = new ProductBuilder(product)
+      TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-trial", null)
+        .productStartDate(t0.minusSeconds(30))
+        .build();
+      TestBundle expectedBundle = new BundleBuilder(bundle)
         .tarificationPeriod(0)
         .status("PENDING_ACTIVATE")
         .productStartDate(t0)
         .build();
-      machine = createMachine(product);
+      machine = createMachine(bundle);
       StateMachineTestPlan<String, String> plan =
           StateMachineTestPlanBuilder.<String, String>builder()
             .defaultAwaitTime(2)
@@ -60,29 +62,28 @@ public class ActivationStartedTest extends SpringStarter {
                 .expectState("Entry")
                 .and()
             .step()
-                .sendEvent(MessageBuilder.withPayload("activation_started")
-                    .setHeader("product", product)
-                    .setHeader("datetime", OffsetDateTime.now())
-                    .build())
+                .sendEvent("activation_started")
                 .expectState("PendingActivate")
                 .expectStateChanged(1)
                 .and()
             .build();
       plan.test();
-      assertEquals(product.getStatus(), "PENDING_ACTIVATE");
-      Helper.Assertions.assertProductEquals(expectedProduct, product);
+      assertEquals("PENDING_ACTIVATE", bundle.drive.getStatus());
+      Helper.Assertions.assertProductEquals(expectedBundle.drive, bundle.drive);
     }
 
     @Test
     public void testActiveSuccess() throws Exception {
-      Product product = new ProductBuilder("simpleOffer1", "", "simple1-price-active").build();
       OffsetDateTime t0 = OffsetDateTime.now();
-      Product expectedProduct = new ProductBuilder(product)
+      TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active", null)
+        .productStartDate(t0.minusSeconds(30))
+        .build();
+      TestBundle expectedBundle = new BundleBuilder(bundle)
         .tarificationPeriod(0)
         .status("PENDING_ACTIVATE")
         .productStartDate(t0)
         .build();
-      machine = createMachine(product);
+      machine = createMachine(bundle);
       StateMachineTestPlan<String, String> plan =
           StateMachineTestPlanBuilder.<String, String>builder()
             .defaultAwaitTime(2)
@@ -91,17 +92,15 @@ public class ActivationStartedTest extends SpringStarter {
                 .expectState("Entry")
                 .and()
             .step()
-                .sendEvent(MessageBuilder.withPayload("activation_started")
-                    .setHeader("product", product)
-                    .setHeader("datetime", OffsetDateTime.now())
-                    .build())
+                .sendEvent("activation_started")
                 .expectState("PendingActivate")
                 .expectStateChanged(1)
                 .and()
             .build();
       plan.test();
-      assertEquals(product.getStatus(), "PENDING_ACTIVATE");
-      Helper.Assertions.assertProductEquals(expectedProduct, product);
+      assertEquals("PENDING_ACTIVATE", bundle.drive.getStatus());
+      assertEquals("simple1-price-active", bundle.drive.getProductPrice().get(0).getId());
+      Helper.Assertions.assertProductEquals(expectedBundle.drive, bundle.drive);
     }
   }
 
@@ -115,11 +114,11 @@ public class ActivationStartedTest extends SpringStarter {
         .tarificationPeriod(0)
         .build();
       Product product = bundle.drive;
-      List<Product> components = bundle.components;
+      List<Product> components = bundle.components();
       assertEquals(ProductClass.BUNDLE.ordinal(), product.getProductClass());
       assertEquals(ProductClass.BUNDLE_COMPONENT.ordinal(), components.get(0).getProductClass());
 
-      TestBundle expectedBundle = new BundleBuilder(bundle.products())
+      TestBundle expectedBundle = new BundleBuilder(bundle)
         .tarificationPeriod(0)
         .productStartDate(t0)
         .status("PENDING_ACTIVATE")
@@ -141,7 +140,7 @@ public class ActivationStartedTest extends SpringStarter {
       plan.test();
       assertEquals(product.getStatus(), "PENDING_ACTIVATE");
       Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
-      Helper.Assertions.assertProductEquals(expectedBundle.components, components);
+      Helper.Assertions.assertProductEquals(expectedBundle.components(), components);
     }
 
     @Test
@@ -152,8 +151,8 @@ public class ActivationStartedTest extends SpringStarter {
         .tarificationPeriod(0)
         .build();
       Product product = bundle.drive;
-      List<Product> components = bundle.components;
-      TestBundle expectedBundle = new BundleBuilder(bundle.products())
+      List<Product> components = bundle.components();
+      TestBundle expectedBundle = new BundleBuilder(bundle)
         .tarificationPeriod(0)
         .productStartDate(t0)
         .status("PENDING_ACTIVATE")
@@ -176,7 +175,7 @@ public class ActivationStartedTest extends SpringStarter {
       plan.test();
       assertEquals(product.getStatus(), "PENDING_ACTIVATE");
       Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
-      Helper.Assertions.assertProductEquals(expectedBundle.components, components);
+      Helper.Assertions.assertProductEquals(expectedBundle.components(), components);
     }
 
     @Test
@@ -195,10 +194,10 @@ public class ActivationStartedTest extends SpringStarter {
         .tarificationPeriod(0)
         .build();
       Product product = bundle.drive;
-      List<Product> components = bundle.components;
+      List<Product> components = bundle.components();
       assertEquals(ProductClass.CUSTOM_BUNDLE.ordinal(), product.getProductClass());
       assertEquals(ProductClass.CUSTOM_BUNDLE_COMPONENT.ordinal(), components.get(0).getProductClass());
-      TestBundle expectedBundle = new BundleBuilder(bundle.products())
+      TestBundle expectedBundle = new BundleBuilder(bundle)
         .tarificationPeriod(0)
         .productStartDate(t0)
         .status("PENDING_ACTIVATE")
@@ -220,7 +219,7 @@ public class ActivationStartedTest extends SpringStarter {
       plan.test();
       assertEquals(product.getStatus(), "PENDING_ACTIVATE");
       Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
-      Helper.Assertions.assertProductEquals(expectedBundle.components, components);
+      Helper.Assertions.assertProductEquals(expectedBundle.components(), components);
     }
 
     @Test
@@ -231,8 +230,8 @@ public class ActivationStartedTest extends SpringStarter {
         .tarificationPeriod(0)
         .build();
       Product product = bundle.drive;
-      List<Product> components = bundle.components;
-      TestBundle expectedBundle = new BundleBuilder(bundle.products())
+      List<Product> components = bundle.components();
+      TestBundle expectedBundle = new BundleBuilder(bundle)
         .tarificationPeriod(0)
         .productStartDate(t0)
         .status("PENDING_ACTIVATE")
@@ -255,7 +254,7 @@ public class ActivationStartedTest extends SpringStarter {
       plan.test();
       assertEquals(product.getStatus(), "PENDING_ACTIVATE");
       Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
-      Helper.Assertions.assertProductEquals(expectedBundle.components, components);
+      Helper.Assertions.assertProductEquals(expectedBundle.components(), components);
     }
   }
 
@@ -264,22 +263,25 @@ public class ActivationStartedTest extends SpringStarter {
     @Test
     public void testSuccessToPendingActivate() throws Exception {
       OffsetDateTime t0 = OffsetDateTime.now();
-      TestBundle bundle = new BundleBuilder("customBundleOffer1", "custom1-price-trial",
+      TestBundle preBundle = new BundleBuilder("customBundleOffer1", "custom1-price-trial",
         "component1", "component2")
         .tarificationPeriod(0)
         .build();
 
-      Product product = new ProductBuilder("component1", "", null)
-        .productClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
+      TestBundle bundle = new BundleBuilder("component3", null, null)
+        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
+        .addBundle(preBundle.bundle)
         .build();
-      bundle.drive = product;
-
-      TestBundle expectedBundle = new BundleBuilder(bundle.products())
+      log.debug("bundle: {}", bundle);
+      Product product = bundle.drive;
+      TestBundle expectedBundle = new BundleBuilder(bundle)
+        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
         .tarificationPeriod(0)
         .productStartDate(t0)
         .status("PENDING_ACTIVATE")
         .build();
       machine = createMachine(bundle);
+      assertEquals(bundle.bundle.getProductId(), preBundle.bundle.getProductId());
       StateMachineTestPlan<String, String> plan =
           StateMachineTestPlanBuilder.<String, String>builder()
             .defaultAwaitTime(2)
@@ -297,7 +299,7 @@ public class ActivationStartedTest extends SpringStarter {
       assertEquals(product.getStatus(), "PENDING_ACTIVATE");
       Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
       Helper.Assertions.assertProductEquals(expectedBundle.bundle, bundle.bundle);
-      Helper.Assertions.assertProductEquals(expectedBundle.components, bundle.components);
+      Helper.Assertions.assertProductEquals(expectedBundle.components(), bundle.components());
     }
   }
 }

@@ -3,6 +3,7 @@ package org.qdrin.qfsm.controller.events;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 
 import org.junit.jupiter.api.*;
@@ -10,6 +11,8 @@ import org.mockserver.serialization.HttpRequestSerializer;
 import org.qdrin.qfsm.EventBuilder;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductBuilder;
+import org.qdrin.qfsm.BundleBuilder;
+import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.controller.ControllerStarter;
 import org.qdrin.qfsm.model.Product;
@@ -25,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.statemachine.StateMachine;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import static org.qdrin.qfsm.Helper.Assertions.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,24 +50,39 @@ public class ActivationAborted extends ControllerStarter {
     @Test
     public void abortSimpleFailedDeclined() throws Exception {
       String offerId = "simpleOffer1";
+      String priceId = "simple1-price-trial";
       OfferDef offerDef = Helper.testOffers.getOffers().get(offerId);
-      Product product = new ProductBuilder("simpleOffer1", "PENDING_ACTIVATE", "simple1-price-trial").build();
-      log.debug("product: {}", product);
+
+      OffsetDateTime t0 = OffsetDateTime.now();
       JsonNode machineState = Helper.buildMachineState("PendingActivate");
-      product.setMachineState(machineState);
-      StateMachine<String, String> machine = createMachine(product);
-      RequestEventDto event = new EventBuilder("activation_aborted", product).build();
+      TestBundle bundle = new BundleBuilder(offerId, priceId, null)
+        .machineState(machineState)
+        .tarificationPeriod(0)
+        .build();
+      StateMachine<String, String> machine = createMachine(bundle);
+      RequestEventDto event = new EventBuilder("activation_aborted", bundle.drive).build();
       HttpEntity<RequestEventDto> request = new HttpEntity<>(event, headers);
       ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
       log.debug(resp.toString());
       assertEquals(HttpStatus.OK, resp.getStatusCode());
       ResponseEventDto response = resp.getBody();
       assertEquals(event.getEvent().getRefId(), response.getRefId());
-      List<ProductResponseDto> products = response.getProducts();
-      assertEquals(product.getProductId(), products.get(0).getProductId());
-      assertEquals("ABORTED", products.get(0).getStatus());
-      assertEquals(offerId, products.get(0).getProductOfferingId());
-      assertEquals(offerDef.getName(), products.get(0).getProductOfferingName());
+      assertResponseEquals(event, response);
+      List<ProductResponseDto> resultProducts = response.getProducts();
+      assertEquals(bundle.drive.getProductId(), resultProducts.get(0).getProductId());
+      assertEquals("ABORTED", resultProducts.get(0).getStatus());
+      assertEquals(offerId, resultProducts.get(0).getProductOfferingId());
+      assertEquals(offerDef.getName(), resultProducts.get(0).getProductOfferingName());
+
+      Product product = getProduct(resultProducts.get(0).getProductId());
+      TestBundle expectedBundle = new BundleBuilder(bundle)
+        .productIds(Arrays.asList(product))
+        .status("ABORTED")
+        .tarificationPeriod(0)
+        .build();
+      Product expectedProduct = expectedBundle.drive;
+      log.debug("expected: {}\nactual: {}", expectedBundle.drive, bundle.drive);
+      assertProductEquals(expectedBundle.drive, product);
     }
   }
 

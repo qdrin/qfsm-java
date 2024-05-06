@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -135,7 +136,10 @@ public class ProductBuilder {
         if(product.getQuantity() != null) { this.quantity = product.getQuantity(); }
         if(product.getMachineState() != null) { this.machineState = product.getMachineState(); }
 
-        priceId = product.getProductPrice(PriceType.RecurringCharge).get().getId();
+        Optional<ProductPrice> oprice = product.getProductPrice(PriceType.RecurringCharge);
+        if(oprice.isPresent()) {
+            priceId = oprice.get().getId();
+        }
         recalc();
     }
 
