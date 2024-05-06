@@ -33,11 +33,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class Helper {
 
 
   static public ObjectMapper mapper = new ObjectMapper();
+  static {
+    mapper.registerModule(new JavaTimeModule());
+  }
 
   public static TestOffers testOffers = setTestOffers();
 

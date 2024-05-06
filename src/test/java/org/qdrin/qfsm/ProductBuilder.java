@@ -12,6 +12,8 @@ import java.util.UUID;
 import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 
 import lombok.AccessLevel;
@@ -76,7 +78,16 @@ public class ProductBuilder {
         OfferDef offer = Helper.testOffers.getOffers().get(this.productOfferingId);
         productOfferingName = offer.getName();
         Map<String, ProductPrice> prices = offer.getPrices();
-        ProductPrice price = prices != null ? prices.get(priceId) : null;
+        ProductPrice price = null;
+        if(priceId != null && prices != null) {
+            final ProductPrice pfinal = prices.get(priceId);
+            try {
+                String pstr = Helper.mapper.writeValueAsString(pfinal);
+                price = Helper.mapper.readValue(pstr, new TypeReference<ProductPrice>() {});
+            } catch(Exception e) {
+                assert(false) : e.getLocalizedMessage();
+            }
+        }
         if(price != null) {
             price.setId(priceId);
             this.productPrice.add(price);
@@ -127,20 +138,36 @@ public class ProductBuilder {
         this.productStartDate = product.getProductStartDate();
         this.activeEndDate = product.getActiveEndDate();
         this. trialEndDate = product.getTrialEndDate();
-        if(product.getProductPrice() != null) { this.productPrice = product.getProductPrice(); }
-        if(product.getProductRelationship() != null) { this.productRelationship = product.getProductRelationship(); }
-        if(product.getCharacteristic() != null) { this.characteristic = product.getCharacteristic(); }
-        if(product.getFabricRef() != null) { this.fabricRef = product.getFabricRef(); }
-        if(product.getMetaInfo() != null) { this.metaInfo = product.getMetaInfo(); }
-        if(product.getLabel() != null) { this.label = product.getLabel(); }
-        if(product.getQuantity() != null) { this.quantity = product.getQuantity(); }
-        if(product.getMachineState() != null) { this.machineState = product.getMachineState(); }
-
-        Optional<ProductPrice> oprice = product.getProductPrice(PriceType.RecurringCharge);
-        if(oprice.isPresent()) {
-            priceId = oprice.get().getId();
+        try {
+            String ser;
+            if(product.getProductPrice() != null) {
+                ser = Helper.mapper.writeValueAsString(product.getProductPrice());
+                this.productPrice = Helper.mapper.readValue(ser, new TypeReference<List<ProductPrice>>() {});
+            }
+            if(product.getProductRelationship() != null) {
+                this.productRelationship = new ArrayList<>(product.getProductRelationship());
+            }
+            if(product.getCharacteristic() != null) {
+                this.characteristic = new ArrayList<>(product.getCharacteristic());
+            }
+            if(product.getFabricRef() != null) {
+                this.fabricRef = new ArrayList<>(product.getFabricRef());
+            }
+            if(product.getMetaInfo() != null) {
+                this.metaInfo = new HashMap<>(product.getMetaInfo());
+            }
+            if(product.getLabel() != null) {
+                this.label = new ArrayList<>(product.getLabel());
+            }
+            if(product.getQuantity() != null) {
+                this.quantity = new HashMap<>(product.getQuantity());
+            }
+            if(product.getMachineState() != null) { this.machineState = product.getMachineState(); }
+        } catch(Exception e) {
+            assert(false) : e.getLocalizedMessage();
         }
-        recalc();
+
+        priceId = null;
     }
 
     public ProductBuilder productId(String val) {productId = val; return this;}

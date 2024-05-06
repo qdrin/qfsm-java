@@ -133,7 +133,6 @@ public class ActivationCompletedTest extends SpringStarter {
     @Test
     public void testActiveNoNextPayDate() throws Exception {
       OffsetDateTime t0 = OffsetDateTime.now();
-      OffsetDateTime t1 = t0.plusDays(30);
       TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active")
         .tarificationPeriod(0)
         .machineState(Helper.buildMachineState("PendingActivate"))
@@ -184,9 +183,8 @@ public class ActivationCompletedTest extends SpringStarter {
 
       TestBundle expectedBundle = new BundleBuilder(bundle)
         .status("ACTIVE_TRIAL")
-        .tarificationPeriod(0)
-        .pricePeriod(0)
         .activeEndDate(null)
+        .pricePeriod(0)
         .build();
       
       machine = createMachine(bundle);
