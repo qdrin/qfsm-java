@@ -145,24 +145,30 @@ public class ProductBuilder {
                 this.productPrice = Helper.mapper.readValue(ser, new TypeReference<List<ProductPrice>>() {});
             }
             if(product.getProductRelationship() != null) {
-                this.productRelationship = new ArrayList<>(product.getProductRelationship());
+                ser = Helper.mapper.writeValueAsString(product.getProductRelationship());
+                this.productRelationship = Helper.mapper.readValue(ser, new TypeReference<List<ProductRelationship>>() {});
             }
             if(product.getCharacteristic() != null) {
-                this.characteristic = new ArrayList<>(product.getCharacteristic());
+                ser = Helper.mapper.writeValueAsString(product.getCharacteristic());
+                this.characteristic = Helper.mapper.readValue(ser, new TypeReference<List<ProductCharacteristic>>() {});
             }
             if(product.getFabricRef() != null) {
-                this.fabricRef = new ArrayList<>(product.getFabricRef());
+                ser = Helper.mapper.writeValueAsString(product.getFabricRef());
+                this.fabricRef = Helper.mapper.readValue(ser, new TypeReference<List<FabricRef>>() {});
             }
             if(product.getMetaInfo() != null) {
-                this.metaInfo = new HashMap<>(product.getMetaInfo());
+                ser = Helper.mapper.writeValueAsString(product.getMetaInfo());
+                this.metaInfo = Helper.mapper.readValue(ser, new TypeReference<Map<String, Object>>() {});
             }
             if(product.getLabel() != null) {
-                this.label = new ArrayList<>(product.getLabel());
+                ser = Helper.mapper.writeValueAsString(product.getLabel());
+                this.label = Helper.mapper.readValue(ser, new TypeReference<List<Characteristic>>() {});
             }
             if(product.getQuantity() != null) {
-                this.quantity = new HashMap<>(product.getQuantity());
+                ser = Helper.mapper.writeValueAsString(product.getQuantity());
+                this.quantity = Helper.mapper.readValue(ser, new TypeReference<Map<String, Object>>() {});
             }
-            if(product.getMachineState() != null) { this.machineState = product.getMachineState(); }
+            if(product.getMachineState() != null) { this.machineState = product.getMachineState().deepCopy(); }
         } catch(Exception e) {
             assert(false) : e.getLocalizedMessage();
         }
