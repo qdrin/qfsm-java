@@ -3,8 +3,11 @@ package org.qdrin.qfsm.fsm;
 import org.springframework.statemachine.StateMachine;
 
 import static org.junit.Assert.*;
+import static org.qdrin.qfsm.Helper.Assertions.assertProductEquals;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -84,16 +87,22 @@ public class ActivationStartedTest extends SpringStarter {
     @Test
     public void testSuccessToPendingActivate() throws Exception {
       OffsetDateTime t0 = OffsetDateTime.now();
-      TestBundle preBundle = new BundleBuilder("customBundleOffer1", "custom1-price-trial",
-        "component1", "component2")
+      String offerId = "customBundleOffer1";
+      String priceId = "custom1-price-trial";
+      String[] componentOfferIds = new String[] {"component1", "component2"};
+
+      TestBundle preBundle = new BundleBuilder(offerId, priceId, componentOfferIds)
         .tarificationPeriod(0)
         .build();
 
+      log.debug("preBundle.bundle: {}", preBundle.bundle);
       TestBundle bundle = new BundleBuilder("component3", null)
         .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
         .addBundle(preBundle.bundle)
         .build();
-      log.debug("bundle: {}", bundle);
+      // Check BundleBuilder relations
+      assertEquals(componentOfferIds.length, bundle.bundle.getProductRelationship().size());
+
       Product product = bundle.drive;
       TestBundle expectedBundle = new BundleBuilder(bundle)
         .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
@@ -101,6 +110,13 @@ public class ActivationStartedTest extends SpringStarter {
         .productStartDate(t0)
         .status("PENDING_ACTIVATE")
         .build();
+      List<ProductRelationship> expectedRelations = expectedBundle.bundle.getProductRelationship();
+      ProductRelationship componentRelation = new ProductRelationship(); 
+      componentRelation.setProductId(bundle.drive.getProductId());
+      componentRelation.setProductOfferingId(offerId);
+      componentRelation.setRelationshipType("CUSTOM_BUNDLES");
+      expectedRelations.add(componentRelation);
+
       machine = createMachine(bundle);
       assertEquals(bundle.bundle.getProductId(), preBundle.bundle.getProductId());
       StateMachineTestPlan<String, String> plan =
@@ -118,9 +134,10 @@ public class ActivationStartedTest extends SpringStarter {
             .build();
       plan.test();
       assertEquals(product.getStatus(), "PENDING_ACTIVATE");
-      Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
-      Helper.Assertions.assertProductEquals(expectedBundle.bundle, bundle.bundle);
-      Helper.Assertions.assertProductEquals(expectedBundle.components(), bundle.components());
+      log.debug("bundle relations: {}", bundle.bundle.getProductRelationship());
+      assertEquals(expectedRelations.size(), bundle.bundle.getProductRelationship().size());
+      assertProductEquals(expectedBundle.drive, product);
+      assertProductEquals(expectedBundle.bundle, bundle.bundle);
     }
 
     @Test

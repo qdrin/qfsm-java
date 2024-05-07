@@ -31,6 +31,10 @@
               <styles xmi:type="notation:TitleStyle" xmi:id="_10mbMbEcEe65QITknCn82A"/>
               <layoutConstraint xmi:type="notation:Bounds" xmi:id="_10mbMrEcEe65QITknCn82A"/>
             </children>
+            <children xmi:type="notation:Shape" xmi:id="_8MqasAyIEe-IadcddhgCPw" type="Behavior_EntryBehaviorLabel">
+              <element xmi:type="uml:OpaqueBehavior" href="fsm.uml#_8MRZIAyIEe-IadcddhgCPw"/>
+              <layoutConstraint xmi:type="notation:Location" xmi:id="_8MqasQyIEe-IadcddhgCPw" x="-10" y="-10"/>
+            </children>
             <element xmi:type="uml:State" href="fsm.uml#_Gay-IKAWEe6Sh616vaZpZA"/>
             <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GbOb8aAWEe6Sh616vaZpZA" x="835" y="57"/>
           </children>

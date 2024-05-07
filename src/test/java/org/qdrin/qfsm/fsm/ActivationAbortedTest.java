@@ -2,12 +2,14 @@ package org.qdrin.qfsm.fsm;
 
 import org.springframework.statemachine.StateMachine;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.qdrin.qfsm.Helper.Assertions.*;
 
 import java.time.OffsetDateTime;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
@@ -73,5 +75,56 @@ public class ActivationAbortedTest extends SpringStarter {
     log.debug("states: {}", machine.getState().getIds());
     assertProductEquals(expectedBundle.drive, bundle.drive);
     assertProductEquals(expectedBundle.components(), bundle.components());
+  }
+
+  @Nested
+  class CustomBundleComponent {
+
+    @ParameterizedTest
+    @ValueSource(strings = {"custom1-price-trial", "custom1-price-active"})
+
+    public void testSuccess(String priceId) throws Exception {
+      OffsetDateTime t0 = OffsetDateTime.now();
+      TestBundle preBundle = new BundleBuilder("customBundleOffer1", priceId,
+        "component1", "component2")
+        .tarificationPeriod(0)
+        .productStartDate(t0)
+        .build();
+
+      TestBundle bundle = new BundleBuilder("component3", null)
+        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
+        .tarificationPeriod(0)
+        .addBundle(preBundle.bundle)
+        .machineState(Helper.buildMachineState("PendingActivate"))
+        .build();
+      log.debug("bundle: {}", bundle);
+      Product product = bundle.drive;
+      TestBundle expectedBundle = new BundleBuilder(bundle)
+        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
+        .tarificationPeriod(0)
+        .productStartDate(t0)
+        .status("ABORTED")
+        .build();
+      machine = createMachine(bundle);
+      assertEquals(bundle.bundle.getProductId(), preBundle.bundle.getProductId());
+      StateMachineTestPlan<String, String> plan =
+          StateMachineTestPlanBuilder.<String, String>builder()
+            .defaultAwaitTime(2)
+            .stateMachine(machine)
+            .step()
+                .expectState("PendingActivate")
+                .and()
+            .step()
+                .sendEvent("activation_aborted")
+                .expectState("Aborted")
+                .expectStateChanged(1)
+                .and()
+            .build();
+      plan.test();
+      assertEquals(product.getStatus(), "ABORTED");
+      Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
+      Helper.Assertions.assertProductEquals(expectedBundle.bundle, bundle.bundle);
+      Helper.Assertions.assertProductEquals(expectedBundle.components(), bundle.components());
+    }
   }
 }

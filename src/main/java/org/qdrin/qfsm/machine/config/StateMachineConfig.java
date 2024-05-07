@@ -82,6 +82,11 @@ public class StateMachineConfig {
     }
 
     @Bean
+    PendingActivateEntry pendingActivateEntry() {
+      return new PendingActivateEntry();
+    }
+
+    @Bean
     PendingDisconnectEntry pendingDisconnectEntry() {
       return new PendingDisconnectEntry();
     }
@@ -218,27 +223,6 @@ public class StateMachineConfig {
           Product product = context.getExtendedState().get("product", Product.class);
           log.info("Clear product price. productId: {}", product.getProductId());
           product.setProductPrice(null);
-        }
-      };
-    }
-
-    @Bean
-    Action<String, String> resetTarificationPeriodAndStartDate() {
-      return new Action<String, String>() {
-        public void execute(StateContext<String, String> context) {
-          ExtendedState extendedState = context.getStateMachine().getExtendedState();
-          Product product = extendedState.get("product", Product.class);
-          List<Product> components = (List<Product>) extendedState.getVariables().get("components");
-          log.debug("components: {}", components);
-          OffsetDateTime t0 = OffsetDateTime.now();
-          log.info("Reset tarification period. productId: {}, tarificationPeriod: {}, productStartDate: {}",
-              product.getProductId(), 0, t0);
-          product.setProductStartDate(t0);
-          product.setTarificationPeriod(0);
-          components.forEach((c) -> {
-            c.setTarificationPeriod(0);
-            c.setProductStartDate(t0);
-          });
         }
       };
     }

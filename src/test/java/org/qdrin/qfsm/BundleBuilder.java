@@ -59,6 +59,7 @@ public class BundleBuilder {
     }
 
     private void createFromProducts() {
+        List<ProductRelationship> relations = new ArrayList<>();
         for(Product product: products) {
             ProductClass pclass = ProductClass.values()[product.getProductClass()];
             switch(pclass) {
@@ -72,11 +73,13 @@ public class BundleBuilder {
                     drive = product;
                     bundle = product;
                     componentClass = ProductClass.BUNDLE_COMPONENT;
+                    relations = product.getProductRelationship();
                     break;
                 case CUSTOM_BUNDLE:
                     assert(bundle == null);
                     drive = product;
                     bundle = product;
+                    relations = product.getProductRelationship();
                     componentClass = ProductClass.CUSTOM_BUNDLE_COMPONENT;
                     break;
                 case CUSTOM_BUNDLE_COMPONENT:
@@ -84,6 +87,12 @@ public class BundleBuilder {
                         break;
                     }
                 default:
+                    ProductRelationship rel = new ProductRelationship();
+                    rel.setProductId(product.getProductId());
+                    rel.setRelationshipType(
+                        bundleClass == ProductClass.BUNDLE ? "BUNDLES" : "CUSTOM_BUNDLES"
+                    );
+                    relations.add(rel);
                     components.add(product);
             }
         }
@@ -121,12 +130,23 @@ public class BundleBuilder {
     public BundleBuilder(String mainOfferId, String priceId, String... componentOfferIds) {
         Product product = new ProductBuilder(mainOfferId, "", priceId).build();
         drive = product;
+        bundleClass = ProductClass.values()[product.getProductClass()];
         products.add(product);
         if(componentOfferIds == null) {
             componentOfferIds = new String[] {};
         }
         for(String componentOfferId: componentOfferIds) {
             Product component = new ProductBuilder(componentOfferId, "", null).build();
+            switch(bundleClass) {
+                case BUNDLE:
+                    componentClass = ProductClass.BUNDLE_COMPONENT;
+                    break;
+                case CUSTOM_BUNDLE:
+                    componentClass = ProductClass.CUSTOM_BUNDLE_COMPONENT;
+                    break;
+                default:
+                    componentClass = ProductClass.VOID;                 
+            }
             products.add(component);
         }
         createFromProducts();
