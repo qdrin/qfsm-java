@@ -132,7 +132,7 @@ public class Helper {
     JsonNode usage = null;
     JsonNode payment = null;
     JsonNode price = null;
-    if(states.length == 0) {
+    if(states == null || states.length == 0) {
       result = mapper.getNodeFactory().textNode("Entry");
     } else if(states.length == 1) {
       result = mapper.getNodeFactory().textNode(states[0]);

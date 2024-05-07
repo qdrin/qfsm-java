@@ -122,6 +122,9 @@ public class BundleBuilder {
         Product product = new ProductBuilder(mainOfferId, "", priceId).build();
         drive = product;
         products.add(product);
+        if(componentOfferIds == null) {
+            componentOfferIds = new String[] {};
+        }
         for(String componentOfferId: componentOfferIds) {
             Product component = new ProductBuilder(componentOfferId, "", null).build();
             products.add(component);
@@ -130,7 +133,7 @@ public class BundleBuilder {
     }
 
     public BundleBuilder(String offerId, String priceId) {
-        this(offerId, priceId, new String[]{});
+        this(offerId, priceId, null);
     }
 
     public BundleBuilder(RequestEventDto event) {
