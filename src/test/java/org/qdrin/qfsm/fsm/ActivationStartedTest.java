@@ -5,20 +5,15 @@ import org.springframework.statemachine.StateMachine;
 import static org.junit.Assert.*;
 
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.SpringStarter;
+import org.qdrin.qfsm.TestSetup;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.model.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
@@ -42,49 +37,20 @@ public class ActivationStartedTest extends SpringStarter {
     machine.stopReactively().block();
     clearDb();
   }
-
-  private static Stream<Arguments> provideActivationStartedData() {
-    return Stream.of(
-      Arguments.of("simpleOffer1", "simple1-price-trial", ProductClass.SIMPLE, null, 
-          null,
-          "PENDING_ACTIVATE"),
-      Arguments.of("simpleOffer1", "simple1-price-active", ProductClass.SIMPLE, null,
-          null,
-          "PENDING_ACTIVATE"),
-      Arguments.of("bundleOffer1", "bundle1-price-trial", ProductClass.BUNDLE, null,
-          new String[] {"component1", "component2", "component3"},
-          "PENDING_ACTIVATE"),
-      Arguments.of("bundleOffer1", "bundle1-price-active", ProductClass.BUNDLE, null, 
-          new String[] {"component1", "component2", "component3"},
-          "PENDING_ACTIVATE"),
-      Arguments.of("customBundleOffer1", "custom1-price-trial", ProductClass.CUSTOM_BUNDLE, null,
-          new String[] {"component1", "component2", "component3"},
-          "PENDING_ACTIVATE"),
-      Arguments.of("customBundleOffer1", "cutsom1-price-active", ProductClass.CUSTOM_BUNDLE, null, 
-          new String[] {"component1", "component2", "component3"},
-          "PENDING_ACTIVATE")
-    );
-  }
   
   @ParameterizedTest
-  @MethodSource("provideActivationStartedData")
-  public void testSuccess(String offerId, String priceId, ProductClass driveClass, String[] machineState,
-            String[] componentOfferIds, String expectedStatus) throws Exception {
+  @MethodSource("org.qdrin.qfsm.Helper#provideTestSetups")
+  public void testSuccess(TestSetup argument) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
-    ProductClass componentClass;
-    switch(driveClass) {
-      case BUNDLE:
-        componentClass = ProductClass.BUNDLE_COMPONENT;
-        break;
-      case CUSTOM_BUNDLE:
-        componentClass = ProductClass.CUSTOM_BUNDLE_COMPONENT;
-        break;
-      default:
-        componentClass = ProductClass.VOID;
-    }
+    String expectedStatus = "PENDING_ACTIVATE";
+    ProductClass driveClass = argument.getProductClass();
+    String priceId = argument.getPriceId();
+    String offerId = argument.getOfferId();
+    String[] componentOfferIds = argument.getComponentOfferIds().toArray(new String[0]);
+
+    ProductClass componentClass = Helper.getComponentClass(driveClass);
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .productStartDate(t0.minusSeconds(30))
-      .machineState(Helper.buildMachineState(machineState))
       .build();
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .tarificationPeriod(0)

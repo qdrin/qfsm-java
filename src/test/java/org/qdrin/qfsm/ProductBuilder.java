@@ -50,6 +50,7 @@ public class ProductBuilder {
     String priceId = null;
 
     private void clear() {
+        priceId = null;
         productOfferingId = null;
         productOfferingName = null;
         productOfferingVersion = null;
@@ -81,6 +82,7 @@ public class ProductBuilder {
         ProductPrice price = null;
         if(priceId != null && prices != null) {
             final ProductPrice pfinal = prices.get(priceId);
+            assert pfinal != null : String.format("Price %s not found!", priceId); 
             try {
                 String pstr = Helper.mapper.writeValueAsString(pfinal);
                 price = Helper.mapper.readValue(pstr, new TypeReference<ProductPrice>() {});

@@ -12,7 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.params.provider.Arguments;
+import org.qdrin.qfsm.TestSetup.TestSetupBuilder;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.model.ProductRelationship;
@@ -69,6 +72,39 @@ public class Helper {
       e.printStackTrace();
     }
     return offers;
+  }
+
+  private static final List<TestSetup> testSetups = buildTestSetups();
+  private static List<TestSetup> buildTestSetups() {
+    List<TestSetup> result = new ArrayList<>();
+    List<String> components = Arrays.asList("component1", "component2", "component3");
+    TestSetupBuilder builder = new TestSetupBuilder();
+    
+    result.add(builder.offerId("simpleOffer1").priceId("simple1-price-trial")
+      .productClass(ProductClass.SIMPLE)
+      .build());
+    result.add(builder.priceId("simple1-price-active").build());
+    
+    result.add(builder.offerId("bundleOffer1").priceId("bundle1-price-trial")
+      .productClass(ProductClass.BUNDLE)
+      .componentOfferIds(new ArrayList<>(components))
+      .build());
+    result.add(builder.priceId("bundle1-price-active").build());
+
+    result.add(builder.offerId("customBundleOffer1").priceId("custom1-price-trial")
+    .productClass(ProductClass.CUSTOM_BUNDLE)
+    .componentOfferIds(new ArrayList<>(components))
+    .build());
+  result.add(builder.priceId("custom1-price-active").build());
+  return result;
+  }
+
+  public static List<TestSetup> getTestSetups() {
+    List<TestSetup> copy = new ArrayList<>();
+    for(TestSetup arg: testSetups) {
+      copy.add(arg.toBuilder().build());
+    }
+    return copy;
   }
 
   public static final String[] stateSuit(String... states) {
@@ -199,6 +235,20 @@ public class Helper {
     } else {
       return bundleMachineState.deepCopy();
     }
+  }
+
+  public static ProductClass getComponentClass(ProductClass bundleClass) {
+    switch(bundleClass) {
+      case BUNDLE: return ProductClass.BUNDLE_COMPONENT;
+      case CUSTOM_BUNDLE: return ProductClass.CUSTOM_BUNDLE_COMPONENT;
+      default: return ProductClass.VOID;
+    }
+  }
+
+  public static Stream<Arguments> provideTestSetups() {
+    List<TestSetup> copy = getTestSetups();
+    Stream<Arguments> stream = copy.stream().map(arg->Arguments.of(arg)).distinct();
+    return stream;
   }
 
   public static class Assertions {
