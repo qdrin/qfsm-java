@@ -233,6 +233,8 @@ public class BundleBuilder {
                 }
             }
         }
+        bundle = null;
+        createFromProducts();
         return this;
     }
 
