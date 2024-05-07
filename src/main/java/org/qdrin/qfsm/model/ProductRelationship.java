@@ -18,11 +18,11 @@ public class ProductRelationship {
   String relationshipType;
   String productOfferingName;
 
-  public ProductRelationship(Product product) {
-    this.productId = product.getProductId();
-    this.productOfferingId = product.getProductOfferingId();
-    this.productOfferingName = product.getProductOfferingName();
-    ProductClass pclass = ProductClass.values()[product.getProductClass()];
+  public ProductRelationship(Product toProduct) {
+    this.productId = toProduct.getProductId();
+    this.productOfferingId = toProduct.getProductOfferingId();
+    this.productOfferingName = toProduct.getProductOfferingName();
+    ProductClass pclass = ProductClass.values()[toProduct.getProductClass()];
     String relationType;
     switch(pclass) {
       case CUSTOM_BUNDLE_COMPONENT:

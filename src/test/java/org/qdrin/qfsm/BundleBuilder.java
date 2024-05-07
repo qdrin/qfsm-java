@@ -73,13 +73,13 @@ public class BundleBuilder {
                     drive = product;
                     bundle = product;
                     componentClass = ProductClass.BUNDLE_COMPONENT;
-                    relations = product.getProductRelationship();
+                    product.setProductRelationship(relations);
                     break;
                 case CUSTOM_BUNDLE:
                     assert(bundle == null);
                     drive = product;
                     bundle = product;
-                    relations = product.getProductRelationship();
+                    product.setProductRelationship(relations);
                     componentClass = ProductClass.CUSTOM_BUNDLE_COMPONENT;
                     break;
                 case CUSTOM_BUNDLE_COMPONENT:
@@ -87,17 +87,15 @@ public class BundleBuilder {
                         break;
                     }
                 default:
-                    ProductRelationship rel = new ProductRelationship();
-                    rel.setProductId(product.getProductId());
-                    rel.setRelationshipType(
-                        bundleClass == ProductClass.BUNDLE ? "BUNDLES" : "CUSTOM_BUNDLES"
-                    );
+                    ProductRelationship rel = new ProductRelationship(product);
                     relations.add(rel);
                     components.add(product);
             }
         }
         if(componentClass != null) {
             setComponentClass(componentClass);
+            String relType = componentClass == ProductClass.BUNDLE_COMPONENT ? "BUNDLES" : "CUSTOM_BUNDLES";
+            bundle.getProductRelationship().forEach((r) -> {r.setRelationshipType(relType);});
         }
     }
 

@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductClass;
@@ -62,6 +63,7 @@ public class ActivationStartedTest extends SpringStarter {
       .status(expectedStatus)
       .productStartDate(t0)
       .build();
+    log.debug("expectedBundle: {}", expectedBundle);
     machine = createMachine(bundle);
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
@@ -84,11 +86,11 @@ public class ActivationStartedTest extends SpringStarter {
 
   @Nested
   class CustomBundleComponent {
-    @Test
-    public void testSuccessToPendingActivate() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"custom1-price-trial", "custom1-price-active"})
+    public void testSuccessToPendingActivate(String priceId) throws Exception {
       OffsetDateTime t0 = OffsetDateTime.now();
       String offerId = "customBundleOffer1";
-      String priceId = "custom1-price-trial";
       String[] componentOfferIds = new String[] {"component1", "component2"};
 
       TestBundle preBundle = new BundleBuilder(offerId, priceId, componentOfferIds)
@@ -110,12 +112,7 @@ public class ActivationStartedTest extends SpringStarter {
         .productStartDate(t0)
         .status("PENDING_ACTIVATE")
         .build();
-      List<ProductRelationship> expectedRelations = expectedBundle.bundle.getProductRelationship();
-      ProductRelationship componentRelation = new ProductRelationship(); 
-      componentRelation.setProductId(bundle.drive.getProductId());
-      componentRelation.setProductOfferingId(offerId);
-      componentRelation.setRelationshipType("CUSTOM_BUNDLES");
-      expectedRelations.add(componentRelation);
+      expectedBundle.bundle.getProductRelationship().add(new ProductRelationship(bundle.drive));
 
       machine = createMachine(bundle);
       assertEquals(bundle.bundle.getProductId(), preBundle.bundle.getProductId());
@@ -135,52 +132,8 @@ public class ActivationStartedTest extends SpringStarter {
       plan.test();
       assertEquals(product.getStatus(), "PENDING_ACTIVATE");
       log.debug("bundle relations: {}", bundle.bundle.getProductRelationship());
-      assertEquals(expectedRelations.size(), bundle.bundle.getProductRelationship().size());
       assertProductEquals(expectedBundle.drive, product);
       assertProductEquals(expectedBundle.bundle, bundle.bundle);
-    }
-
-    @Test
-    public void testSuccessToActive() throws Exception {
-      OffsetDateTime t0 = OffsetDateTime.now();
-      TestBundle preBundle = new BundleBuilder("customBundleOffer1", "custom1-price-trial",
-        "component1", "component2")
-        .machineState(Helper.buildMachineState("Active", "Paid", "PriceActive"))
-        .tarificationPeriod(0)
-        .build();
-
-      TestBundle bundle = new BundleBuilder("component3", null)
-        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
-        .addBundle(preBundle.bundle)
-        .build();
-      log.debug("bundle: {}", bundle);
-      Product product = bundle.drive;
-      TestBundle expectedBundle = new BundleBuilder(bundle)
-        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
-        .tarificationPeriod(0)
-        .productStartDate(t0)
-        .status("PENDING_ACTIVATE")
-        .build();
-      machine = createMachine(bundle);
-      assertEquals(bundle.bundle.getProductId(), preBundle.bundle.getProductId());
-      StateMachineTestPlan<String, String> plan =
-          StateMachineTestPlanBuilder.<String, String>builder()
-            .defaultAwaitTime(2)
-            .stateMachine(machine)
-            .step()
-                .expectState("Entry")
-                .and()
-            .step()
-                .sendEvent("activation_started")
-                .expectState("PendingActivate")
-                .expectStateChanged(1)
-                .and()
-            .build();
-      plan.test();
-      assertEquals(product.getStatus(), "PENDING_ACTIVATE");
-      Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
-      Helper.Assertions.assertProductEquals(expectedBundle.bundle, bundle.bundle);
-      Helper.Assertions.assertProductEquals(expectedBundle.components(), bundle.components());
     }
   }
 }

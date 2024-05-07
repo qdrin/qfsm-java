@@ -23,7 +23,6 @@ import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.TestExpected;
 import org.qdrin.qfsm.TestExpected.TestExpectedBuilder;
 import org.qdrin.qfsm.TestSetup;
-import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.tasks.ActionSuite;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;

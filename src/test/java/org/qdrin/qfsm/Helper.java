@@ -319,8 +319,8 @@ public class Helper {
       assert real != null : "real " + message + " is null";
       OffsetDateTime t0 = expected.minusSeconds(delta);
       OffsetDateTime t1 = expected.plusSeconds(delta);
-      assert(real.isBefore(t1)) : message + " not before";
-      assert(real.isAfter(t0)) : message + "not after";
+      assert(real.isBefore(t1)) : String.format("%s : %s is not before %s", message, real, t1);
+      assert(real.isAfter(t0)) : String.format("%s : %s is not after %s", message, real, t0);
     }
 
     public static void assertDates(OffsetDateTime expected, OffsetDateTime real) {

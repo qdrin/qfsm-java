@@ -1,11 +1,8 @@
 package org.qdrin.qfsm.machine.states;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.qdrin.qfsm.ProductClass;
-import org.qdrin.qfsm.machine.actions.AddActionAction;
-import org.qdrin.qfsm.machine.actions.DeleteActionAction;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductRelationship;
 import org.springframework.statemachine.ExtendedState;
@@ -23,13 +20,16 @@ public class PendingActivateEntry implements Action<String, String> {
     log.debug("event: {}, message: {}", context.getEvent());
     product.setTarificationPeriod(0);
     OffsetDateTime t0 = OffsetDateTime.now();
+    product.setProductStartDate(t0);
     List<Product> components = (List<Product>) extendedState.getVariables().get("components");
     components.stream().forEach((c) -> {c.setTarificationPeriod(0); c.setProductStartDate(t0);});
+    log.debug("set tarificationPeriod: 0, productStartDate: {}", t0);
     ProductClass pclass = ProductClass.values()[product.getProductClass()];
     if(pclass == ProductClass.CUSTOM_BUNDLE_COMPONENT) {
       Product bundle = extendedState.get("bundle", Product.class);
       ProductRelationship relation = new ProductRelationship(product);
       bundle.getProductRelationship().add(relation);
+      log.info("set relation {} from bundle {} to component", relation, bundle.getProductId());
     }
   }
 }
