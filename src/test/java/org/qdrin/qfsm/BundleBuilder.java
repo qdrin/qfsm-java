@@ -195,8 +195,7 @@ public class BundleBuilder {
 
     public BundleBuilder addComponent(Product component) {
         components.add(component);
-        ProductRelationship relation = new ProductRelationship();
-        relation.setProductId(component.getProductId());
+        ProductRelationship relation = new ProductRelationship(component);
         List<ProductRelationship> relations = bundle.getProductRelationship();
         relations = relations == null ? new ArrayList<>() : relations;
         relations.add(relation);
@@ -253,9 +252,7 @@ public class BundleBuilder {
     }
 
     public BundleBuilder status(String status) {
-        for(Product product: products) {
-            product.setStatus(status);
-        }
+        products.stream().forEach(p -> p.setStatus(status));
         return this;
     }
 

@@ -179,6 +179,10 @@
                 <body>isNotTarificated</body>
               </specification>
             </ownedRule>
+            <effect xmi:type="uml:OpaqueBehavior" xmi:id="_cyexsA0KEe-dAqXPFY5Rmw">
+              <language>bean</language>
+              <body>mergeComponent</body>
+            </effect>
           </transition>
           <subvertex xmi:type="uml:Pseudostate" xmi:id="_rygxcLn_Ee6yNs2FzguhlQ" name=""/>
           <subvertex xmi:type="uml:State" xmi:id="_yybJ4Ln_Ee6yNs2FzguhlQ" name="PaymentOn">
@@ -254,7 +258,7 @@
               </specification>
             </ownedRule>
           </transition>
-          <transition xmi:type="uml:Transition" xmi:id="_WguUYArIEe-F_I8jzb-Dqg" guard="_5UdZEArIEe-F_I8jzb-Dqg" source="__C9pcArHEe-F_I8jzb-Dqg" target="_c28j4L9LEe65db1_bM-TwQ">
+          <transition xmi:type="uml:Transition" xmi:id="_WguUYArIEe-F_I8jzb-Dqg" guard="_5UdZEArIEe-F_I8jzb-Dqg" kind="local" source="__C9pcArHEe-F_I8jzb-Dqg" target="_c28j4L9LEe65db1_bM-TwQ">
             <ownedRule xmi:type="uml:Constraint" xmi:id="_5UdZEArIEe-F_I8jzb-Dqg">
               <specification xmi:type="uml:OpaqueExpression" xmi:id="_5UdZEQrIEe-F_I8jzb-Dqg">
                 <language>bean</language>

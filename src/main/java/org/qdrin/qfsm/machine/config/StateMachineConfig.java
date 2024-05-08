@@ -1,12 +1,11 @@
 package org.qdrin.qfsm.machine.config;
 
-import java.time.OffsetDateTime;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.qdrin.qfsm.PriceType;
 import org.qdrin.qfsm.ProductClass;
+import org.qdrin.qfsm.machine.actions.MergeComponent;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
@@ -16,7 +15,6 @@ import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.qdrin.qfsm.service.QStateMachineService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -240,6 +238,11 @@ public class StateMachineConfig {
           }
         }
       };
+    }
+
+    @Bean
+    MergeComponent mergeComponent() {
+      return new MergeComponent();
     }
 
     // -----------------------------------------------------------------

@@ -132,11 +132,7 @@ public class FsmApp {
 				ProductClass pclass = productClass == ProductClass.BUNDLE ? ProductClass.BUNDLE_COMPONENT : ProductClass.CUSTOM_BUNDLE_COMPONENT;
 				component.setProductClass(pclass.ordinal());
 				components.add(component);
-				ProductRelationship pr = new ProductRelationship();
-				pr.setProductId(component.getProductId());
-				pr.setProductOfferingId(component.getProductOfferingId());
-				pr.setRelationshipType(rel.getRelationshipType());
-				pr.setProductOfferingName(component.getProductOfferingName());
+				ProductRelationship pr = new ProductRelationship(component);
 				productRelations.add(pr);
 				componentItem.get().setProductId(component.getProductId());
 				orderItems.add(componentItem.get());

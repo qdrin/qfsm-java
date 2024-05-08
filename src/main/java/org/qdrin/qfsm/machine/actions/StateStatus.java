@@ -36,9 +36,7 @@ public class StateStatus {
       product.setStatus(status);
       log.debug("productId: {}, new status: {}", product.getProductId(), product.getStatus());
       List<Product> components = (List<Product>) extendedState.getVariables().get("components");
-      for(Product component: components) {
-          component.setStatus(status);
-      }
+      components.stream().filter(c -> c.getMachineState().has("Provision")).forEach(c -> c.setStatus(status));
     }
   }
 }

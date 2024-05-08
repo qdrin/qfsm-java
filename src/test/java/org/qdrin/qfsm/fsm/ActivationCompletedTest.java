@@ -258,11 +258,12 @@ public class ActivationCompletedTest extends SpringStarter {
                 .and()
             .step()
                 .sendEvent("activation_completed")
-                .expectStates(Helper.stateSuit(states.get(0), "paymentFinal", "priceFinal"))
+                .expectStates(Helper.stateSuit(states.get(0), "PaymentFinal", "PriceFinal"))
                 // .expectStateChanged(1)
                 .and()
             .build();
       plan.test();
+      log.debug("states: {}", machine.getState().getIds());
       assertEquals(status, product.getStatus());
       Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
       Helper.Assertions.assertProductEquals(expectedBundle.bundle, bundle.bundle);

@@ -95,6 +95,7 @@ public class ActivationStartedTest extends SpringStarter {
 
       TestBundle preBundle = new BundleBuilder(offerId, priceId, componentOfferIds)
         .tarificationPeriod(0)
+        .status("PENDING_ACTIVATE")
         .build();
 
       log.debug("preBundle.bundle: {}", preBundle.bundle);

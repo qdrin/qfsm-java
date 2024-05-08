@@ -15,8 +15,8 @@ import lombok.experimental.FieldDefaults;
 public class ProductRelationship {
   String productId;
   String productOfferingId;
-  String relationshipType;
   String productOfferingName;
+  String relationshipType;
 
   public ProductRelationship(Product toProduct) {
     this.productId = toProduct.getProductId();
