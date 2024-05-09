@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.qdrin.qfsm.model.Product;
-import org.qdrin.qfsm.persist.QStateMachineContextConverter;
 import org.qdrin.qfsm.tasks.ActionSuite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;

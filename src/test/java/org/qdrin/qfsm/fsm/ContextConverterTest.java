@@ -18,7 +18,7 @@ import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
-import org.qdrin.qfsm.persist.QStateMachineContextConverter;
+import org.qdrin.qfsm.service.QStateMachineContextConverter;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
