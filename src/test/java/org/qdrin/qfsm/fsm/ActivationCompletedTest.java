@@ -196,24 +196,8 @@ public class ActivationCompletedTest extends SpringStarter {
       return Stream.of(
         Arguments.of("customOffer1", "custom1-price-trial",
             "ACTIVE_TRIAL", Arrays.asList("ActiveTrial", "Paid", "PriceActive")),
-        Arguments.of("customOffer1", "custom1-price-trial",
-            "ACTIVE_TRIAL", Arrays.asList("Suspending", "NotPaid", "PriceChanging")),
-        Arguments.of("customOffer1", "custom1-price-trial",
-            "SUSPENDED", Arrays.asList("Suspended", "NotPaid", "PriceChanging")),
-        Arguments.of("customOffer1", "custom1-price-trial",
-            "SUSPENDED", Arrays.asList("Resuming", "Paid", "PriceChanging")),
-        Arguments.of("customOffer1", "custom1-price-trial",
-            "ACTIVE_TRIAL", Arrays.asList("Prolongation", "Paid", "PriceActive")),
         Arguments.of("customOffer1", "custom1-price-active",
-            "ACTIVE", Arrays.asList("Active", "Paid", "PriceActive")),
-        Arguments.of("customOffer1", "custom1-price-active",
-            "ACTIVE", Arrays.asList("Suspending", "NotPaid", "PriceChanging")),
-        Arguments.of("customOffer1", "custom1-price-active",
-            "SUSPENDED", Arrays.asList("Suspended", "NotPaid", "PriceChanging")),
-        Arguments.of("customOffer1", "custom1-price-active",
-            "SUSPENDED", Arrays.asList("Resuming", "Paid", "PriceChanging")),
-        Arguments.of("customOffer1", "custom1-price-active",
-            "ACTIVE", Arrays.asList("Prolongation", "Paid", "PriceActive"))
+            "ACTIVE", Arrays.asList("Active", "Paid", "PriceActive"))
       );  
     }
 
@@ -265,6 +249,81 @@ public class ActivationCompletedTest extends SpringStarter {
       plan.test();
       log.debug("states: {}", machine.getState().getIds());
       assertEquals(status, product.getStatus());
+      Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
+      Helper.Assertions.assertProductEquals(expectedBundle.bundle, bundle.bundle);
+      Helper.Assertions.assertProductEquals(expectedBundle.components(), bundle.components());
+    }
+
+    private static Stream<Arguments> testCustomBundleComponentActivationRejected() {
+      return Stream.of(
+        Arguments.of("customOffer1", "custom1-price-trial",
+            "ACTIVE_TRIAL", Arrays.asList("Suspending", "NotPaid", "PriceChanging")),
+        Arguments.of("customOffer1", "custom1-price-trial",
+            "SUSPENDED", Arrays.asList("Suspended", "NotPaid", "PriceChanging")),
+        Arguments.of("customOffer1", "custom1-price-trial",
+            "SUSPENDED", Arrays.asList("Resuming", "Paid", "PriceChanging")),
+        Arguments.of("customOffer1", "custom1-price-trial",
+            "ACTIVE_TRIAL", Arrays.asList("Prolongation", "Paid", "PriceActive")),
+        Arguments.of("customOffer1", "custom1-price-active",
+            "ACTIVE", Arrays.asList("Suspending", "NotPaid", "PriceChanging")),
+        Arguments.of("customOffer1", "custom1-price-active",
+            "SUSPENDED", Arrays.asList("Suspended", "NotPaid", "PriceChanging")),
+        Arguments.of("customOffer1", "custom1-price-active",
+            "SUSPENDED", Arrays.asList("Resuming", "Paid", "PriceChanging")),
+        Arguments.of("customOffer1", "custom1-price-active",
+            "ACTIVE", Arrays.asList("Prolongation", "Paid", "PriceActive"))
+      );  
+    }
+
+    @ParameterizedTest
+    @MethodSource
+
+    public void testCustomBundleComponentActivationRejected(String offerId, String priceId,
+        String status, List<String> states) throws Exception {
+      OffsetDateTime t0 = OffsetDateTime.now();
+      JsonNode machineState = Helper.buildMachineState(states.toArray(new String[0]));
+      TestBundle preBundle = new BundleBuilder("customBundleOffer1", priceId,
+        "component1", "component2")
+        .tarificationPeriod(2)
+        .productStartDate(t0)
+        .status(status)
+        .machineState(machineState)
+        .build();
+
+      TestBundle bundle = new BundleBuilder("component3", null)
+        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
+        .tarificationPeriod(0)
+        .addBundle(preBundle.bundle)
+        .machineState(Helper.buildMachineState("PendingActivate"))
+        .status("PENDING_ACTIVATE")
+        .build();
+      log.debug("bundle: {}", bundle);
+      Product product = bundle.drive;
+      TestBundle expectedBundle = new BundleBuilder(bundle)
+        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
+        .tarificationPeriod(0)
+        .status("PENDING_ACTIVATE")
+        .build();
+
+      machine = createMachine(bundle);
+      assertEquals(bundle.bundle.getProductId(), preBundle.bundle.getProductId());
+      StateMachineTestPlan<String, String> plan =
+          StateMachineTestPlanBuilder.<String, String>builder()
+            .defaultAwaitTime(2)
+            .stateMachine(machine)
+            .step()
+                .expectState("PendingActivate")
+                .and()
+            .step()
+                .sendEvent("activation_completed")
+                .expectStates("PendingActivate")
+                .expectStateChanged(0)
+                .expectEventNotAccepted(0)
+                .and()
+            .build();
+      plan.test();
+      log.debug("states: {}", machine.getState().getIds());
+      assertEquals("PENDING_ACTIVATE", product.getStatus());
       Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
       Helper.Assertions.assertProductEquals(expectedBundle.bundle, bundle.bundle);
       Helper.Assertions.assertProductEquals(expectedBundle.components(), bundle.components());

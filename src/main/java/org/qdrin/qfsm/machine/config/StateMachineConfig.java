@@ -292,10 +292,8 @@ public class StateMachineConfig {
     }
 
     @Bean
-    public Guard<String, String> isIndependedlyActivated() {
-      return new ProductClassGuard(Arrays.asList(
-        ProductClass.SIMPLE, ProductClass.BUNDLE, ProductClass.CUSTOM_BUNDLE, ProductClass.CUSTOM_BUNDLE_COMPONENT
-      ));
+    public Guard<String, String> canActivate() {
+      return new CanActivateGuard();
     }
   }
 }

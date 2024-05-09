@@ -9,19 +9,19 @@
         <trigger xmi:type="uml:Trigger" xmi:id="_4i_IwLCHEe6zeo6uvgVLWA" event="_yjXIoLCHEe6zeo6uvgVLWA"/>
       </transition>
       <transition xmi:type="uml:Transition" xmi:id="_bB4iULn-Ee6yNs2FzguhlQ" source="_ZdmsILn-Ee6yNs2FzguhlQ" target="_mBTgYMlsEe6D_qDhyLHyWw"/>
-      <transition xmi:type="uml:Transition" xmi:id="_BpRM4LoBEe6yNs2FzguhlQ" source="_Gay-IKAWEe6Sh616vaZpZA" target="_bp6j8LoEEe6yNs2FzguhlQ">
+      <transition xmi:type="uml:Transition" xmi:id="_BpRM4LoBEe6yNs2FzguhlQ" guard="_5KFC4A3aEe-Zur2zZs0YFQ" source="_Gay-IKAWEe6Sh616vaZpZA" target="_bp6j8LoEEe6yNs2FzguhlQ">
+        <ownedRule xmi:type="uml:Constraint" xmi:id="_5KFC4A3aEe-Zur2zZs0YFQ">
+          <specification xmi:type="uml:OpaqueExpression" xmi:id="_5KFp8A3aEe-Zur2zZs0YFQ">
+            <language>bean</language>
+            <body>canActivate</body>
+          </specification>
+        </ownedRule>
         <trigger xmi:type="uml:Trigger" xmi:id="_xWcMsLoCEe6yNs2FzguhlQ" event="_RYkUgLCDEe6zeo6uvgVLWA"/>
       </transition>
       <transition xmi:type="uml:Transition" xmi:id="_BILcILztEe6WIIctFrkbQg" source="_lUS-kLoEEe6yNs2FzguhlQ" target="__Z-08LzsEe6WIIctFrkbQg"/>
       <transition xmi:type="uml:Transition" xmi:id="_WtcHoL9OEe65db1_bM-TwQ" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_z6iD0ArEEe-F_I8jzb-Dqg"/>
       <transition xmi:type="uml:Transition" xmi:id="_EwcgQMBDEe64IK3ZTfm97w" source="_bp6j8LoEEe6yNs2FzguhlQ" target="_vh29AMDOEe6ubM7h2HVYrA"/>
       <transition xmi:type="uml:Transition" xmi:id="_tSSasMlsEe6D_qDhyLHyWw" source="_mBTgYMlsEe6D_qDhyLHyWw" target="_Gay-IKAWEe6Sh616vaZpZA">
-        <ownedRule xmi:type="uml:Constraint" xmi:id="_eWb4EAunEe-zt_IWkBmQJw">
-          <specification xmi:type="uml:OpaqueExpression" xmi:id="_eWb4EQunEe-zt_IWkBmQJw">
-            <language>bean</language>
-            <body>isIndependedlyActivated</body>
-          </specification>
-        </ownedRule>
         <trigger xmi:type="uml:Trigger" xmi:id="_0dVFEMlsEe6D_qDhyLHyWw" event="_HGxUkLCDEe6zeo6uvgVLWA"/>
       </transition>
       <transition xmi:type="uml:Transition" xmi:id="_zwgzcNpkEe6AsbqF-PrkhA" source="_bp6j8LoEEe6yNs2FzguhlQ" target="__C9pcArHEe-F_I8jzb-Dqg"/>

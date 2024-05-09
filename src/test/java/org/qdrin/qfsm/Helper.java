@@ -254,9 +254,9 @@ public class Helper {
   public static class Assertions {
 
     public static void assertResponseEquals(RequestEventDto request, ResponseEventDto response) {
-      assertEquals(request.getEvent().getRefId(), response.getRefId());
+      assertEquals(request.getEvent().getRefId(), response.getRefId(), "refId");
       List<ProductResponseDto> rproducts = response.getProducts();
-      assertNotNull(rproducts);
+      assertNotNull(rproducts, "response products is null");
       String eventType = request.getEvent().getEventType();
       if(eventType.equals("activation_started")) {
         List<ProductActivateRequestDto> orderItems = request.getProductOrderItems();
@@ -265,14 +265,14 @@ public class Helper {
           List<ProductResponseDto> lp = rproducts.stream()
               .filter(p -> p.getProductOrderItemId().equals(item.getProductOrderItemId()))
               .collect(Collectors.toList());
-          assertEquals(1, lp.size());
+          assertEquals(1, lp.size(), String.format("productOfferingId: %s", item.getProductOfferingId()));
           ProductResponseDto rproduct = lp.get(0);
-          assertNotNull(rproduct.getProductId());
-          assertEquals(item.getProductOfferingId(), rproduct.getProductOfferingId());
-          assertEquals(item.getProductOfferingName(), rproduct.getProductOfferingName());
-          assertEquals(item.getIsBundle(), rproduct.getIsBundle());
-          assertEquals(item.getIsCustom(), rproduct.getIsCustom());
-          assertEquals("PENDING_ACTIVATE", rproduct.getStatus());
+          assertNotNull(rproduct.getProductId(), "productId is null");
+          assertEquals(item.getProductOfferingId(), rproduct.getProductOfferingId(), "productOfferingId");
+          assertEquals(item.getProductOfferingName(), rproduct.getProductOfferingName(), "productOfferingName");
+          assertEquals(item.getIsBundle(), rproduct.getIsBundle(), "isBundle");
+          assertEquals(item.getIsCustom(), rproduct.getIsCustom(), "isCustom");
+          assertEquals("PENDING_ACTIVATE", rproduct.getStatus(), "status");
           if(rproduct.getIsBundle()) {
             List<ProductRelationship> relations = rproduct.getProductRelationship();
             if(relations == null) {
@@ -294,7 +294,7 @@ public class Helper {
           List<ProductResponseDto> lp = rproducts.stream()
               .filter(p -> p.getProductId().equals(item.getProductId()))
               .collect(Collectors.toList());
-          assertEquals(1, lp.size());
+          assertEquals(1, lp.size(),  String.format("productId: %s", item.getProductId()));
         }
         for(ProductResponseDto rproduct: rproducts) {
           if(rproduct.getIsBundle()) {
@@ -302,12 +302,12 @@ public class Helper {
             if(relations == null) {
               relations = new ArrayList<>();
             }
-            assertEquals(rproducts.size()-1, relations.size());
+            assertEquals(rproducts.size()-1, relations.size(), "relationship size mismatch");
             for(ProductRelationship r: relations) {
               List<ProductResponseDto> lrp = rproducts.stream()
               .filter(p -> p.getProductId().equals(r.getProductId()))
               .collect(Collectors.toList());
-            assertEquals(1, lrp.size());
+            assertEquals(1, lrp.size(), String.format("relation not found: %s", r.getProductId()));
             }
           }
         }
