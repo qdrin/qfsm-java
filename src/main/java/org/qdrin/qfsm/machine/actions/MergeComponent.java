@@ -20,6 +20,7 @@ public class MergeComponent implements Action<String, String> {
     product.setStatus(bundle.getStatus());
     product.setTrialEndDate(bundle.getTrialEndDate());
     product.setActiveEndDate(bundle.getActiveEndDate());
+    product.setMachineState(null);
     log.info("merged component {} to bundle {}", product.getProductId(), bundle.getProductId());
   }
 }
