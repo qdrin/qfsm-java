@@ -39,8 +39,6 @@ public class BundleBuilder {
             return products.stream().filter(p -> p.getProductOfferingId().equals(offerId)).findFirst().get();
         }
     }
-    @Autowired
-    ProductRepository productRepository;
 
     String partyRoleId = UUID.randomUUID().toString();
     String eventType = null;
@@ -166,13 +164,14 @@ public class BundleBuilder {
                         .build();
                 products.add(product);
             }
-        } else {  // Обработка все событий, кроме activation_started
-            for(ProductRequestDto item: event.getProducts()) {
-                Product product = productRepository.findById(item.getProductId()).get();
-                assert(product != null);
-                products.add(product);
-            }        
         }
+        // } else {  // Обработка все событий, кроме activation_started
+        //     for(ProductRequestDto item: event.getProducts()) {
+        //         Product product = productRepository.findById(item.getProductId()).get();
+        //         assert(product != null);
+        //         products.add(product);
+        //     }        
+        // }
         createFromProducts();
     }
 
@@ -289,7 +288,7 @@ public class BundleBuilder {
         return this;
     }
 
-    public BundleBuilder save() {
+    public BundleBuilder save(ProductRepository productRepository) {
         for(Product product: products) {
             productRepository.save(product);
         }

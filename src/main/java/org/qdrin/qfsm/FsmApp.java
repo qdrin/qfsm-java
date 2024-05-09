@@ -10,12 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.StateMachineEventResult;
-import org.springframework.statemachine.config.StateMachineFactory;
-import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.state.State;
-import org.springframework.statemachine.support.AbstractStateMachine;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -30,6 +26,7 @@ import org.qdrin.qfsm.model.dto.ProductRequestDto;
 import org.qdrin.qfsm.persist.QStateMachineContextConverter;
 import org.qdrin.qfsm.repository.EventRepository;
 import org.qdrin.qfsm.repository.ProductRepository;
+import org.qdrin.qfsm.service.QStateMachineService;
 import org.qdrin.qfsm.tasks.*;
 import org.qdrin.qfsm.utils.EventValidator;
 
@@ -38,10 +35,7 @@ import org.qdrin.qfsm.utils.EventValidator;
 public class FsmApp {
 
 	@Autowired
-  	StateMachineService<String, String> stateMachineService;
-
-	@Autowired
-	StateMachineFactory<String, String> stateMachinefactory;
+	QStateMachineService service;
 
 	@Autowired
 	EventRepository eventRepository;
@@ -53,25 +47,6 @@ public class FsmApp {
   public JsonNode getMachineState(State<String, String> state) {
 		JsonNode mstate = QStateMachineContextConverter.toJsonNode(state);
 		return mstate;
-	}
-
-	public <T> T getVariable(String machineId, String varname, Class<T> clazz) {
-		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
-		T var = machine.getExtendedState().get(varname, clazz);
-		stateMachineService.releaseStateMachine(machineId);
-		return var;
-	}
-
-	public void removeVariable(String machineId, String varname) {
-		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
-		machine.getExtendedState().getVariables().remove(varname);
-		stateMachineService.releaseStateMachine(machineId);
-	}
-
-	public void setVariable(String machineId, String varname, Object var) {
-		StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
-		machine.getExtendedState().getVariables().put(varname, var);
-		stateMachineService.releaseStateMachine(machineId);
 	}
 
 	private void checkEvent(Event event) {
@@ -275,18 +250,9 @@ public class FsmApp {
 			Product product = bundle.getDrive();
 			Product productBundle = bundle.getBundle();
 			List<Product> components = bundle.getComponents();
-			String machineId = product.getProductId();
 			// StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 			// NEW
-			StateMachine<String, String> machine = stateMachinefactory.getStateMachine(machineId);
-			if(! product.getMachineState().isEmpty()) {
-				StateMachineContext<String, String> context = QStateMachineContextConverter.toContext(product.getMachineState());
-				// machine.stopReactively().block();
-				machine.getStateMachineAccessor().doWithAllRegions(
-					function -> function.resetStateMachineReactively(context).block()
-				);
-			}
-			machine.startReactively().block();
+			StateMachine<String, String> machine = service.acquireStateMachine(product);
 			String eventType = event.getEventType();
 			List<ActionSuite> actions = new ArrayList<>();
 			List<ActionSuite> deleteActions = new ArrayList<>();
@@ -312,6 +278,7 @@ public class FsmApp {
 			variables.remove("components");
 			variables.remove("actions");
 			variables.remove("deleteActions");
+			// service.releaseStateMachine(machineId);
 
 			FsmActions fsmActions = new FsmActions();
 			for(ActionSuite action: deleteActions) {
@@ -320,7 +287,6 @@ public class FsmApp {
 			for(ActionSuite action: actions) {
 				fsmActions.createTask(action);
 			}
-			productRepository.save(product);
 			if(productBundle != null && ! productBundle.getProductId().equals(product.getProductId())) {
 				productRepository.save(productBundle);
 			}
@@ -331,8 +297,8 @@ public class FsmApp {
 					}
 				}
 			}
-			log.info("new state: {}, variables: {}", machineState, variables);
-			stateMachineService.releaseStateMachine(machineId);
+			log.info("[{}] new state: {}, variables: {}", product.getProductId(), product.getMachineState(), variables);
+			productRepository.save(product);
 		}
 		eventRepository.save(event);
 		return result;
@@ -356,7 +322,7 @@ public class FsmApp {
 			throw new EventDeniedException(emsg, e);
     }
 		finally {
-			stateMachineService.releaseStateMachine(machine.getId());
+			service.releaseStateMachine(machine.getId());
 		}
 		if(res == null || res.getResultType() == StateMachineEventResult.ResultType.DENIED) {
 			throw new EventDeniedException(String.format("[%s] Event %s not accepted in current state", machine.getId(), eventName));

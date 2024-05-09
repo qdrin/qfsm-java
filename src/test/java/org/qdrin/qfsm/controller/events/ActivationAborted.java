@@ -41,7 +41,7 @@ public class ActivationAborted extends ControllerStarter {
   @Nested
   class Simple {
     @Test
-    public void abortSimpleFailedDeclined() throws Exception {
+    public void abortSimpleDeclined() throws Exception {
       String offerId = "simpleOffer1";
       String priceId = "simple1-price-trial";
       OfferDef offerDef = Helper.testOffers.getOffers().get(offerId);
@@ -51,6 +51,7 @@ public class ActivationAborted extends ControllerStarter {
       TestBundle bundle = new BundleBuilder(offerId, priceId)
         .machineState(machineState)
         .tarificationPeriod(0)
+        .save(productRepository)
         .build();
       StateMachine<String, String> machine = createMachine(bundle);
       RequestEventDto event = new EventBuilder("activation_aborted", bundle.drive).build();
@@ -70,10 +71,11 @@ public class ActivationAborted extends ControllerStarter {
       Product product = getProduct(resultProducts.get(0).getProductId());
       TestBundle expectedBundle = new BundleBuilder(bundle)
         .productIds(Arrays.asList(product))
+        .machineState(Helper.buildMachineState("Aborted"))
         .status("ABORTED")
         .tarificationPeriod(0)
         .build();
-      log.debug("expected: {}\nactual: {}", expectedBundle.drive, bundle.drive);
+      log.debug("expected: {}\nactual: {}", expectedBundle.drive, product);
       assertProductEquals(expectedBundle.drive, product);
     }
   }

@@ -43,8 +43,7 @@ public class Product {
   Boolean isCustom;
   String status;
   @JdbcTypeCode(SqlTypes.JSON)
-  @Builder.Default
-  JsonNode machineState = new ObjectMapper().createObjectNode();
+  JsonNode machineState;
   @Builder.Default
   int productClass = 0;
   int tarificationPeriod;
@@ -86,7 +85,6 @@ public class Product {
     this.productOfferingName = orderItem.getProductOfferingName();
     this.isBundle = orderItem.getIsBundle();
     this.isCustom = orderItem.getIsCustom();
-    this.machineState = new ObjectMapper().createObjectNode();
     if(orderItem.getCharacteristic() != null) { this.characteristic = orderItem.getCharacteristic(); }
     if(orderItem.getMetaInfo() != null) { this.metaInfo = orderItem.getMetaInfo(); }
     if(orderItem.getLabel() != null) { this.label = orderItem.getLabel(); }

@@ -18,28 +18,18 @@ import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
-import org.qdrin.qfsm.persist.ProductStateMachinePersist;
 import org.qdrin.qfsm.persist.QStateMachineContextConverter;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.statemachine.service.StateMachineService;
-import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ContextConverterTest extends SpringStarter {
-
-  @Resource(name = "stateMachinePersist")
-  private ProductStateMachinePersist persist;
-
-  @Autowired
-  StateMachineService<String, String> service;
 
   private StateMachine<String, String> machine;
 
@@ -90,32 +80,6 @@ public class ContextConverterTest extends SpringStarter {
     log.debug("expected: {}", machineState.toString());
     JSONAssert.assertEquals(machineState.toString(), machineState.toString(), false);
     JSONAssert.assertEquals(machineState.toString(), machineStateTarget.toString(), false);
-  }
-
-  // This test is just example how accessor work
-  // Unfortunately it cause exception when accessing orthogonal regions
-  // so we has gone to the persist/restore with context method
-  @Test
-  public void testSimpleStateSetByAccessor() throws Exception {
-    machine = service.acquireStateMachine("testSimpleStateSet");
-    var accessor = machine.getStateMachineAccessor();
-    
-    StateMachineContext<String, String> context = new DefaultStateMachineContext<String,String>("Aborted", null, null, null);
-    Consumer<StateMachineAccess<String, String>> access;
-    access = arg -> {
-      arg.resetStateMachineReactively(context).block();
-    }; 
-    accessor.doWithAllRegions(access);
-
-    StateMachineTestPlan<String, String> plan =
-        StateMachineTestPlanBuilder.<String, String>builder()
-          .defaultAwaitTime(2)
-          .stateMachine(machine)
-          .step()
-              .expectState("Aborted")
-              .and()
-          .build();
-        plan.test();
   }
 
   @Test
@@ -190,7 +154,9 @@ public class ContextConverterTest extends SpringStarter {
     machine = createMachine(bundle);
     assertEquals("Provision", machine.getState().getId());
     bundle = new BundleBuilder("simpleOffer1", "simple1-price-active").build();
+    machine.stopReactively().block();
     machine = createMachine(bundle);
+    log.debug("2nd stage. machine: {}, state: {}", machine, machine.getState());
     assertEquals("Entry", machine.getState().getId());
   }
 }

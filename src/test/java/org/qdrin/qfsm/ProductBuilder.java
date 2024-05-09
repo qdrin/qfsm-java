@@ -33,7 +33,7 @@ public class ProductBuilder {
     Boolean isBundle = false;
     Boolean isCustom = false;
     String status = null;
-    JsonNode machineState = new ObjectMapper().createObjectNode();
+    JsonNode machineState = null;
     ProductClass productClass = ProductClass.VOID;
     int tarificationPeriod = -1;
     OffsetDateTime trialEndDate = null;
@@ -59,7 +59,7 @@ public class ProductBuilder {
         isBundle = false;
         isCustom = false;
         status = null;
-        machineState = new ObjectMapper().createObjectNode();
+        machineState = null;
         productClass = ProductClass.VOID;
         tarificationPeriod = -1;
         trialEndDate = null;

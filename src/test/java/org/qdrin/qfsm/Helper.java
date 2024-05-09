@@ -224,6 +224,7 @@ public class Helper {
   }
 
   public static JsonNode buildComponentMachineState(JsonNode bundleMachineState) {
+    if(bundleMachineState == null) { return null; }
     if(bundleMachineState.has("Provision")) {
       ObjectNode res = mapper.createObjectNode();
       JsonNode usage = bundleMachineState.get("Provision").get(0);
@@ -419,7 +420,7 @@ public class Helper {
         { assertEquals(expected.getLabel(), actual.getLabel(), "label"); }
       if(! expected.getMetaInfo().isEmpty())
         { assertEquals(expected.getMetaInfo(), actual.getMetaInfo(), "metaInfo"); }
-      if(! expected.getMachineState().isEmpty())
+      if(expected.getMachineState() != null)
         { JSONAssert.assertEquals(expected.getMachineState().toString(), actual.getMachineState().toString(), false); }
     }
 

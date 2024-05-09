@@ -225,8 +225,10 @@ public class ActivationCompletedTest extends SpringStarter {
         .build();
       log.debug("bundle: {}", bundle);
       Product product = bundle.drive;
+      // TODO: Добавить анализ на состав бандла
       TestBundle expectedBundle = new BundleBuilder(bundle)
         .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
+        .machineState(null)  // means that leg is merged to bundle
         .tarificationPeriod(2)
         .status(status)
         .build();

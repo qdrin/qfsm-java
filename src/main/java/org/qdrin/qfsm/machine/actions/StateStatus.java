@@ -37,7 +37,7 @@ public class StateStatus {
       log.debug("productId: {}, new status: {}", product.getProductId(), product.getStatus());
       List<Product> components = (List<Product>) extendedState.getVariables().get("components");
       components.stream()
-        .filter(c -> c.getMachineState().isEmpty()) // null machineState means that leg is merged and not self-operated
+        .filter(c -> c.getMachineState() == null) // null machineState means that leg is merged and not self-operated
         .forEach(c -> c.setStatus(status));
       log.debug("product: {}", product);
       log.debug("components: {}", components);

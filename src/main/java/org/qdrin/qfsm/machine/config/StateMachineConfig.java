@@ -34,23 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class StateMachineConfig {
 
-	@Bean
-	ProductStateMachinePersist stateMachinePersist() {
-		return new ProductStateMachinePersist();
-	}
-
-  @Bean
-  StateMachinePersister<String, String, String> stateMachinePersister() {
-    return new DefaultStateMachinePersister<>(stateMachinePersist());
-  }
-
-  @Bean 
-  StateMachineService<String, String> stateMachineService(
-      StateMachineFactory<String, String> factory
-  ) {
-    return new QStateMachineService<>(factory, stateMachinePersister());
-  }
-
   @Configuration
   // @EnableStateMachine
   @EnableStateMachineFactory
