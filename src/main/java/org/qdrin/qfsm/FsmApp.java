@@ -10,9 +10,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.StateMachineEventResult;
+import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.service.StateMachineService;
 import org.springframework.statemachine.state.State;
+import org.springframework.statemachine.support.AbstractStateMachine;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -36,6 +39,9 @@ public class FsmApp {
 
 	@Autowired
   	StateMachineService<String, String> stateMachineService;
+
+	@Autowired
+	StateMachineFactory<String, String> stateMachinefactory;
 
 	@Autowired
 	EventRepository eventRepository;
@@ -270,7 +276,17 @@ public class FsmApp {
 			Product productBundle = bundle.getBundle();
 			List<Product> components = bundle.getComponents();
 			String machineId = product.getProductId();
-			StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
+			// StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
+			// NEW
+			StateMachine<String, String> machine = stateMachinefactory.getStateMachine(machineId);
+			if(! product.getMachineState().isEmpty()) {
+				StateMachineContext<String, String> context = QStateMachineContextConverter.toContext(product.getMachineState());
+				// machine.stopReactively().block();
+				machine.getStateMachineAccessor().doWithAllRegions(
+					function -> function.resetStateMachineReactively(context).block()
+				);
+			}
+			machine.startReactively().block();
 			String eventType = event.getEventType();
 			List<ActionSuite> actions = new ArrayList<>();
 			List<ActionSuite> deleteActions = new ArrayList<>();

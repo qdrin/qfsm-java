@@ -39,9 +39,6 @@ public class SpringStarter {
   @Autowired
   EventRepository eventRepository;
 
-  @Autowired
-  ContextRepository contextRepository;
-
   @Resource(name = "stateMachinePersist")
   private ProductStateMachinePersist persist;
 
@@ -65,7 +62,6 @@ public class SpringStarter {
 
   public void clearDb() {
     productRepository.deleteAll();
-    contextRepository.deleteAll();
     eventRepository.deleteAll();
   }
 

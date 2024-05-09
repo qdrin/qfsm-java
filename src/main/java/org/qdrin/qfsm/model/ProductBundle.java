@@ -1,6 +1,9 @@
 package org.qdrin.qfsm.model;
 
 import java.util.List;
+
+import org.springframework.statemachine.StateMachine;
+
 import java.util.ArrayList;
 
 import lombok.AccessLevel;
