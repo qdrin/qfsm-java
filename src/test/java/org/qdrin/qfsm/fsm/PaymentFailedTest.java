@@ -42,6 +42,54 @@ public class PaymentFailedTest extends SpringStarter {
     clearDb();
   }
 
+  private static Stream<Arguments> testFirstTrialPrice() {
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-trial",
+        Arrays.asList("ActiveTrial", "Paid", "PriceActive")),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", 
+        Arrays.asList("ActiveTrial", "Paid", "PriceActive")),
+      Arguments.of("customBundleOffer1", "custom1-price-trial",
+        Arrays.asList("ActiveTrial", "Paid", "PriceActive"))
+    );  
+  }
+  @ParameterizedTest
+  @MethodSource
+  public void testFirstTrialPrice(String offerId, String priceId, List<String> states) throws Exception {
+    OffsetDateTime t0 = OffsetDateTime.now();
+    JsonNode machineState = Helper.buildMachineState(states);
+
+    TestBundle bundle = new BundleBuilder(offerId, priceId)
+      .status("ACTIVE_TRIAL")
+      .productStartDate(t0)
+      .tarificationPeriod(0)
+      .priceNextPayDate(nextPayDate)
+      .pricePeriod(1)
+      .machineState(machineState)
+      .build();
+
+    TestBundle expectedBundle = new BundleBuilder(bundle)
+      .build();
+    machine = createMachine(bundle);
+
+    StateMachineTestPlan<String, String> plan =
+        StateMachineTestPlanBuilder.<String, String>builder()
+          .defaultAwaitTime(2)
+          .stateMachine(machine)
+          .step()
+              .expectStates(Helper.stateSuite(states))
+              .and()
+          .step()
+              .sendEvent("payment_failed")
+              .expectEventNotAccepted(19)
+              .and()
+          .build();
+    plan.test();
+    releaseMachine(machine.getId());
+    log.debug("states: {}", machine.getState().getIds());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
+  }
+
   private static Stream<Arguments> testFirstActivePrice() {
     return Stream.of(
       Arguments.of("simpleOffer1", "simple1-price-active",

@@ -48,6 +48,63 @@ public class PaymentProcessedTest extends SpringStarter {
     clearDb();
   }
 
+  private static Stream<Arguments> testFirstTrialPrice() {
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-trial",
+        Arrays.asList("ActiveTrial", "Paid", "PriceActive")),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", 
+        Arrays.asList("ActiveTrial", "Paid", "PriceActive")),
+      Arguments.of("customBundleOffer1", "custom1-price-trial",
+        Arrays.asList("ActiveTrial", "Paid", "PriceActive"))
+    );  
+  }
+  @ParameterizedTest
+  @MethodSource
+  public void testFirstTrialPrice(String offerId, String priceId, List<String> states) throws Exception {
+    OffsetDateTime t0 = OffsetDateTime.now();
+    JsonNode machineState = Helper.buildMachineState(states);
+    List<String> expectedStates = new ArrayList<>(states);
+    expectedStates.set(1, "Paid");
+
+    log.debug("expectedStates: {}", expectedStates);
+    TestBundle bundle = new BundleBuilder(offerId, priceId)
+      .status("ACTIVE_TRIAL")
+      .productStartDate(t0)
+      .tarificationPeriod(1)
+      .priceNextPayDate(nextPayDate)
+      .pricePeriod(1)
+      .machineState(machineState)
+      .build();
+
+    TestBundle expectedBundle = new BundleBuilder(bundle)
+      .tarificationPeriod(1)
+      .pricePeriod(1)
+      .machineState(machineState)
+      .build();
+    machine = createMachine(bundle);
+    
+    List<ActionSuite> expectedActions = new ArrayList<>();
+    List<ActionSuite> expectedDeleteActions = new ArrayList<>();
+
+    StateMachineTestPlan<String, String> plan =
+        StateMachineTestPlanBuilder.<String, String>builder()
+          .defaultAwaitTime(2)
+          .stateMachine(machine)
+          .step()
+              .expectStates(Helper.stateSuite(states))
+              .and()
+          .step()
+              .sendEvent("payment_processed")
+              .expectEventNotAccepted(19)
+              .and()
+          .build();
+    plan.test();
+    releaseMachine(machine.getId());
+    log.debug("states: {}", machine.getState().getIds());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
+  }
+
   private static Stream<Arguments> testFirstActivePrice() {
     return Stream.of(
       Arguments.of("simpleOffer1", "simple1-price-active",
