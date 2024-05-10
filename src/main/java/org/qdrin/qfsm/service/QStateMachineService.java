@@ -3,6 +3,7 @@ package org.qdrin.qfsm.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.tasks.ActionSuite;
@@ -31,25 +32,37 @@ public class QStateMachineService {
 	// }
 
 	public StateMachine<String, String> acquireStateMachine(Product product) {
+		return acquireStateMachine(product, null, new ArrayList<Product>());
+	}
+
+	public StateMachine<String, String> acquireStateMachine(Product product, Product bundle) {
+		return acquireStateMachine(product, bundle, new ArrayList<Product>());
+	}
+		
+	public StateMachine<String, String> acquireStateMachine(Product product, Product bundle, List<Product> components) {
 		String machineId = product.getProductId();
 		JsonNode machineState = product.getMachineState();
 		log.debug("Acquiring machineId: {}, machineState: {}", machineId, machineState);
 
 		StateMachine<String, String> machine = stateMachineFactory.getStateMachine(machineId);
-		log.debug("id0: {}", machine.getId());
 		if(machineState != null) {
 			StateMachineContext<String, String> context = QStateMachineContextConverter.toContext(machineState);
 			machine.getStateMachineAccessor().doWithAllRegions(
 				function -> function.resetStateMachineReactively(context).block()
 			);
 			((AbstractStateMachine<String, String>) machine).setId(machineId);
-			log.debug("id1: {}", machine.getId());
 		}
-		log.debug("id2: {}", machine.getId());
 		Map<Object, Object> variables = machine.getExtendedState().getVariables();
 		variables.put("actions", new ArrayList<ActionSuite>());
 		variables.put("deleteActions", new ArrayList<ActionSuite>());
 		variables.put("product", product);
+		if(bundle != null) {
+			variables.put("bundle", bundle);
+		}
+		if(components == null) {
+			components = new ArrayList<>();
+		}
+		variables.put("components", components);
 		machine.startReactively().block();
 		machines.put(machineId, machine);
 		return machine;

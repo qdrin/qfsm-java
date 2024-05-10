@@ -68,7 +68,7 @@ public class ActivationAbortedTest extends SpringStarter {
           .stateMachine(machine)
           .step()
               .sendEvent("activation_aborted")
-              .expectStates(Helper.stateSuit("Aborted"))
+              .expectStates(Helper.stateSuite("Aborted"))
               .and()
           .build();
     plan.test();

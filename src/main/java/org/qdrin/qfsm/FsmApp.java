@@ -252,7 +252,7 @@ public class FsmApp {
 			List<Product> components = bundle.getComponents();
 			// StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 			// NEW
-			StateMachine<String, String> machine = service.acquireStateMachine(product);
+			StateMachine<String, String> machine = service.acquireStateMachine(product, bundle.getBundle(), components);
 			String eventType = event.getEventType();
 			List<ActionSuite> actions = new ArrayList<>();
 			List<ActionSuite> deleteActions = new ArrayList<>();
@@ -260,15 +260,6 @@ public class FsmApp {
 			log.debug("machine acquired: {}", machine.getId());
 			JsonNode machineState = getMachineState(machine.getState());
 			var variables = machine.getExtendedState().getVariables();
-			variables.put("product", product);
-			if(productBundle != null) {
-				variables.put("bundle", productBundle);
-			}
-			if(components != null) {
-				variables.put("components", components);
-			}
-			variables.put("actions", actions);
-			variables.put("deleteActions", deleteActions);
 			log.info("current state: {}, variables: {}", machineState, variables);
 			sendMessage(machine, eventType);
 			machineState = getMachineState(machine.getState());

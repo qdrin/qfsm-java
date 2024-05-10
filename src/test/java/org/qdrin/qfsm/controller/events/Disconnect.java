@@ -46,9 +46,4 @@ public class Disconnect extends ControllerStarter {
       assertEquals(error.getErrorCode(), "EventDeniedException");
     }
   }
-
-  @Nested
-  class Bundle {
-    
-  }
 }

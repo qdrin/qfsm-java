@@ -25,7 +25,7 @@ public class ProductBundle {
   Product drive;              // Product feeded to state machine
   Product bundle;             // Bundle head
   @Default
-  List<Product> components = new ArrayList<>();   // bundle legs
+  List<Product> components = new ArrayList<>();   // drive legs if it's bundle
   String errorCode;
   String errorMessage;
 }

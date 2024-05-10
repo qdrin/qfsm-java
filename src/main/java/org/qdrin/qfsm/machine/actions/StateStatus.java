@@ -28,7 +28,7 @@ public class StateStatus {
   public void setStatus(StateContext<String, String> context) {
     State<String, String> state = context.getTarget();
     log.debug("enter state '{}'", state.getId());
-    var extendedState = context.getExtendedState();
+    var extendedState = context.getStateMachine().getExtendedState();
     String status = statusMap.getOrDefault(state.getId(), null);
     if(status != null) {
       log.debug("setting status to {}", status);

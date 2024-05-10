@@ -107,7 +107,11 @@ public class Helper {
     return copy;
   }
 
-  public static final String[] stateSuit(String... states) {
+  public static final String[] stateSuite(List<String> states) {
+    return stateSuite(states.toArray(new String[0]));
+  }
+
+  public static final String[] stateSuite(String... states) {
     List<String> stateList = new ArrayList<>();
     boolean isProvision = false;
     for(String s: states) {
@@ -160,6 +164,9 @@ public class Helper {
     return res;
   }
 
+  public static JsonNode buildMachineState(List<String> states) {
+    return buildMachineState(states.toArray(new String[0]));
+  }
 
   public static JsonNode buildMachineState(String... states) {
     JsonNode result;

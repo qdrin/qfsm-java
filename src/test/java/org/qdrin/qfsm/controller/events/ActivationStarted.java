@@ -36,6 +36,25 @@ public class ActivationStarted extends ControllerStarter {
     clearDb();
   }
 
+  @Test
+    public void eventDeclined() throws Exception {
+      String offerId = "simpleOffer1";
+      String priceId = "simple1-price-trial";
+      RequestEventDto event = new EventBuilder("activation_started", offerId, priceId).build();
+      HttpEntity<RequestEventDto> request = new HttpEntity<>(event, headers);
+      ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
+      assertEquals(HttpStatus.OK, resp.getStatusCode());
+      ResponseEventDto response = resp.getBody();
+      Product product = getProduct(response.getProducts().get(0).getProductId());
+      assertNotNull(product);
+      event = new EventBuilder("disconnect", product).build();
+      HttpEntity<RequestEventDto> requestError = new HttpEntity<>(event, headers);
+      ResponseEntity<ErrorModel> respError = restTemplate.postForEntity(eventUrl, requestError, ErrorModel.class);
+      assertEquals(HttpStatus.BAD_REQUEST, respError.getStatusCode());
+      ErrorModel error = respError.getBody();
+      assertEquals(error.getErrorCode(), "EventDeniedException");
+    }
+
   @Nested
   class Simple {
     @Test
@@ -128,23 +147,5 @@ public class ActivationStarted extends ControllerStarter {
 
   @Nested
   class Disconnect {
-    @Test
-    public void disconnectSimpleFailedDeclined() throws Exception {
-      String offerId = "simpleOffer1";
-      String priceId = "simple1-price-trial";
-      RequestEventDto event = new EventBuilder("activation_started", offerId, priceId).build();
-      HttpEntity<RequestEventDto> request = new HttpEntity<>(event, headers);
-      ResponseEntity<ResponseEventDto> resp = restTemplate.postForEntity(eventUrl, request, ResponseEventDto.class);
-      assertEquals(HttpStatus.OK, resp.getStatusCode());
-      ResponseEventDto response = resp.getBody();
-      Product product = getProduct(response.getProducts().get(0).getProductId());
-      assertNotNull(product);
-      event = new EventBuilder("disconnect", product).build();
-      HttpEntity<RequestEventDto> requestError = new HttpEntity<>(event, headers);
-      ResponseEntity<ErrorModel> respError = restTemplate.postForEntity(eventUrl, requestError, ErrorModel.class);
-      assertEquals(HttpStatus.BAD_REQUEST, respError.getStatusCode());
-      ErrorModel error = respError.getBody();
-      assertEquals(error.getErrorCode(), "EventDeniedException");
-    }
   }
 }

@@ -75,10 +75,8 @@ public class SpringStarter {
       component.setMachineState(componentMachineState);
       // productRepository.save(component);
     }
-    StateMachine<String, String> machine = service.acquireStateMachine(product);
+    StateMachine<String, String> machine = service.acquireStateMachine(product, bundle.bundle, components);
     Map<Object, Object> variables = machine.getExtendedState().getVariables();
-    variables.put("components", components);
-    if(bundle.bundle != null) { variables.put("bundle", bundle.bundle); }
     return machine;
   }
 

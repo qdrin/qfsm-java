@@ -113,13 +113,13 @@ public class ContextConverterTest extends SpringStarter {
     machine = createMachine(bundle);
     log.debug("machine: {}", machine);
     log.debug("states: {}", machine.getState().getIds());
-    log.debug("search states: {}", Arrays.asList(Helper.stateSuit("Prolongation", "Paid", "PriceActive")));
+    log.debug("search states: {}", Arrays.asList(Helper.stateSuite("Prolongation", "Paid", "PriceActive")));
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
           .stateMachine(machine)
           .step()
-              .expectStates(Helper.stateSuit("Prolongation", "Paid", "PriceActive"))
+              .expectStates(Helper.stateSuite("Prolongation", "Paid", "PriceActive"))
               .and()
           .build();
         plan.test();
@@ -134,13 +134,13 @@ public class ContextConverterTest extends SpringStarter {
     machine = createMachine(bundle);
     log.debug("machine: {}", machine);
     log.debug("states: {}", machine.getState().getIds());
-    log.debug("search states: {}", Arrays.asList(Helper.stateSuit("Prolongation", "Paid", "PriceActive")));
+    log.debug("search states: {}", Arrays.asList(Helper.stateSuite("Prolongation", "Paid", "PriceActive")));
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
           .stateMachine(machine)
           .step()
-              .expectStates(Helper.stateSuit("Prolongation", "Paid", "PriceActive"))
+              .expectStates(Helper.stateSuite("Prolongation", "Paid", "PriceActive"))
               .and()
           .build();
         plan.test();
