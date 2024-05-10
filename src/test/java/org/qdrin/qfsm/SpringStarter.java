@@ -66,7 +66,6 @@ public class SpringStarter {
   }
 
   public StateMachine<String, String> createMachine(TestBundle bundle) {
-    String machineId = bundle.drive.getProductId();
     Product product = bundle.drive;
     List<Product> components = bundle.components();
     JsonNode machineState = product.getMachineState();
@@ -76,8 +75,11 @@ public class SpringStarter {
       // productRepository.save(component);
     }
     StateMachine<String, String> machine = service.acquireStateMachine(product, bundle.bundle, components);
-    Map<Object, Object> variables = machine.getExtendedState().getVariables();
     return machine;
+  }
+
+  public void releaseMachine(String machineId) {
+    service.releaseStateMachine(machineId);
   }
 
   public List<Product> getResponseProducts(ResponseEventDto response) {

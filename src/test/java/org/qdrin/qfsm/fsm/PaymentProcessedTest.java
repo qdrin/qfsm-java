@@ -114,6 +114,7 @@ public class PaymentProcessedTest extends SpringStarter {
               .and()
           .build();
     plan.test();
+    releaseMachine(machine.getId());
     log.debug("states: {}", machine.getState().getIds());
     assertProductEquals(expectedBundle.drive, bundle.drive);
     assertProductEquals(expectedBundle.components(), bundle.components());
