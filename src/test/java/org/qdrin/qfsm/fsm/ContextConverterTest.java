@@ -52,7 +52,8 @@ public class ContextConverterTest extends SpringStarter {
               .expectState("Entry")
               .and()
           .build();
-        plan.test();
+    plan.test();
+    releaseMachine(machine.getId());
   }
 
   @Test
@@ -100,7 +101,8 @@ public class ContextConverterTest extends SpringStarter {
               .expectState("Aborted")
               .and()
           .build();
-        plan.test();
+    plan.test();
+    releaseMachine(machine.getId());
   }
 
   @Test
@@ -122,7 +124,8 @@ public class ContextConverterTest extends SpringStarter {
               .expectStates(Helper.stateSuite("Prolongation", "Paid", "PriceActive"))
               .and()
           .build();
-        plan.test();
+    plan.test();
+    releaseMachine(machine.getId());
     assert(machine.getState().getIds().contains("Paid"));
   }
 
@@ -143,7 +146,8 @@ public class ContextConverterTest extends SpringStarter {
               .expectStates(Helper.stateSuite("Prolongation", "Paid", "PriceActive"))
               .and()
           .build();
-        plan.test();
+    plan.test();
+    releaseMachine(machine.getId());
   }
 
   @Test

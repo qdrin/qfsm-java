@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.qdrin.qfsm.tasks.ActionSuite;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import lombok.*;
 import lombok.Builder.Default;
 import lombok.experimental.FieldDefaults;
@@ -29,4 +31,6 @@ public class TestExpected {
     List<ActionSuite> actions = null;
     @Default
     List<ActionSuite> deleteActions = null;
+    @Default
+    JsonNode machineState = null;
 }

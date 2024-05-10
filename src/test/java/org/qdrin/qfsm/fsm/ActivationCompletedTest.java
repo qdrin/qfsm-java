@@ -126,6 +126,7 @@ public class ActivationCompletedTest extends SpringStarter {
               .and()
           .build();
     plan.test();
+    releaseMachine(machine.getId());
     log.debug("states: {}", machine.getState().getIds());
     assertProductEquals(expectedBundle.drive, bundle.drive);
     assertProductEquals(expectedBundle.components(), bundle.components());
@@ -134,12 +135,15 @@ public class ActivationCompletedTest extends SpringStarter {
   private static Stream<Arguments> testSuccessNoNextPayDate() {
     List<TestSetup> copy = Helper.getTestSetups();
     List<Arguments> args = new ArrayList<>();
+    List<String> newStates = Arrays.asList("Active", "WaitingPayment", "PriceWaiting");
+    JsonNode newMachineState = Helper.buildMachineState(newStates);
     for(TestSetup setup: copy) {
       TestExpectedBuilder builder = TestExpected.builder()
         .pricePeriod(0)
         .status("ACTIVE")
         .tarificationPeriod(0)
-        .states(Arrays.asList("Active", "WaitingPayment", "PriceWaiting"))
+        .states(newStates)
+        .machineState(newMachineState)
         .actions(Arrays.asList(ActionSuite.WAITING_PAY_ENDED))
         .nextPayDate(null)
         .deleteActions(Arrays.asList());
@@ -159,6 +163,7 @@ public class ActivationCompletedTest extends SpringStarter {
 
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status(exp.getStatus())
+      .machineState(exp.getMachineState())
       .tarificationPeriod(0)
       .pricePeriod(0)
       .activeEndDate(null)
@@ -180,6 +185,7 @@ public class ActivationCompletedTest extends SpringStarter {
               .and()
           .build();
     plan.test();
+    releaseMachine(machine.getId());
     log.debug("states: {}", machine.getState().getIds());
     Helper.Assertions.assertProductEquals(expectedBundle.drive, bundle.drive);
     
@@ -249,6 +255,7 @@ public class ActivationCompletedTest extends SpringStarter {
                 .and()
             .build();
       plan.test();
+      releaseMachine(machine.getId());
       log.debug("states: {}", machine.getState().getIds());
       assertEquals(status, product.getStatus());
       Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
@@ -324,6 +331,7 @@ public class ActivationCompletedTest extends SpringStarter {
                 .and()
             .build();
       plan.test();
+      releaseMachine(machine.getId());
       log.debug("states: {}", machine.getState().getIds());
       assertEquals("PENDING_ACTIVATE", product.getStatus());
       Helper.Assertions.assertProductEquals(expectedBundle.drive, product);

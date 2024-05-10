@@ -3,6 +3,7 @@ package org.qdrin.qfsm.fsm;
 import org.springframework.statemachine.StateMachine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.qdrin.qfsm.Helper.buildMachineState;
 import static org.qdrin.qfsm.Helper.Assertions.*;
 
 import java.time.OffsetDateTime;
@@ -55,6 +56,7 @@ public class ActivationAbortedTest extends SpringStarter {
     price.setPeriod(0);
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("ABORTED")
+      .machineState(Helper.buildMachineState("Aborted"))
       .driveClass(driveClass)
       .componentClass(componentClass)
       .tarificationPeriod(0)
@@ -72,6 +74,7 @@ public class ActivationAbortedTest extends SpringStarter {
               .and()
           .build();
     plan.test();
+    releaseMachine(machine.getId());
     log.debug("states: {}", machine.getState().getIds());
     assertProductEquals(expectedBundle.drive, bundle.drive);
     assertProductEquals(expectedBundle.components(), bundle.components());
@@ -104,6 +107,7 @@ public class ActivationAbortedTest extends SpringStarter {
         .tarificationPeriod(0)
         .productStartDate(t0)
         .status("ABORTED")
+        .machineState(Helper.buildMachineState("Aborted"))
         .build();
       machine = createMachine(bundle);
       assertEquals(bundle.bundle.getProductId(), preBundle.bundle.getProductId());
@@ -121,6 +125,7 @@ public class ActivationAbortedTest extends SpringStarter {
                 .and()
             .build();
       plan.test();
+      releaseMachine(machine.getId());
       assertEquals(product.getStatus(), "ABORTED");
       Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
       Helper.Assertions.assertProductEquals(expectedBundle.bundle, bundle.bundle);

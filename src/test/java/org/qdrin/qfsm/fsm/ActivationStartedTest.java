@@ -79,6 +79,7 @@ public class ActivationStartedTest extends SpringStarter {
               .and()
           .build();
     plan.test();
+    releaseMachine(machine.getId());
     assertEquals(expectedStatus, bundle.drive.getStatus());
     Helper.Assertions.assertProductEquals(expectedBundle.drive, bundle.drive);
     Helper.Assertions.assertProductEquals(expectedBundle.components(), bundle.components());
@@ -131,6 +132,7 @@ public class ActivationStartedTest extends SpringStarter {
                 .and()
             .build();
       plan.test();
+      releaseMachine(machine.getId());
       assertEquals(product.getStatus(), "PENDING_ACTIVATE");
       log.debug("bundle relations: {}", bundle.bundle.getProductRelationship());
       assertProductEquals(expectedBundle.drive, product);
