@@ -3,16 +3,14 @@ package org.qdrin.qfsm;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
-
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
-import org.qdrin.qfsm.model.dto.ProductRequestDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -241,8 +239,9 @@ public class BundleBuilder {
     }
 
     public BundleBuilder tarificationPeriod(int tarificationPeriod) {
-        for(Product product: products) {
-            product.setTarificationPeriod(tarificationPeriod);
+        List<ProductClass> isTarificated = Arrays.asList(ProductClass.SIMPLE, ProductClass.BUNDLE, ProductClass.CUSTOM_BUNDLE);
+        if(isTarificated.contains(ProductClass.values()[drive.getProductClass()])) {
+            drive.setTarificationPeriod(tarificationPeriod);
         }
         return this;
     }
