@@ -52,11 +52,11 @@ public class ActivationAbortedTest extends SpringStarter {
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentIds)
       .productStartDate(t0)
       .tarificationPeriod(0)
+      .status("PENDING_ACTIVATE")
       .machineState(Helper.buildMachineState("PendingActivate"))
+      .pricePeriod(0)
+      .priceNextPayDate(t1)
       .build();
-    ProductPrice price = bundle.drive.getProductPrice().get(0);
-    price.setNextPayDate(t1);
-    price.setPeriod(0);
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("ABORTED")
       .machineState(Helper.buildMachineState("Aborted"))

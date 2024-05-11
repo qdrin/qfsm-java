@@ -86,7 +86,7 @@ public class ActivationCompletedTest extends SpringStarter {
     int expectedTarificationPeriod = exp.getTarificationPeriod();
     int expectedPricePeriod = exp.getPricePeriod();
 
-    TestBundle bundle = new BundleBuilder(offerId, priceId)
+    TestBundle bundle = new BundleBuilder(offerId, priceId, setup.getComponentOfferIds())
       .productStartDate(t0)
       .priceNextPayDate(nextPayDate)
       .pricePeriod(0)
