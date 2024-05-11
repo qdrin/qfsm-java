@@ -48,79 +48,127 @@ public class ActivationCompletedTest extends SpringStarter {
     clearDb();
   }
 
-  private static Stream<Arguments> testSuccess() {
-    List<TestSetup> copy = Helper.getTestSetups();
-    List<Arguments> args = new ArrayList<>();
-    for(TestSetup setup: copy) {
-      TestExpectedBuilder builder = TestExpected.builder().pricePeriod(1);
-      if(setup.getPriceId().contains("trial")) {
-        builder.status("ACTIVE_TRIAL")
-          .tarificationPeriod(1)
-          .states(Arrays.asList("ActiveTrial", "Paid", "PriceActive"))
-          .actions(Arrays.asList(ActionSuite.PRICE_ENDED))
-          .nextPayDate(nextPayDate)
-          .deleteActions(Arrays.asList());
-      }
-      else {
-        builder.status("ACTIVE")
-          .tarificationPeriod(0)
-          .states(Arrays.asList("Active", "WaitingPayment", "PriceActive"))
-          .actions(Arrays.asList(ActionSuite.WAITING_PAY_ENDED, ActionSuite.PRICE_ENDED))
-          .nextPayDate(null)
-          .deleteActions(Arrays.asList());
-      }
-      args.add(Arguments.of(setup, builder.build()));
-    }
-    return args.stream();
+      // List<TestSetup> copy = Helper.getTestSetups();
+    // List<Arguments> args = new ArrayList<>();
+    // for(TestSetup setup: copy) {
+    //   TestExpectedBuilder builder = TestExpected.builder().pricePeriod(1);
+    //   if(setup.getPriceId().contains("trial")) {
+    //     builder.status("ACTIVE_TRIAL")
+    //       .tarificationPeriod(1)
+    //       .states(Arrays.asList("ActiveTrial", "Paid", "PriceActive"))
+    //       .actions(Arrays.asList(ActionSuite.PRICE_ENDED))
+    //       .nextPayDate(nextPayDate)
+    //       .deleteActions(Arrays.asList());
+    //   }
+    //   else {
+    //     builder.status("ACTIVE")
+    //       .tarificationPeriod(0)
+    //       .states(Arrays.asList("Active", "WaitingPayment", "PriceActive"))
+    //       .actions(Arrays.asList(ActionSuite.WAITING_PAY_ENDED, ActionSuite.PRICE_ENDED))
+    //       .nextPayDate(null)
+    //       .deleteActions(Arrays.asList());
+    //   }
+    //   args.add(Arguments.of(setup, builder.build()));
+    // }
+    // return args.stream();
+  public static Stream<Arguments> testSuccessTrial() {
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-trial", new ArrayList<>()),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", Arrays.asList("component1", "component2", "component3")),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", Arrays.asList("component1", "component2", "component3"))
+    );
   }
   @ParameterizedTest
   @MethodSource
-  public void testSuccess(TestSetup setup, TestExpected exp) throws Exception {
+  public void testSuccessTrial(String offerId, String priceId, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
-    OffsetDateTime expectedActiveEndDate = exp.getNextPayDate();
-    String offerId = setup.getOfferId();
-    String priceId = setup.getPriceId();
-    ProductClass driveClass = setup.getProductClass();
-    ProductClass componentClass = Helper.getComponentClass(driveClass);
-    String[] expectedStates = exp.getStates().toArray(new String[0]);
-    int expectedTarificationPeriod = exp.getTarificationPeriod();
-    int expectedPricePeriod = exp.getPricePeriod();
+    OffsetDateTime t1 = t0.plusDays(30);
+    String[] expectedStates = Helper.stateSuite("ActiveTrial", "Paid", "PriceActive");
 
-    TestBundle bundle = new BundleBuilder(offerId, priceId, setup.getComponentOfferIds())
+    TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
+      .status("PENDING_ACTIVATE")
+      .machineState(Helper.buildMachineState("PendingActivate"))
       .productStartDate(t0)
-      .priceNextPayDate(nextPayDate)
+      .priceNextPayDate(t1)
       .pricePeriod(0)
+      .tarificationPeriod(0)
       .build();
-    String expectedStatus = exp.getStatus();
     TestBundle expectedBundle = new BundleBuilder(bundle)
-      .status(expectedStatus)
-      .tarificationPeriod(expectedTarificationPeriod)
-      .pricePeriod(expectedPricePeriod)
-      .trialEndDate(expectedActiveEndDate)
-      .activeEndDate(expectedActiveEndDate)
-      .driveClass(driveClass)
-      .componentClass(componentClass)
+      .status("ACTIVE_TRIAL")
+      .tarificationPeriod(1)
+      .pricePeriod(1)
+      .trialEndDate(t1)
+      .activeEndDate(t1)
       .build();
     machine = createMachine(bundle);
     
-    List<ActionSuite> expectedActions = exp.getActions();
-    List<ActionSuite> expectedDeleteActions = exp.getDeleteActions();
+    List<ActionSuite> expectedActions = Arrays.asList(ActionSuite.PRICE_ENDED);
+    List<ActionSuite> expectedDeleteActions = Arrays.asList();
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
           .stateMachine(machine)
           .step()
-              .expectState("Entry")
-              .and()
-          .step()
-              .sendEvent("activation_started")
               .expectState("PendingActivate")
-              .expectStateChanged(1)
               .and()
           .step()
               .sendEvent("activation_completed")
-              .expectStates(Helper.stateSuite(expectedStates))
+              .expectStates(expectedStates)
+              .expectVariable("deleteActions", expectedDeleteActions)
+              .expectVariable("actions", expectedActions)
+              .and()
+          .build();
+    plan.test();
+    releaseMachine(machine.getId());
+    log.debug("states: {}", machine.getState().getIds());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
+  }
+
+  public static Stream<Arguments> testSuccessActive() {
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-active", new ArrayList<>()),
+      Arguments.of("bundleOffer1", "bundle1-price-active", Arrays.asList("component1", "component2", "component3")),
+      Arguments.of("customBundleOffer1", "custom1-price-active", Arrays.asList("component1", "component2", "component3"))
+    );
+  }
+  @ParameterizedTest
+  @MethodSource
+  public void testSuccessActive(String offerId, String priceId, List<String> componentOfferIds) throws Exception {
+    OffsetDateTime t0 = OffsetDateTime.now();
+    OffsetDateTime t1 = t0.plusDays(30);
+    String[] expectedStates = Helper.stateSuite("Active", "WaitingPayment", "PriceActive");
+
+    TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
+      .status("PENDING_ACTIVATE")
+      .machineState(Helper.buildMachineState("PendingActivate"))
+      .productStartDate(t0)
+      .priceNextPayDate(t1)
+      .pricePeriod(0)
+      .tarificationPeriod(0)
+      .build();
+    TestBundle expectedBundle = new BundleBuilder(bundle)
+      .status("ACTIVE")
+      .tarificationPeriod(0)
+      .pricePeriod(1)
+      .activeEndDate(t1)
+      .build();
+    machine = createMachine(bundle);
+    
+    List<ActionSuite> expectedActions = Arrays.asList(ActionSuite.WAITING_PAY_ENDED, ActionSuite.PRICE_ENDED);
+    List<ActionSuite> expectedDeleteActions = Arrays.asList();
+
+    StateMachineTestPlan<String, String> plan =
+        StateMachineTestPlanBuilder.<String, String>builder()
+          .defaultAwaitTime(2)
+          .stateMachine(machine)
+          .step()
+              .expectState("PendingActivate")
+              .and()
+          .step()
+              .sendEvent("activation_completed")
+              .expectStates(expectedStates)
               .expectVariable("deleteActions", expectedDeleteActions)
               .expectVariable("actions", expectedActions)
               .and()
