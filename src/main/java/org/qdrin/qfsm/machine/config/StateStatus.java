@@ -1,4 +1,4 @@
-package org.qdrin.qfsm.machine.actions;
+package org.qdrin.qfsm.machine.config;
 
 import java.util.List;
 import java.util.Map;

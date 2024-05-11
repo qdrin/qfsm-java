@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Configuration
 public class StateMachineConfig {
-
+  
   @Configuration
   // @EnableStateMachine
   @EnableStateMachineFactory

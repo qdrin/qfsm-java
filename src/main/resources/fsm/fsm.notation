@@ -20,6 +20,9 @@
         </eAnnotations>
         <children xmi:type="notation:BasicCompartment" xmi:id="_B3BHWJ5dEe6bEMWh5jDIIQ" type="Region_SubvertexCompartment">
           <children xmi:type="notation:Shape" xmi:id="_GbOb8KAWEe6Sh616vaZpZA" type="State_Shape">
+            <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wTXlMA68Ee-v6pUrAoQ2Fw" source="PapyrusCSSForceValue">
+              <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wTXlMQ68Ee-v6pUrAoQ2Fw" key="mutable" value="true"/>
+            </eAnnotations>
             <children xmi:type="notation:DecorationNode" xmi:id="_GbOb8qAWEe6Sh616vaZpZA" type="State_NameLabel"/>
             <children xmi:type="notation:DecorationNode" xmi:id="_GbOb86AWEe6Sh616vaZpZA" type="State_FloatingNameLabel">
               <layoutConstraint xmi:type="notation:Location" xmi:id="_GbOb9KAWEe6Sh616vaZpZA" x="40"/>
@@ -34,6 +37,20 @@
             <children xmi:type="notation:Shape" xmi:id="_8MqasAyIEe-IadcddhgCPw" type="Behavior_EntryBehaviorLabel">
               <element xmi:type="uml:OpaqueBehavior" href="fsm.uml#_8MRZIAyIEe-IadcddhgCPw"/>
               <layoutConstraint xmi:type="notation:Location" xmi:id="_8MqasQyIEe-IadcddhgCPw" x="-10" y="-10"/>
+            </children>
+            <children xmi:type="notation:Shape" xmi:id="_wQX7kA68Ee-v6pUrAoQ2Fw" type="Trigger_DeferrableTriggerLabel">
+              <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wTXlMg68Ee-v6pUrAoQ2Fw" source="PapyrusCSSForceValue">
+                <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wTXlMw68Ee-v6pUrAoQ2Fw" key="mutable" value="true"/>
+              </eAnnotations>
+              <element xmi:type="uml:Trigger" href="fsm.uml#_wPBQsA68Ee-v6pUrAoQ2Fw"/>
+              <layoutConstraint xmi:type="notation:Location" xmi:id="_wQX7kQ68Ee-v6pUrAoQ2Fw" x="-10" y="-10"/>
+            </children>
+            <children xmi:type="notation:Shape" xmi:id="_yL2w0A68Ee-v6pUrAoQ2Fw" type="Trigger_DeferrableTriggerLabel">
+              <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_yOVdEA68Ee-v6pUrAoQ2Fw" source="PapyrusCSSForceValue">
+                <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yOVdEQ68Ee-v6pUrAoQ2Fw" key="mutable" value="true"/>
+              </eAnnotations>
+              <element xmi:type="uml:Trigger" href="fsm.uml#_yLEGoA68Ee-v6pUrAoQ2Fw"/>
+              <layoutConstraint xmi:type="notation:Location" xmi:id="_yL2w0Q68Ee-v6pUrAoQ2Fw" x="-10" y="-10"/>
             </children>
             <element xmi:type="uml:State" href="fsm.uml#_Gay-IKAWEe6Sh616vaZpZA"/>
             <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GbOb8aAWEe6Sh616vaZpZA" x="835" y="57"/>

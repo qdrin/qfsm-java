@@ -1,31 +1,28 @@
 package org.qdrin.qfsm.fsm;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.StateMachineEventResult;
+import org.springframework.statemachine.access.StateMachineAccessor;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.qdrin.qfsm.Helper.Assertions.*;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
-import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.SpringStarter;
-import org.qdrin.qfsm.TestExpected;
-import org.qdrin.qfsm.TestExpected.TestExpectedBuilder;
-import org.qdrin.qfsm.TestSetup;
-import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.tasks.ActionSuite;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
@@ -33,6 +30,7 @@ import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 
 @Slf4j
@@ -41,11 +39,96 @@ public class PaymentProcessedTest extends SpringStarter {
   StateMachine<String, String> machine = null;
 
   private static OffsetDateTime nextPayDate = OffsetDateTime.now().plusDays(30);
-  
+
   @BeforeEach
   public void setup() throws Exception {
     machine = null;
     clearDb();
+  }
+
+  // @Test
+  // public void testDeferredAtPendingActivateSequence() throws Exception {
+  //   String offerId = "simpleOffer1";
+  //   String priceId = "simple1-price-active";
+  //   OffsetDateTime t0 = OffsetDateTime.now();
+  //   JsonNode machineState = Helper.buildMachineState("PendingActivate");
+  //   TestBundle bundle = new BundleBuilder(offerId, priceId)
+  //     .status("PENDING_ACTIVATE")
+  //     .productStartDate(t0)
+  //     .tarificationPeriod(0)
+  //     .priceNextPayDate(nextPayDate)
+  //     .pricePeriod(1)
+  //     .machineState(machineState)
+  //     .build();
+  //   StateMachine<String, String> machine = createMachine(bundle);
+  //   StateMachineTestPlan<String, String> plan =
+  //       StateMachineTestPlanBuilder.<String, String>builder()
+  //         .defaultAwaitTime(2)
+  //         .stateMachine(machine)
+  //         .step()
+  //             .expectState("PendingActivate")
+  //             .and()
+  //         .step()
+  //             .sendEvent("payment_processed")  // send payment_processed first
+  //             .expectState("PendingActivate")
+  //             .and()
+  //         .step()
+  //             .sendEvent("activation_completed")
+  //             // deferred payment_processed cause "Paid" instead of "WaitingPayment"
+  //             .expectStates(Helper.stateSuite("Active", "Paid", "PriceActive"))
+  //             .and()
+  //         .build();
+  //   plan.test();
+  //   log.debug("machine: {}", machine.getExtendedState());
+  //   releaseMachine(machine.getId());
+  // }
+
+  private static Stream<Arguments> testDeferredAtPendingActivate() {
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-active"),
+      Arguments.of("bundleOffer1", "bundle1-price-active"),
+      Arguments.of("customBundleOffer1", "custom1-price-active")
+    );  
+  }
+  @ParameterizedTest
+  @MethodSource
+  public void testDeferredAtPendingActivate(String offerId, String priceId) throws Exception {
+    OffsetDateTime t0 = OffsetDateTime.now();
+    JsonNode machineState = Helper.buildMachineState("PendingActivate");
+    TestBundle bundle = new BundleBuilder(offerId, priceId)
+      .status("PENDING_ACTIVATE")
+      .productStartDate(t0)
+      .tarificationPeriod(0)
+      .priceNextPayDate(nextPayDate)
+      .pricePeriod(1)
+      .machineState(machineState)
+      .build();
+    StateMachine<String, String> machine = createMachine(bundle);
+    Mono<Message<String>> msg = Mono.just((MessageBuilder.withPayload("payment_processed").build()));
+    StateMachineEventResult<String, String> res = machine.sendEvent(msg).blockLast();
+    log.debug("res: {}", res);
+    assertEquals(StateMachineEventResult.ResultType.DEFERRED, res.getResultType());
+    Message<String> deferred = res.getMessage();
+    releaseMachine(machine.getId());
+    machine = createMachine(bundle);
+    StateMachineTestPlan<String, String> plan =
+    StateMachineTestPlanBuilder.<String, String>builder()
+      .defaultAwaitTime(2)
+      .stateMachine(machine)
+      .step()
+          .expectState("PendingActivate")
+          .and()
+      .step()
+          .sendEvent("activation_completed")
+          .expectStates(Helper.stateSuite("Active", "WaitingPayment", "PriceActive"))
+          .and()
+      .step()
+          .sendEvent(deferred)
+          .expectStates(Helper.stateSuite("Active", "Paid", "PriceActive"))
+          .and()
+      .build();
+    plan.test();
+    releaseMachine(machine.getId());
   }
 
   private static Stream<Arguments> testFirstTrialPrice() {
@@ -82,9 +165,6 @@ public class PaymentProcessedTest extends SpringStarter {
       .machineState(machineState)
       .build();
     machine = createMachine(bundle);
-    
-    List<ActionSuite> expectedActions = new ArrayList<>();
-    List<ActionSuite> expectedDeleteActions = new ArrayList<>();
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()

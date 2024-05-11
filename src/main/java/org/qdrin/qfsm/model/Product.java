@@ -78,6 +78,8 @@ public class Product {
   @JdbcTypeCode(SqlTypes.JSON)
   @Builder.Default
   Map<String, Object> quantity = new HashMap<>();
+  byte[] context = null;
+  
   // Map<String, Object> extraParams;
   public Product(ProductActivateRequestDto orderItem) {
     this.productId = UUID.randomUUID().toString();

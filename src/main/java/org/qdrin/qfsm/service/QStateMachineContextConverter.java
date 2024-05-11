@@ -5,6 +5,7 @@ import org.springframework.statemachine.StateMachineContext;
 import java.util.List;
 
 import org.springframework.statemachine.ExtendedState;
+import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.kryo.StateMachineContextSerializer;
 import org.springframework.statemachine.state.AbstractState;
@@ -25,9 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class QStateMachineContextConverter {
-  private final int maxBufSize = 1024*2048;
+  private static final int maxBufSize = 1024*1024*2048;
   
-  StateMachineContext<String, String> toContext(byte[] buffer) {
+  public static StateMachineContext<String, String> toContext(byte[] buffer) {
     Kryo kryo = new Kryo();
     StateMachineContextSerializer<String, String> serializer = new StateMachineContextSerializer<>();
     kryo.addDefaultSerializer(StateMachineContext.class, serializer);
@@ -117,7 +118,7 @@ public class QStateMachineContextConverter {
     return result;
   }
   
-  byte[] toBytes(StateMachineContext<String, String> context) {
+  public static byte[] toBytes(StateMachineContext<String, String> context) {
     Kryo kryo = new Kryo();
     StateMachineContextSerializer<String, String> serializer = new StateMachineContextSerializer<>();
     kryo.addDefaultSerializer(StateMachineContext.class, serializer);

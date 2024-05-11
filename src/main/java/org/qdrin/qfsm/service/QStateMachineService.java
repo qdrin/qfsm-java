@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.config.StateMachineFactory;
+import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.support.AbstractStateMachine;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,7 @@ public class QStateMachineService {
 	// private final static Log log = LogFactory.getLog(QStateMachineService.class);
 	@Autowired
 	private StateMachineFactory<String, String> stateMachineFactory;
+
 	private final Map<String, StateMachine<String, String>> machines = new HashMap<String, StateMachine<String, String>>();
 
 	// public QStateMachineService(StateMachineFactory<String, String> stateMachineFactory) {
@@ -74,11 +76,6 @@ public class QStateMachineService {
 			StateMachine<String, String> stateMachine = machines.remove(machineId);
 			Product product = stateMachine.getExtendedState().get("product", Product.class);
 			product.setMachineState(QStateMachineContextConverter.toJsonNode(stateMachine.getState()));
-			log.debug("releasing machine with product.machineState: {}", product.getMachineState());
-			if (stateMachine != null) {
-				log.info("Stoping machineId: {}", machineId);
-				stateMachine.stopReactively().block();
-			}
 		}
 	}
 

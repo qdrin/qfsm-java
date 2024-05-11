@@ -26,6 +26,8 @@
       </transition>
       <transition xmi:type="uml:Transition" xmi:id="_zwgzcNpkEe6AsbqF-PrkhA" source="_bp6j8LoEEe6yNs2FzguhlQ" target="__C9pcArHEe-F_I8jzb-Dqg"/>
       <subvertex xmi:type="uml:State" xmi:id="_Gay-IKAWEe6Sh616vaZpZA" name="PendingActivate">
+        <deferrableTrigger xmi:type="uml:Trigger" xmi:id="_wPBQsA68Ee-v6pUrAoQ2Fw" event="_77j1YLXdEe6PAs2TUsdVsw"/>
+        <deferrableTrigger xmi:type="uml:Trigger" xmi:id="_yLEGoA68Ee-v6pUrAoQ2Fw" event="_3thusLXdEe6PAs2TUsdVsw"/>
         <entry xmi:type="uml:OpaqueBehavior" xmi:id="_8MRZIAyIEe-IadcddhgCPw">
           <language>bean</language>
           <body>pendingActivateEntry</body>
