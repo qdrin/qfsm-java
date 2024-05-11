@@ -111,7 +111,7 @@ public class ContextConverterTest extends SpringStarter {
     ObjectMapper mapper = new ObjectMapper();
     TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active").build();
     JsonNode machineState = mapper.readTree(resource.getInputStream());
-    bundle.drive.setMachineState(machineState);
+    bundle.drive.getMachineContext().setMachineState(machineState);
     machine = createMachine(bundle);
     log.debug("machine: {}", machine);
     log.debug("states: {}", machine.getState().getIds());
@@ -133,7 +133,7 @@ public class ContextConverterTest extends SpringStarter {
   public void testOrthogonalStateSetMachineStateBuilder() throws Exception {
     JsonNode machineState = Helper.buildMachineState("Prolongation", "Paid", "PriceActive");
     TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active").build();
-    bundle.drive.setMachineState(machineState);
+    bundle.drive.getMachineContext().setMachineState(machineState);
     machine = createMachine(bundle);
     log.debug("machine: {}", machine);
     log.debug("states: {}", machine.getState().getIds());

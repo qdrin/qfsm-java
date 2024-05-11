@@ -62,10 +62,10 @@ public class SpringStarter {
   public StateMachine<String, String> createMachine(TestBundle bundle) {
     Product product = bundle.drive;
     List<Product> components = bundle.components();
-    JsonNode machineState = product.getMachineState();
+    JsonNode machineState = product.getMachineContext().getMachineState();
     JsonNode componentMachineState = Helper.buildComponentMachineState(machineState);
     for(Product component: components) {
-      component.setMachineState(componentMachineState);
+      component.getMachineContext().setMachineState(componentMachineState);
       // productRepository.save(component);
     }
     StateMachine<String, String> machine = service.acquireStateMachine(product, bundle.bundle, components);

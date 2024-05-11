@@ -427,8 +427,9 @@ public class Helper {
         { assertEquals(expected.getLabel(), actual.getLabel(), "label"); }
       if(! expected.getMetaInfo().isEmpty())
         { assertEquals(expected.getMetaInfo(), actual.getMetaInfo(), "metaInfo"); }
-      if(expected.getMachineState() != null)
-        { JSONAssert.assertEquals(expected.getMachineState().toString(), actual.getMachineState().toString(), false); }
+      if(expected.getMachineContext().getMachineState() != null)
+        { JSONAssert.assertEquals(expected.getMachineContext().getMachineState().toString(),
+                                  actual.getMachineContext().getMachineState().toString(), false); }
     }
 
     public static void assertProductEquals(List<Product> expected, List<Product> actual) throws Exception {

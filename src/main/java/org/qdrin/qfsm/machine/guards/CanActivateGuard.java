@@ -22,7 +22,7 @@ public class CanActivateGuard implements Guard<String, String> {
           return true;
         case CUSTOM_BUNDLE_COMPONENT:
           Product bundle = extendedState.get("bundle", Product.class);
-          JsonNode machineState = bundle.getMachineState();
+          JsonNode machineState = bundle.getMachineContext().getMachineState();
           return machineState.toString().contains("Activated");
         default:
           return false;

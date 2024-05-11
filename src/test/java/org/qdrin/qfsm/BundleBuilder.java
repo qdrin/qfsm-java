@@ -284,7 +284,7 @@ public class BundleBuilder {
     }
 
     public BundleBuilder machineState(JsonNode machineState) {
-        drive.setMachineState(machineState);
+        drive.getMachineContext().setMachineState(machineState);
         return this;
     }
 

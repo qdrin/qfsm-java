@@ -15,9 +15,6 @@ import org.qdrin.qfsm.PriceType;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.ProductRequestDto;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -43,7 +40,8 @@ public class Product {
   Boolean isCustom;
   String status;
   @JdbcTypeCode(SqlTypes.JSON)
-  JsonNode machineState;
+  @Builder.Default
+  MachineContext machineContext = new MachineContext();
   @Builder.Default
   int productClass = 0;
   int tarificationPeriod;
@@ -78,7 +76,6 @@ public class Product {
   @JdbcTypeCode(SqlTypes.JSON)
   @Builder.Default
   Map<String, Object> quantity = new HashMap<>();
-  byte[] context = null;
   
   // Map<String, Object> extraParams;
   public Product(ProductActivateRequestDto orderItem) {
@@ -87,6 +84,7 @@ public class Product {
     this.productOfferingName = orderItem.getProductOfferingName();
     this.isBundle = orderItem.getIsBundle();
     this.isCustom = orderItem.getIsCustom();
+    this.machineContext = new MachineContext();
     if(orderItem.getCharacteristic() != null) { this.characteristic = orderItem.getCharacteristic(); }
     if(orderItem.getMetaInfo() != null) { this.metaInfo = orderItem.getMetaInfo(); }
     if(orderItem.getLabel() != null) { this.label = orderItem.getLabel(); }

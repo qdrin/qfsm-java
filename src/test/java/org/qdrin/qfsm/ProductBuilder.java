@@ -33,7 +33,7 @@ public class ProductBuilder {
     Boolean isBundle = false;
     Boolean isCustom = false;
     String status = null;
-    JsonNode machineState = null;
+    MachineContext machineContext = new MachineContext();
     ProductClass productClass = ProductClass.VOID;
     int tarificationPeriod = -1;
     OffsetDateTime trialEndDate = null;
@@ -59,7 +59,7 @@ public class ProductBuilder {
         isBundle = false;
         isCustom = false;
         status = null;
-        machineState = null;
+        machineContext = new MachineContext();
         productClass = ProductClass.VOID;
         tarificationPeriod = -1;
         trialEndDate = null;
@@ -170,7 +170,12 @@ public class ProductBuilder {
                 ser = Helper.mapper.writeValueAsString(product.getQuantity());
                 this.quantity = Helper.mapper.readValue(ser, new TypeReference<Map<String, Object>>() {});
             }
-            if(product.getMachineState() != null) { this.machineState = product.getMachineState().deepCopy(); }
+            if(product.getMachineContext().getMachineState() != null) {
+                this.machineContext.setMachineState(product.getMachineContext().getMachineState().deepCopy()); 
+            }
+            if(! product.getMachineContext().getDeferredEvents().isEmpty()) {
+                this.machineContext.setDeferredEvents(new ArrayList<>(product.getMachineContext().getDeferredEvents()));
+            }
         } catch(Exception e) {
             assert(false) : e.getLocalizedMessage();
         }
@@ -193,7 +198,8 @@ public class ProductBuilder {
     public ProductBuilder isBundle(Boolean val) {isBundle = val; recalc(); return this;}
     public ProductBuilder isCustom(Boolean val) {isCustom = val; recalc(); return this;}
     public ProductBuilder status(String val) {status = val; return this;} 
-    public ProductBuilder machineState(JsonNode val) {machineState = val; return this;}
+    public ProductBuilder machineState(JsonNode val) {machineContext.setMachineState(val); return this;}
+    public ProductBuilder deferredEvents(List<String> val) { machineContext.setDeferredEvents(val); return this; }
     public ProductBuilder productClass(ProductClass val) {productClass = val; return this;}
     public ProductBuilder tarificationPeriod(int val) {tarificationPeriod = val; return this;}
     public ProductBuilder trialEndDate(OffsetDateTime val) {trialEndDate = val; return this;}
@@ -233,7 +239,7 @@ public class ProductBuilder {
         product.setIsBundle(isBundle);
         product.setIsCustom(isCustom);
         product.setStatus(status);
-        product.setMachineState(machineState);
+        product.setMachineContext(machineContext);
         product.setProductClass(productClass.ordinal());
         product.setTarificationPeriod(tarificationPeriod);
         product.setTrialEndDate(trialEndDate);

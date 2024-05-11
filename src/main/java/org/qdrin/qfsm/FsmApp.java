@@ -288,7 +288,7 @@ public class FsmApp {
 					}
 				}
 			}
-			log.info("[{}] new state: {}, variables: {}", product.getProductId(), product.getMachineState(), variables);
+			log.info("[{}] new state: {}, variables: {}", product.getProductId(), product.getMachineContext().getMachineState(), variables);
 			productRepository.save(product);
 		}
 		eventRepository.save(event);

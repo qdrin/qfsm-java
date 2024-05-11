@@ -43,7 +43,7 @@ public class QStateMachineService {
 		
 	public StateMachine<String, String> acquireStateMachine(Product product, Product bundle, List<Product> components) {
 		String machineId = product.getProductId();
-		JsonNode machineState = product.getMachineState();
+		JsonNode machineState = product.getMachineContext().getMachineState();
 		log.debug("Acquiring machineId: {}, machineState: {}", machineId, machineState);
 
 		StateMachine<String, String> machine = stateMachineFactory.getStateMachine(machineId);
@@ -75,7 +75,7 @@ public class QStateMachineService {
 		synchronized (machines) {
 			StateMachine<String, String> stateMachine = machines.remove(machineId);
 			Product product = stateMachine.getExtendedState().get("product", Product.class);
-			product.setMachineState(QStateMachineContextConverter.toJsonNode(stateMachine.getState()));
+			product.getMachineContext().setMachineState(QStateMachineContextConverter.toJsonNode(stateMachine.getState()));
 		}
 	}
 
