@@ -3,6 +3,8 @@ package org.qdrin.qfsm.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.messaging.Message;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AccessLevel;
@@ -17,5 +19,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MachineContext {
   JsonNode machineState;  // 'Classic' machineState
-  List<String> deferredEvents = new ArrayList<>();     // List of deferred event id's
+  List<Message<String>> deferredEvents = new ArrayList<>();     // List of deferred event id's
 }

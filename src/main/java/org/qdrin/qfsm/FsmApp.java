@@ -261,7 +261,29 @@ public class FsmApp {
 			JsonNode machineState = getMachineState(machine.getState());
 			var variables = machine.getExtendedState().getVariables();
 			log.info("current state: {}, variables: {}", machineState, variables);
-			sendMessage(machine, eventType);
+			StateMachineEventResult<String, String> res = sendMessage(machine, eventType);
+			switch(res.getResultType()) {
+				case DENIED:
+				String emsg = String.format(
+					"[%s] Event %s not accepted in current state", machine.getId(), eventType);
+					throw new EventDeniedException(emsg);
+				case DEFERRED:
+					Message<String> message = res.getMessage();
+					log.info("[{}] Defer event. {}", machine.getId(), message);
+					product.getMachineContext().getDeferredEvents().add(message);
+					break;
+				case ACCEPTED:
+					List<Message<String>> deferredEvents = new ArrayList<>(product.getMachineContext().getDeferredEvents());
+					for(Message<String> deferredEvent: deferredEvents) {
+						try {
+							Mono<Message<String>> monomsg = Mono.just(deferredEvent);
+							machine.sendEvent(monomsg).blockLast();
+							product.getMachineContext().getDeferredEvents().remove(deferredEvent);
+						} catch(Exception e) {
+							log.warn(e.getLocalizedMessage());
+						}
+					}
+			}
 			machineState = getMachineState(machine.getState());
 			variables = machine.getExtendedState().getVariables();
 			variables.remove("product");
@@ -295,7 +317,7 @@ public class FsmApp {
 		return result;
 	}
 
-  private void sendMessage(StateMachine<String, String> machine, String eventName) {
+  private StateMachineEventResult<String, String> sendMessage(StateMachine<String, String> machine, String eventName) {
 		Message<String> message = MessageBuilder
 			.withPayload(eventName)
 			.setHeader("origin", "user")
@@ -304,19 +326,21 @@ public class FsmApp {
 		log.debug("[{}] sending event: {}, message: {}", machine.getId(), eventName, message);
 		StateMachineEventResult<String, String> res;
     try {
-		  res = machine.sendEvent(monomsg).blockLast();
+		  	res = machine.sendEvent(monomsg).blockLast();
 			log.debug("event result: {}", res);
     } catch(IllegalArgumentException e) {
 			e.printStackTrace();
 			String emsg = String.format("[%s] Event %s not accepted in current state: %s", machine.getId(), eventName, e.getLocalizedMessage());
-      log.error(emsg);
+      		log.error(emsg);
 			throw new EventDeniedException(emsg, e);
-    }
-		finally {
+    } catch(Exception e) {
+			e.printStackTrace();
+			String emsg = String.format(
+				"[%s] Event %s. Unknown error: %s", machine.getId(), eventName, e.getLocalizedMessage());
+			throw new InternalError(emsg, e);
+	} finally {
 			service.releaseStateMachine(machine.getId());
 		}
-		if(res == null || res.getResultType() == StateMachineEventResult.ResultType.DENIED) {
-			throw new EventDeniedException(String.format("[%s] Event %s not accepted in current state", machine.getId(), eventName));
-		}
+	return res;
 	}
 }

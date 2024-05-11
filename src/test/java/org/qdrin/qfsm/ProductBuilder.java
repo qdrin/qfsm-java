@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
+import org.springframework.messaging.Message;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
@@ -199,7 +200,7 @@ public class ProductBuilder {
     public ProductBuilder isCustom(Boolean val) {isCustom = val; recalc(); return this;}
     public ProductBuilder status(String val) {status = val; return this;} 
     public ProductBuilder machineState(JsonNode val) {machineContext.setMachineState(val); return this;}
-    public ProductBuilder deferredEvents(List<String> val) { machineContext.setDeferredEvents(val); return this; }
+    public ProductBuilder deferredEvents(List<Message<String>> val) { machineContext.setDeferredEvents(val); return this; }
     public ProductBuilder productClass(ProductClass val) {productClass = val; return this;}
     public ProductBuilder tarificationPeriod(int val) {tarificationPeriod = val; return this;}
     public ProductBuilder trialEndDate(OffsetDateTime val) {trialEndDate = val; return this;}
