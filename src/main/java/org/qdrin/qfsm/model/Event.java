@@ -14,6 +14,8 @@ import org.hibernate.type.SqlTypes;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.qdrin.qfsm.model.dto.*;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 
 @Entity
 @Table(name = "events")
@@ -52,5 +54,16 @@ public class Event {
     this.productOrderItems = eventDto.getProductOrderItems();
     this.characteristics = eventDto.getCharacteristics();
     this.eventProperties = eventDto.getEventProperties();
+  }
+
+  public Message<String> toMessage() {
+      Message<String> message = MessageBuilder
+        .withPayload(eventType)
+        .setHeader("clientInfo", clientInfo)
+        .setHeader("eventDate", eventDate)
+        .setHeader("characteristics", characteristics)
+        .setHeader("eventProperties", eventProperties)
+			  .build();
+      return message;
   }
 }

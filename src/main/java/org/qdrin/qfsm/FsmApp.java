@@ -2,6 +2,7 @@ package org.qdrin.qfsm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineEventResult;
 import org.springframework.statemachine.state.State;
@@ -241,7 +243,7 @@ public class FsmApp {
 		EventValidator.validate(event);
 		FsmResult result = event.getEventType().equals("activation_started") ? createBundles(event) : getBundles(event);
 		List<ProductBundle> bundles = result.getBundles();
-		if(bundles.size() != 1) {
+		if(bundles.size() != 1) {  // TODO: refactor for bulk operations
 			String errString = String.format("incorrect number of products: %d", bundles.size());
 			log.error(errString);
 			throw new BadUserDataException(errString);
@@ -253,15 +255,39 @@ public class FsmApp {
 			// StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
 			// NEW
 			StateMachine<String, String> machine = service.acquireStateMachine(product, bundle.getBundle(), components);
+			ExtendedState extendedState = machine.getExtendedState();
+			Map<Object, Object> variables = extendedState.getVariables();
+			List<ActionSuite> actions = (List<ActionSuite>) variables.get("actions");
+			List<ActionSuite> deleteActions = (List<ActionSuite>) variables.get("deleteActions");
 			String eventType = event.getEventType();
-			List<ActionSuite> actions = new ArrayList<>();
-			List<ActionSuite> deleteActions = new ArrayList<>();
 
 			log.debug("machine acquired: {}", machine.getId());
-			JsonNode machineState = getMachineState(machine.getState());
-			var variables = machine.getExtendedState().getVariables();
-			log.info("current state: {}, variables: {}", machineState, variables);
-			StateMachineEventResult<String, String> res = sendMessage(machine, eventType);
+			// First send deferred events cause they aren't saved in context
+			List<Message<String>> deferredEvents = new ArrayList<>(product.getMachineContext().getDeferredEvents());
+			for(Message<String> deferredEvent: deferredEvents) {
+				try {
+					StateMachineEventResult<String, String> res = machine.sendEvent(Mono.just(deferredEvent)).blockLast();
+				} catch(Exception e) {
+					log.warn("[{}] deferred event '{}' failed: {}", 
+						machine.getId(), deferredEvent.getPayload(), e.getLocalizedMessage());
+				}
+			}
+			StateMachineEventResult<String, String> res;
+			try {
+				res = machine.sendEvent(Mono.just(event.toMessage())).blockLast();
+			} catch(IllegalArgumentException e) {
+				String emsg = String.format("[%s] Event %s not accepted in current state: %s",
+					machine.getId(), eventType, e.getLocalizedMessage());
+				log.error(emsg);
+				throw new EventDeniedException(emsg, e);
+			} catch(Exception e) {
+				e.printStackTrace();
+				String emsg = String.format(
+					"[%s] Event %s. Unknown error: %s", machine.getId(), eventType, e.getLocalizedMessage());
+				throw new InternalError(emsg, e);
+			} finally {
+				service.releaseStateMachine(machine.getId());
+			}
 			switch(res.getResultType()) {
 				case DENIED:
 				String emsg = String.format(
@@ -273,25 +299,7 @@ public class FsmApp {
 					product.getMachineContext().getDeferredEvents().add(message);
 					break;
 				case ACCEPTED:
-					List<Message<String>> deferredEvents = new ArrayList<>(product.getMachineContext().getDeferredEvents());
-					for(Message<String> deferredEvent: deferredEvents) {
-						try {
-							Mono<Message<String>> monomsg = Mono.just(deferredEvent);
-							machine.sendEvent(monomsg).blockLast();
-							product.getMachineContext().getDeferredEvents().remove(deferredEvent);
-						} catch(Exception e) {
-							log.warn(e.getLocalizedMessage());
-						}
-					}
 			}
-			machineState = getMachineState(machine.getState());
-			variables = machine.getExtendedState().getVariables();
-			variables.remove("product");
-			variables.remove("bundle");
-			variables.remove("components");
-			variables.remove("actions");
-			variables.remove("deleteActions");
-			// service.releaseStateMachine(machineId);
 
 			FsmActions fsmActions = new FsmActions();
 			for(ActionSuite action: deleteActions) {
@@ -303,44 +311,11 @@ public class FsmApp {
 			if(productBundle != null && ! productBundle.getProductId().equals(product.getProductId())) {
 				productRepository.save(productBundle);
 			}
-			if(components != null) {
-				for(Product component: components) {
-					if(! component.getProductId().equals(product.getProductId())) {
-						productRepository.save(component);
-					}
-				}
-			}
+			components.stream().forEach(c -> productRepository.save(c));
 			log.info("[{}] new state: {}, variables: {}", product.getProductId(), product.getMachineContext().getMachineState(), variables);
 			productRepository.save(product);
 		}
 		eventRepository.save(event);
 		return result;
-	}
-
-  private StateMachineEventResult<String, String> sendMessage(StateMachine<String, String> machine, String eventName) {
-		Message<String> message = MessageBuilder
-			.withPayload(eventName)
-			.setHeader("origin", "user")
-			.build();
-		Mono<Message<String>> monomsg = Mono.just(message);
-		log.debug("[{}] sending event: {}, message: {}", machine.getId(), eventName, message);
-		StateMachineEventResult<String, String> res;
-    try {
-		  	res = machine.sendEvent(monomsg).blockLast();
-			log.debug("event result: {}", res);
-    } catch(IllegalArgumentException e) {
-			e.printStackTrace();
-			String emsg = String.format("[%s] Event %s not accepted in current state: %s", machine.getId(), eventName, e.getLocalizedMessage());
-      		log.error(emsg);
-			throw new EventDeniedException(emsg, e);
-    } catch(Exception e) {
-			e.printStackTrace();
-			String emsg = String.format(
-				"[%s] Event %s. Unknown error: %s", machine.getId(), eventName, e.getLocalizedMessage());
-			throw new InternalError(emsg, e);
-	} finally {
-			service.releaseStateMachine(machine.getId());
-		}
-	return res;
 	}
 }
