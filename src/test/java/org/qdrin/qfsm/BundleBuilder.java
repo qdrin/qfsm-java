@@ -123,6 +123,10 @@ public class BundleBuilder {
         createFromProducts();
     }
 
+    public BundleBuilder(String mainOfferId, String priceId, List<String> componentOfferIds) {
+        this(mainOfferId, priceId, componentOfferIds.toArray(new String[0]));
+    }
+
     public BundleBuilder(String mainOfferId, String priceId, String... componentOfferIds) {
         Product product = new ProductBuilder(mainOfferId, "", priceId).build();
         drive = product;
@@ -149,7 +153,7 @@ public class BundleBuilder {
     }
 
     public BundleBuilder(String offerId, String priceId) {
-        this(offerId, priceId, null);
+        this(offerId, priceId, new ArrayList<>());
     }
 
     public BundleBuilder(RequestEventDto event) {

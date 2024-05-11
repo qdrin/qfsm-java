@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.model.dto.EventDto;
@@ -34,6 +35,7 @@ public class EventBuilder {
     String priceId = null;
     List<String> componentIds = new ArrayList<>();
     Product product = null;
+    List<Product> components = null;
     List<ProductRequestDto> products = null;
     List<ProductActivateRequestDto> productOrderItems = null;
     List<Characteristic> characteristics = null;
@@ -75,15 +77,27 @@ public class EventBuilder {
             products = new ArrayList<>();
             ProductRequestDto main = new ProductRequestDto();
             main.setProductId(product.getProductId());
-            main.setProductRelationship(product.getProductRelationship());
-            if(main.getProductRelationship() != null) {
-                for(ProductRelationship rel: main.getProductRelationship()) {
-                    ProductRequestDto component = new ProductRequestDto();
-                    component.setProductId(rel.getProductId());
-                    products.add(component);
-                }
-            }
             products.add(mainIndex, main);
+            ArrayList<ProductRelationship> relations = new ArrayList<>();
+            main.setProductRelationship(relations);
+            String reltype;
+            switch(ProductClass.values()[product.getProductClass()]) {
+                case BUNDLE:
+                    reltype = "BUNDLES"; break;
+                case CUSTOM_BUNDLE:
+                    reltype = "CUSTOM_BUNDLES"; break;
+                default:
+                    reltype = "";
+            }
+            components.stream().forEach(c -> {
+                ProductRequestDto cRequestDto = new ProductRequestDto();
+                cRequestDto.setProductId(c.getProductId());
+                ProductRelationship r = new ProductRelationship();
+                r.setProductId(c.getProductId());
+                r.setRelationshipType(reltype);
+                relations.add(r);
+                products.add(cRequestDto);
+            });
         }
     }
 
@@ -124,6 +138,14 @@ public class EventBuilder {
     public EventBuilder(String eventType, Product product) {
         this.eventType = eventType;
         this.product = product;
+        this.components = new ArrayList<>();
+        recalc();
+    }
+
+    public EventBuilder(String eventType, TestBundle testBundle) {
+        this.eventType = eventType;
+        this.product = testBundle.drive;
+        this.components = testBundle.components();
         recalc();
     }
 
@@ -131,6 +153,7 @@ public class EventBuilder {
         this.eventType = eventType;
         this.productOfferingId = mainOfferId;
         this.priceId = priceId;
+        this.components = new ArrayList<>();
         recalc();
     }
 

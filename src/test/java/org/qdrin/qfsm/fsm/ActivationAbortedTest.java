@@ -7,6 +7,8 @@ import static org.qdrin.qfsm.Helper.buildMachineState;
 import static org.qdrin.qfsm.Helper.Assertions.*;
 
 import java.time.OffsetDateTime;
+import java.util.List;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -44,9 +46,10 @@ public class ActivationAbortedTest extends SpringStarter {
     String offerId = arg.getOfferId();
     ProductClass driveClass = arg.getProductClass();
     String priceId = arg.getPriceId();
+    List<String> componentIds = arg.getComponentOfferIds();
     
     ProductClass componentClass = Helper.getComponentClass(driveClass);
-    TestBundle bundle = new BundleBuilder(offerId, priceId)
+    TestBundle bundle = new BundleBuilder(offerId, priceId, componentIds)
       .productStartDate(t0)
       .tarificationPeriod(0)
       .machineState(Helper.buildMachineState("PendingActivate"))

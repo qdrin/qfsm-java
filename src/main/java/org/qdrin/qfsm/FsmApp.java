@@ -203,6 +203,9 @@ public class FsmApp {
 			processedProducts.add(head);
 		}
 		for(Product product: products) {
+			if(processedProducts.contains(product)) {
+				continue;
+			}
 			int index = product.getProductClass();
 			ProductClass productClass = ProductClass.values()[index];
 			ProductBundle bundle = new ProductBundle();
@@ -230,7 +233,7 @@ public class FsmApp {
 				default:
 					errString = String.format("Unexpected bundle or custom bundle remains after their processing: %s", product.getProductId());
 					log.error(errString);
-					throw new RuntimeException(errString);
+					throw new BadUserDataException(errString);
 			}
 		}
 		FsmResult result = new FsmResult();
