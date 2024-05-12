@@ -7,19 +7,20 @@ import static org.qdrin.qfsm.Helper.buildMachineState;
 import static org.qdrin.qfsm.Helper.Assertions.*;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
-import static org.qdrin.qfsm.Helper.Assertions.*;
 import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.SpringStarter;
-import org.qdrin.qfsm.TestSetup;
 import org.qdrin.qfsm.model.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
@@ -38,18 +39,26 @@ public class ActivationAbortedTest extends SpringStarter {
     clearDb();
   }
 
+  public static Stream<Arguments> testSuccess() {
+    List<String> components = Arrays.asList("component1", "component2", "component3");
+    List<String> empty = Arrays.asList();
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-trial", empty),
+      Arguments.of("simpleOffer1", "simple1-price-active", empty),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", components),
+      Arguments.of("bundleOffer1", "bundle1-price-active", components),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", components),
+      Arguments.of("customBundleOffer1", "custom1-price-active", components)
+    );
+  }
+
   @ParameterizedTest
-  @MethodSource("org.qdrin.qfsm.Helper#provideTestSetups")
-  public void testSuccess(TestSetup arg) throws Exception {
+  @MethodSource
+  public void testSuccess(String offerId, String priceId, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
     OffsetDateTime t1 = t0.plusDays(30);
-    String offerId = arg.getOfferId();
-    ProductClass driveClass = arg.getProductClass();
-    String priceId = arg.getPriceId();
-    List<String> componentIds = arg.getComponentOfferIds();
     
-    ProductClass componentClass = Helper.getComponentClass(driveClass);
-    TestBundle bundle = new BundleBuilder(offerId, priceId, componentIds)
+    TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .productStartDate(t0)
       .tarificationPeriod(0)
       .status("PENDING_ACTIVATE")
@@ -60,8 +69,6 @@ public class ActivationAbortedTest extends SpringStarter {
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("ABORTED")
       .machineState(Helper.buildMachineState("Aborted"))
-      .driveClass(driveClass)
-      .componentClass(componentClass)
       .tarificationPeriod(0)
       .pricePeriod(0)
       .build();

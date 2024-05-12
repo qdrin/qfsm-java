@@ -8,16 +8,18 @@ import static org.qdrin.qfsm.Helper.Assertions.assertProductEquals;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.SpringStarter;
-import org.qdrin.qfsm.TestSetup;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.model.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
@@ -42,27 +44,39 @@ public class ActivationStartedTest extends SpringStarter {
     clearDb();
   }
   
+  public static Stream<Arguments> testSuccess() {
+    List<String> components = Arrays.asList("component1", "component2", "component3");
+    List<String> empty = Arrays.asList();
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-trial", empty),
+      Arguments.of("simpleOffer1", "simple1-price-active", empty),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", components),
+      Arguments.of("bundleOffer1", "bundle1-price-active", components),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", components),
+      Arguments.of("customBundleOffer1", "custom1-price-active", components)
+    );
+  }
+
   @ParameterizedTest
-  @MethodSource("org.qdrin.qfsm.Helper#provideTestSetups")
-  public void testSuccess(TestSetup argument) throws Exception {
+  @MethodSource
+  public void testSuccess(String offerId, String priceId, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
     String expectedStatus = "PENDING_ACTIVATE";
-    ProductClass driveClass = argument.getProductClass();
-    String priceId = argument.getPriceId();
-    String offerId = argument.getOfferId();
-    String[] componentOfferIds = argument.getComponentOfferIds().toArray(new String[0]);
-
+    ProductClass driveClass = ProductClass.SIMPLE;
+    if(! offerId.contains("simple")) {
+      driveClass = offerId.contains("custom") ? ProductClass.CUSTOM_BUNDLE : ProductClass.BUNDLE;
+    }
     ProductClass componentClass = Helper.getComponentClass(driveClass);
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .productStartDate(t0.minusSeconds(30))
       .build();
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .tarificationPeriod(0)
-      .driveClass(driveClass)
-      .componentClass(componentClass)
       .status(expectedStatus)
       .productStartDate(t0)
       .build();
+    ProductClass actualClass = ProductClass.values()[bundle.drive.getProductClass()];
+    assertEquals(driveClass, actualClass);
     log.debug("expectedBundle: {}", expectedBundle);
     machine = createMachine(bundle);
     StateMachineTestPlan<String, String> plan =
