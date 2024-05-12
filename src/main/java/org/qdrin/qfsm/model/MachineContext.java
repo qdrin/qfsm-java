@@ -18,6 +18,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MachineContext {
+  Boolean isIndependent = false;
   JsonNode machineState;  // 'Classic' machineState
   List<Message<String>> deferredEvents = new ArrayList<>();     // List of deferred event id's
 }

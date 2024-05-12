@@ -39,8 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ActivationCompletedTest extends SpringStarter {
 
   StateMachine<String, String> machine = null;
-
-  private static OffsetDateTime nextPayDate = OffsetDateTime.now().plusDays(30);
   
   @BeforeEach
   public void setup() throws Exception {
@@ -48,29 +46,6 @@ public class ActivationCompletedTest extends SpringStarter {
     clearDb();
   }
 
-      // List<TestSetup> copy = Helper.getTestSetups();
-    // List<Arguments> args = new ArrayList<>();
-    // for(TestSetup setup: copy) {
-    //   TestExpectedBuilder builder = TestExpected.builder().pricePeriod(1);
-    //   if(setup.getPriceId().contains("trial")) {
-    //     builder.status("ACTIVE_TRIAL")
-    //       .tarificationPeriod(1)
-    //       .states(Arrays.asList("ActiveTrial", "Paid", "PriceActive"))
-    //       .actions(Arrays.asList(ActionSuite.PRICE_ENDED))
-    //       .nextPayDate(nextPayDate)
-    //       .deleteActions(Arrays.asList());
-    //   }
-    //   else {
-    //     builder.status("ACTIVE")
-    //       .tarificationPeriod(0)
-    //       .states(Arrays.asList("Active", "WaitingPayment", "PriceActive"))
-    //       .actions(Arrays.asList(ActionSuite.WAITING_PAY_ENDED, ActionSuite.PRICE_ENDED))
-    //       .nextPayDate(null)
-    //       .deleteActions(Arrays.asList());
-    //   }
-    //   args.add(Arguments.of(setup, builder.build()));
-    // }
-    // return args.stream();
   public static Stream<Arguments> testSuccessTrial() {
     return Stream.of(
       Arguments.of("simpleOffer1", "simple1-price-trial", new ArrayList<>()),
@@ -84,7 +59,6 @@ public class ActivationCompletedTest extends SpringStarter {
     OffsetDateTime t0 = OffsetDateTime.now();
     OffsetDateTime t1 = t0.plusDays(30);
     String[] expectedStates = Helper.stateSuite("ActiveTrial", "Paid", "PriceActive");
-
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .status("PENDING_ACTIVATE")
       .machineState(Helper.buildMachineState("PendingActivate"))
@@ -93,8 +67,10 @@ public class ActivationCompletedTest extends SpringStarter {
       .pricePeriod(0)
       .tarificationPeriod(0)
       .build();
+    assertEquals(componentOfferIds.size(), bundle.components().size());
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("ACTIVE_TRIAL")
+      .machineState(Helper.buildMachineState("ActiveTrial", "Paid", "PriceActive"))
       .tarificationPeriod(1)
       .pricePeriod(1)
       .trialEndDate(t1)
@@ -148,8 +124,10 @@ public class ActivationCompletedTest extends SpringStarter {
       .pricePeriod(0)
       .tarificationPeriod(0)
       .build();
+    assertEquals(componentOfferIds.size(), bundle.components().size());
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("ACTIVE")
+      .machineState(Helper.buildMachineState("Active", "WaitingPayment", "PriceActive"))
       .tarificationPeriod(0)
       .pricePeriod(1)
       .activeEndDate(t1)
@@ -180,38 +158,33 @@ public class ActivationCompletedTest extends SpringStarter {
     assertProductEquals(expectedBundle.components(), bundle.components());
   }
 
-  private static Stream<Arguments> testSuccessNoNextPayDate() {
-    List<TestSetup> copy = Helper.getTestSetups();
-    List<Arguments> args = new ArrayList<>();
-    List<String> newStates = Arrays.asList("Active", "WaitingPayment", "PriceWaiting");
-    JsonNode newMachineState = Helper.buildMachineState(newStates);
-    for(TestSetup setup: copy) {
-      TestExpectedBuilder builder = TestExpected.builder()
-        .pricePeriod(0)
-        .status("ACTIVE")
-        .tarificationPeriod(0)
-        .states(newStates)
-        .machineState(newMachineState)
-        .actions(Arrays.asList(ActionSuite.WAITING_PAY_ENDED))
-        .nextPayDate(null)
-        .deleteActions(Arrays.asList());
-      args.add(Arguments.of(setup, builder.build()));
-    }
-    return args.stream();
+  public static Stream<Arguments> testSuccessNoNextPayDate() {
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-trial", "ACTIVE_TRIAL", new ArrayList<>()),
+      Arguments.of("simpleOffer1", "simple1-price-active", "ACTIVE", new ArrayList<>()),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", "ACTIVE_TRIAL", Arrays.asList("component1", "component2", "component3")),
+      Arguments.of("bundleOffer1", "bundle1-price-active", "ACTIVE", Arrays.asList("component1", "component2", "component3")),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", "ACTIVE_TRIAL", Arrays.asList("component1", "component2", "component3")),
+      Arguments.of("customBundleOffer1", "custom1-price-active", "ACTIVE", Arrays.asList("component1", "component2", "component3"))
+    );
   }
 
   @ParameterizedTest
   @MethodSource
-  public void testSuccessNoNextPayDate(TestSetup setup, TestExpected exp) throws Exception {
+  public void testSuccessNoNextPayDate(
+      String offerId, String priceId, String expectedStatus, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
-    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active")
+    TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .tarificationPeriod(0)
+      .status("PENDING_ACTIVATE")
       .machineState(Helper.buildMachineState("PendingActivate"))
       .build();
-
+    assertEquals(componentOfferIds.size(), bundle.components().size());
+    String expectedUsage = expectedStatus.equals("ACTIVE") ? "Active" : "ActiveTrial";
+    JsonNode expectedMachineState = Helper.buildMachineState(expectedUsage, "WaitingPayment", "PriceWaiting");
     TestBundle expectedBundle = new BundleBuilder(bundle)
-      .status(exp.getStatus())
-      .machineState(exp.getMachineState())
+      .status(expectedStatus)
+      .machineState(expectedMachineState)
       .tarificationPeriod(0)
       .pricePeriod(0)
       .activeEndDate(null)
@@ -227,9 +200,9 @@ public class ActivationCompletedTest extends SpringStarter {
           .stateMachine(machine)
           .step()
               .sendEvent("activation_completed")
-              .expectStates(Helper.stateSuite(exp.getStates().toArray(new String[0])))
-              .expectVariable("deleteActions", exp.getDeleteActions())
-              .expectVariable("actions", exp.getActions())
+              .expectStates(Helper.stateSuite(expectedUsage, "WaitingPayment", "PriceWaiting"))
+              .expectVariable("deleteActions", Arrays.asList())
+              .expectVariable("actions", Arrays.asList(ActionSuite.WAITING_PAY_ENDED))
               .and()
           .build();
     plan.test();
@@ -245,7 +218,6 @@ public class ActivationCompletedTest extends SpringStarter {
 
     @Nested
   class CustomBundleComponent {
-
     private static Stream<Arguments> testCustomBundleComponentActivationCompleted() {
       return Stream.of(
         Arguments.of("customOffer1", "custom1-price-trial",
@@ -269,6 +241,7 @@ public class ActivationCompletedTest extends SpringStarter {
         .productStartDate(t0)
         .status(status)
         .machineState(machineState)
+        .isIndependent(false)
         .build();
 
       TestBundle bundle = new BundleBuilder("component3", null)
@@ -285,6 +258,7 @@ public class ActivationCompletedTest extends SpringStarter {
         .machineState(null)  // means that leg is merged to bundle
         .tarificationPeriod(2)
         .status(status)
+        .isIndependent(false)
         .build();
 
       machine = createMachine(bundle);
@@ -313,6 +287,10 @@ public class ActivationCompletedTest extends SpringStarter {
 
     private static Stream<Arguments> testCustomBundleComponentActivationRejected() {
       return Stream.of(
+        Arguments.of("customOffer1", "custom1-price-trial",
+            "PendingActivate", Arrays.asList("PendingActivate")),
+        Arguments.of("customOffer1", "custom1-price-active",
+            "PendingActivate", Arrays.asList("PendingActivate")),
         Arguments.of("customOffer1", "custom1-price-trial",
             "ACTIVE_TRIAL", Arrays.asList("Suspending", "NotPaid", "PriceChanging")),
         Arguments.of("customOffer1", "custom1-price-trial",

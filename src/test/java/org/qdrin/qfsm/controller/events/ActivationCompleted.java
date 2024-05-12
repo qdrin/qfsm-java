@@ -77,6 +77,5 @@ public class ActivationCompleted extends ControllerStarter {
     assertResponseEquals(event, response);
     List<Product> products = getResponseProducts(response);
     assertProductEquals(expectedBundle.products, products);
-    assertProductEquals(expectedBundle.components(), bundle.components());
   }
 }

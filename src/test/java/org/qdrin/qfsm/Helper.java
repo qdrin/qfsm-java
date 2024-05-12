@@ -400,7 +400,7 @@ public class Helper {
       if(expected.getProductOfferingName() != null)
         { assertEquals(expected.getProductOfferingName(), actual.getProductOfferingName(), "productOfferingName"); }
       if(expected.getStatus() != null)  
-      { assertEquals(expected.getStatus(), actual.getStatus(), "status"); }
+      { assertEquals(expected.getStatus(), actual.getStatus(), String.format("offerId: %s, status", expected.getProductOfferingId())); }
       if(expected.getProductClass() != -1)
         { assertEquals(expected.getProductClass(), actual.getProductClass(), "productClass"); }
       if(! expected.getProductRelationship().isEmpty())
@@ -427,9 +427,17 @@ public class Helper {
         { assertEquals(expected.getLabel(), actual.getLabel(), "label"); }
       if(! expected.getMetaInfo().isEmpty())
         { assertEquals(expected.getMetaInfo(), actual.getMetaInfo(), "metaInfo"); }
-      if(expected.getMachineContext().getMachineState() != null)
-        { JSONAssert.assertEquals(expected.getMachineContext().getMachineState().toString(),
-                                  actual.getMachineContext().getMachineState().toString(), false); }
+      if(expected.getMachineContext().getIsIndependent() != null)
+        { assertEquals(expected.getMachineContext().getIsIndependent(), actual.getMachineContext().getIsIndependent()); }
+      if(expected.getMachineContext().getMachineState() != null){
+        String exp = expected.getMachineContext().getMachineState().toString();
+        String act = actual.getMachineContext().getMachineState().toString();
+        try {
+          JSONAssert.assertEquals(exp, act, false);
+        } catch (AssertionError ae) {
+          assert false : String.format("machineState. expected: %s, actual: %s", exp, act);
+          }
+      }
     }
 
     public static void assertProductEquals(List<Product> expected, List<Product> actual) throws Exception {

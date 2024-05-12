@@ -88,6 +88,7 @@ public class BundleBuilder {
                     components.add(product);
             }
         }
+        drive.getMachineContext().setIsIndependent(true);
         if(componentClass != null) {
             setComponentClass(componentClass);
             String relType = componentClass == ProductClass.BUNDLE_COMPONENT ? "BUNDLES" : "CUSTOM_BUNDLES";
@@ -288,6 +289,11 @@ public class BundleBuilder {
 
     public BundleBuilder machineState(JsonNode machineState) {
         drive.getMachineContext().setMachineState(machineState);
+        return this;
+    }
+
+    public BundleBuilder isIndependent(boolean val) {
+        drive.getMachineContext().setIsIndependent(val);
         return this;
     }
 

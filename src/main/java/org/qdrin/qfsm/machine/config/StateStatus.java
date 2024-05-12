@@ -36,11 +36,15 @@ public class StateStatus {
       product.setStatus(status);
       log.debug("productId: {}, new status: {}", product.getProductId(), product.getStatus());
       List<Product> components = (List<Product>) extendedState.getVariables().get("components");
-      components.stream()
-        .filter(c -> c.getMachineContext().getMachineState() == null) // null machineState means that leg is merged and not self-operated
-        .forEach(c -> c.setStatus(status));
-      log.debug("product: {}", product);
-      log.debug("components: {}", components);
+      log.debug("components isIndepended: {}", components.stream().map(c -> c.getMachineContext().getIsIndependent()).toList());
+      components.stream().forEach(c -> { 
+          if(! c.getMachineContext().getIsIndependent()) {
+            c.setStatus(status);
+            log.debug("component [{}] status: {}", c.getProductId(), c.getStatus());
+          }
+        });
+      log.info("[{}] status: {}", product.getProductId(), product.getStatus());
+      log.debug("components: {}", components.stream().map(c -> c.getStatus()).toList());
     }
   }
 }

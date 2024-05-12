@@ -100,6 +100,7 @@ public class ActivationStartedTest extends SpringStarter {
         .build();
 
       log.debug("preBundle.bundle: {}", preBundle.bundle);
+      assert(preBundle.bundle.getMachineContext().getIsIndependent());
       TestBundle bundle = new BundleBuilder("component3", null)
         .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
         .addBundle(preBundle.bundle)
@@ -113,9 +114,10 @@ public class ActivationStartedTest extends SpringStarter {
         .tarificationPeriod(0)
         .productStartDate(t0)
         .status("PENDING_ACTIVATE")
+        .isIndependent(true)
         .build();
       expectedBundle.bundle.getProductRelationship().add(new ProductRelationship(bundle.drive));
-
+      assert(expectedBundle.bundle.getMachineContext().getIsIndependent()) : "expectedBundle is not independent";
       machine = createMachine(bundle);
       assertEquals(bundle.bundle.getProductId(), preBundle.bundle.getProductId());
       StateMachineTestPlan<String, String> plan =

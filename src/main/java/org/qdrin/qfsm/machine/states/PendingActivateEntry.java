@@ -21,8 +21,12 @@ public class PendingActivateEntry implements Action<String, String> {
     product.setTarificationPeriod(0);
     OffsetDateTime t0 = OffsetDateTime.now();
     product.setProductStartDate(t0);
+    product.getMachineContext().setIsIndependent(true);
     List<Product> components = (List<Product>) extendedState.getVariables().get("components");
-    components.stream().forEach((c) -> {c.setTarificationPeriod(0); c.setProductStartDate(t0);});
+    components.stream().forEach((c) -> {
+      c.setTarificationPeriod(0);
+      c.setProductStartDate(t0);
+    });
     log.debug("set tarificationPeriod: 0, productStartDate: {}", t0);
     ProductClass pclass = ProductClass.values()[product.getProductClass()];
     if(pclass == ProductClass.CUSTOM_BUNDLE_COMPONENT) {

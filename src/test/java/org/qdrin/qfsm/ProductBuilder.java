@@ -177,6 +177,9 @@ public class ProductBuilder {
             if(! product.getMachineContext().getDeferredEvents().isEmpty()) {
                 this.machineContext.setDeferredEvents(new ArrayList<>(product.getMachineContext().getDeferredEvents()));
             }
+            if(product.getMachineContext().getIsIndependent() != null) {
+                this.machineContext.setIsIndependent(product.getMachineContext().getIsIndependent());
+            }
         } catch(Exception e) {
             assert(false) : e.getLocalizedMessage();
         }

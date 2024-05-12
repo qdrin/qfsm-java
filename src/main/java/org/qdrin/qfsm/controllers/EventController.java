@@ -28,17 +28,9 @@ import jakarta.validation.Valid;
 @Service
 @Slf4j
 public class EventController {
-    // @Autowired
-    // StateMachineService<String, String> stateMachineService;
-  
-    // @Autowired
-    // StateMachinePersister<String, String, String> persister;
-    
-    // @Autowired
-    // DataSource dataSource;
 
-		@Autowired
-		FsmApp fsmApp;
+	@Autowired
+	FsmApp fsmApp;
 
     @PostMapping("/v1/event")
     public ResponseEntity<ResponseEventDto> eventHandler(@RequestBody @Valid RequestEventDto incomingEvent) {

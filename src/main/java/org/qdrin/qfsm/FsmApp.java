@@ -255,8 +255,7 @@ public class FsmApp {
 			Product product = bundle.getDrive();
 			Product productBundle = bundle.getBundle();
 			List<Product> components = bundle.getComponents();
-			// StateMachine<String, String> machine = stateMachineService.acquireStateMachine(machineId);
-			// NEW
+
 			StateMachine<String, String> machine = service.acquireStateMachine(product, bundle.getBundle(), components);
 			ExtendedState extendedState = machine.getExtendedState();
 			Map<Object, Object> variables = extendedState.getVariables();
@@ -278,7 +277,7 @@ public class FsmApp {
 			StateMachineEventResult<String, String> res;
 			try {
 				res = machine.sendEvent(Mono.just(event.toMessage())).blockLast();
-			} catch(IllegalArgumentException e) {
+			} catch(IllegalArgumentException e) {  // TODO: Change exception to denyReason variable
 				String emsg = String.format("[%s] Event %s not accepted in current state: %s",
 					machine.getId(), eventType, e.getLocalizedMessage());
 				log.error(emsg);
@@ -314,7 +313,7 @@ public class FsmApp {
 			if(productBundle != null && ! productBundle.getProductId().equals(product.getProductId())) {
 				productRepository.save(productBundle);
 			}
-			components.stream().forEach(c -> productRepository.save(c));
+			components.stream().forEach(c -> productRepository.save(c));  // Doesn't work?
 			log.info("[{}] new state: {}, variables: {}", product.getProductId(), product.getMachineContext().getMachineState(), variables);
 			productRepository.save(product);
 		}
