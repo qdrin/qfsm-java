@@ -23,7 +23,7 @@ import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.SpringStarter;
-import org.qdrin.qfsm.tasks.ActionSuite;
+import org.qdrin.qfsm.tasks.TaskType;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
@@ -197,8 +197,8 @@ public class PaymentProcessedTest extends SpringStarter {
       .build();
     machine = createMachine(bundle);
     
-    List<ActionSuite> expectedActions = new ArrayList<>();
-    List<ActionSuite> expectedDeleteActions = Arrays.asList(ActionSuite.WAITING_PAY_ENDED);
+    List<TaskType> expectedActions = new ArrayList<>();
+    List<TaskType> expectedDeleteActions = Arrays.asList(TaskType.WAITING_PAY_ENDED);
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()

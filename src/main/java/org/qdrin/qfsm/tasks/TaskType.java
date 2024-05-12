@@ -3,7 +3,7 @@ package org.qdrin.qfsm.tasks;
 
 import java.time.OffsetDateTime;
 
-public enum ActionSuite {
+public enum TaskType {
   // tasks
   PRICE_ENDED,
   CHANGE_PRICE,
@@ -24,7 +24,7 @@ public enum ActionSuite {
 
   private OffsetDateTime wakeAt = OffsetDateTime.now();
 
-  public ActionSuite withWakeAt(OffsetDateTime wakeAt) {
+  public TaskType withWakeAt(OffsetDateTime wakeAt) {
     this.wakeAt = wakeAt;
     return this;
   }

@@ -258,9 +258,8 @@ public class FsmApp {
 
 			StateMachine<String, String> machine = service.acquireStateMachine(product, bundle.getBundle(), components);
 			ExtendedState extendedState = machine.getExtendedState();
-			Map<Object, Object> variables = extendedState.getVariables();
-			List<ActionSuite> actions = (List<ActionSuite>) variables.get("actions");
-			List<ActionSuite> deleteActions = (List<ActionSuite>) variables.get("deleteActions");
+			TaskSet tasks = extendedState.get("tasks", TaskSet.class);
+			TaskSet deleteTasks = extendedState.get("deleteTasks", TaskSet.class);
 			String eventType = event.getEventType();
 
 			log.debug("machine acquired: {}", machine.getId());
@@ -304,17 +303,17 @@ public class FsmApp {
 			}
 
 			FsmActions fsmActions = new FsmActions();
-			for(ActionSuite action: deleteActions) {
-				fsmActions.deleteTask(action);
+			for(TaskDef task: deleteTasks.getTasks()) {
+				fsmActions.deleteTask(task);
 			}
-			for(ActionSuite action: actions) {
-				fsmActions.createTask(action);
+			for(TaskDef task: tasks.getTasks()) {
+				fsmActions.createTask(task);
 			}
 			if(productBundle != null && ! productBundle.getProductId().equals(product.getProductId())) {
 				productRepository.save(productBundle);
 			}
 			components.stream().forEach(c -> productRepository.save(c));  // Doesn't work?
-			log.info("[{}] new state: {}, variables: {}", product.getProductId(), product.getMachineContext().getMachineState(), variables);
+			log.info("[{}] new state: {}", product.getProductId(), product.getMachineContext().getMachineState());
 			productRepository.save(product);
 		}
 		eventRepository.save(event);

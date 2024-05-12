@@ -1,15 +1,14 @@
 package org.qdrin.qfsm.machine.states;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.qdrin.qfsm.machine.actions.AddActionAction;
-import org.qdrin.qfsm.machine.actions.DeleteActionAction;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductCharacteristic;
-import org.qdrin.qfsm.tasks.ActionSuite;
-import org.qdrin.qfsm.tasks.ExternalData;
+import org.qdrin.qfsm.tasks.*;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 
@@ -22,7 +21,8 @@ public class PendingDisconnectEntry implements Action<String, String> {
 
   @Override
   public void execute(StateContext<String, String> context) {
-    Product product = context.getExtendedState().get("product", Product.class);
+    ExtendedState extendedState = context.getStateMachine().getExtendedState(); 
+    Product product = extendedState.get("product", Product.class);
     log.debug("PendingActivateEntry started. event: {}, message: {}", context.getEvent());
     // TODO: Remove after manual mode
     List<ProductCharacteristic> chars = ExternalData.requestProductCharacteristics();
@@ -49,14 +49,23 @@ public class PendingDisconnectEntry implements Action<String, String> {
       .withPayload("price_off").build());
     var paymentRes = context.getStateMachine().sendEvent(paymentOff).collectList();
     var priceRes = context.getStateMachine().sendEvent(priceOff).collectList();
-    new DeleteActionAction(
-      ActionSuite.PRICE_ENDED,
-      ActionSuite.SUSPEND_ENDED,
-      ActionSuite.WAITING_PAY_ENDED,
-      ActionSuite.CHANGE_PRICE,
-      ActionSuite.RESUME_EXTERNAL
-      ).execute(context);
-    new AddActionAction(ActionSuite.DISCONNECT).execute(context);  // product.getActiveEndDate().toInstant() or characteristic-valued
+    TaskSet deleteTasks = extendedState.get("deleteTasks", TaskSet.class);
+    String productId = product.getProductId();
+    deleteTasks.put(TaskDef.builder().productId(productId).type(TaskType.PRICE_ENDED).build());
+    deleteTasks.put(TaskDef.builder().productId(productId).type(TaskType.SUSPEND_ENDED).build());
+    deleteTasks.put(TaskDef.builder().productId(productId).type(TaskType.WAITING_PAY_ENDED).build());
+    deleteTasks.put(TaskDef.builder().productId(productId).type(TaskType.CHANGE_PRICE).build());
+    deleteTasks.put(TaskDef.builder().productId(productId).type(TaskType.RESUME_EXTERNAL).build());
+
+    // TODO: or characteristic-valued or event characteristic valued
+    OffsetDateTime disconnectDate = product.getActiveEndDate();
+    TaskSet tasks = extendedState.get("tasks", TaskSet.class);
+    tasks.put(TaskDef.builder()
+      .productId(productId)
+      .type(TaskType.DISCONNECT)
+      .wakeAt(disconnectDate)
+      .build()  
+    );
     paymentRes.block();
     priceRes.block();
   }

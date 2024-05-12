@@ -17,7 +17,7 @@ public class ProductClassGuard implements Guard<String, String> {
 
   @Override
   public boolean evaluate(StateContext<String, String> context) {
-    int ord = context.getExtendedState().get("product", Product.class)
+    int ord = context.getStateMachine().getExtendedState().get("product", Product.class)
       .getProductClass();
     ProductClass pclass = ProductClass.values()[ord];
     return match.contains(pclass); 

@@ -6,7 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.qdrin.qfsm.model.Product;
-import org.qdrin.qfsm.tasks.ActionSuite;
+import org.qdrin.qfsm.tasks.TaskSet;
+import org.qdrin.qfsm.tasks.TaskType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
@@ -55,8 +56,8 @@ public class QStateMachineService {
 			((AbstractStateMachine<String, String>) machine).setId(machineId);
 		}
 		Map<Object, Object> variables = machine.getExtendedState().getVariables();
-		variables.put("actions", new ArrayList<ActionSuite>());
-		variables.put("deleteActions", new ArrayList<ActionSuite>());
+		variables.put("tasks", new TaskSet());
+		variables.put("deleteTasks", new TaskSet());
 		variables.put("product", product);
 		if(bundle != null) {
 			variables.put("bundle", bundle);

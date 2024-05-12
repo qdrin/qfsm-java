@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 import static org.qdrin.qfsm.Helper.Assertions.assertProductEquals;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.stream.Stream;

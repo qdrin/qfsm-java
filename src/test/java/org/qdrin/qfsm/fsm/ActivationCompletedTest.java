@@ -22,7 +22,7 @@ import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.model.Product;
-import org.qdrin.qfsm.tasks.ActionSuite;
+import org.qdrin.qfsm.tasks.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
@@ -74,8 +74,8 @@ public class ActivationCompletedTest extends SpringStarter {
       .build();
     machine = createMachine(bundle);
     
-    List<ActionSuite> expectedActions = Arrays.asList(ActionSuite.PRICE_ENDED);
-    List<ActionSuite> expectedDeleteActions = Arrays.asList();
+    List<TaskType> expectedActions = Arrays.asList(TaskType.PRICE_ENDED);
+    List<TaskType> expectedDeleteActions = Arrays.asList();
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
@@ -130,8 +130,8 @@ public class ActivationCompletedTest extends SpringStarter {
       .build();
     machine = createMachine(bundle);
     
-    List<ActionSuite> expectedActions = Arrays.asList(ActionSuite.WAITING_PAY_ENDED, ActionSuite.PRICE_ENDED);
-    List<ActionSuite> expectedDeleteActions = Arrays.asList();
+    List<TaskType> expectedActions = Arrays.asList(TaskType.WAITING_PAY_ENDED, TaskType.PRICE_ENDED);
+    List<TaskType> expectedDeleteActions = Arrays.asList();
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
@@ -188,7 +188,10 @@ public class ActivationCompletedTest extends SpringStarter {
     
     machine = createMachine(bundle);
     
-    OffsetDateTime expectedWaitingPayEnded = t0.plus(getWaitingPayInterval());
+    TaskSet tasks = machine.getExtendedState().get("tasks", TaskSet.class);
+    OffsetDateTime taskDate = t0.plus(getWaitingPayInterval()).plusMinutes(300);
+    TaskSet expectedTasks = new TaskSet();
+    expectedTasks.put(TaskDef.builder().type(TaskType.WAITING_PAY_ENDED).wakeAt(taskDate).build());
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
@@ -197,19 +200,16 @@ public class ActivationCompletedTest extends SpringStarter {
           .step()
               .sendEvent("activation_completed")
               .expectStates(Helper.stateSuite(expectedUsage, "WaitingPayment", "PriceWaiting"))
-              .expectVariable("deleteActions", Arrays.asList())
-              .expectVariable("actions", Arrays.asList(ActionSuite.WAITING_PAY_ENDED))
+              .expectVariable("deleteTasks")
+              .expectVariable("tasks")
               .and()
           .build();
     plan.test();
     releaseMachine(machine.getId());
     log.debug("states: {}", machine.getState().getIds());
+    log.debug("tasks: {}", tasks.getTasks());
     Helper.Assertions.assertProductEquals(expectedBundle.drive, bundle.drive);
-    
-    Map<Object, Object> variables = machine.getExtendedState().getVariables(); 
-    List<ActionSuite> actions = (List<ActionSuite>) variables.get("actions");
-    OffsetDateTime waitingPayEnded = actions.get(0).getWakeAt();
-    assertDates(expectedWaitingPayEnded, waitingPayEnded);
+    assertTasksEquals(expectedTasks, tasks, true);
   }
 
     @Nested

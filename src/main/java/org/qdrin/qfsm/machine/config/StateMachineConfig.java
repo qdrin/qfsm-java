@@ -195,27 +195,28 @@ public class StateMachineConfig {
     Action<String, String> clearProductPrice() {
       return new Action<String, String>() {
         public void execute(StateContext<String, String> context) {
-          Product product = context.getExtendedState().get("product", Product.class);
+          Product product = context.getStateMachine().getExtendedState().get("product", Product.class);
           log.info("Clear product price. productId: {}", product.getProductId());
           product.setProductPrice(null);
         }
       };
     }
 
-    @Bean
-    Action<String, String> resetPricePeriod() {
-      return new Action<String, String>() {
-        public void execute(StateContext<String, String> context) {
-          Product product = context.getExtendedState().get("product", Product.class);
-          log.info("Reset price period. productId: {}", product.getProductId());
-          product.setTarificationPeriod(0);
-          Optional<ProductPrice> price = product.getProductPrice(PriceType.RecurringCharge);
-          if(price.isPresent()) {
-            price.get().setPeriod(0);
-          }
-        }
-      };
-    }
+    // TODO: Remove
+    // @Bean
+    // Action<String, String> resetPricePeriod() {
+    //   return new Action<String, String>() {
+    //     public void execute(StateContext<String, String> context) {
+    //       Product product = context.getStateMachine().getExtendedState().get("product", Product.class);
+    //       log.info("Reset price period. productId: {}", product.getProductId());
+    //       product.setTarificationPeriod(0);
+    //       Optional<ProductPrice> price = product.getProductPrice(PriceType.RecurringCharge);
+    //       if(price.isPresent()) {
+    //         price.get().setPeriod(0);
+    //       }
+    //     }
+    //   };
+    // }
 
     @Bean
     MergeComponent mergeComponent() {

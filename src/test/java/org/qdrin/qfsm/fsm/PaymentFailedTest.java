@@ -20,7 +20,7 @@ import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.SpringStarter;
-import org.qdrin.qfsm.tasks.ActionSuite;
+import org.qdrin.qfsm.tasks.TaskType;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
@@ -141,8 +141,8 @@ public class PaymentFailedTest extends SpringStarter {
     Map<Object, Object> variables = machine.getExtendedState().getVariables();
     log.debug("actions: {}", variables.get("actions"));
 
-    List<ActionSuite> expectedActions = Arrays.asList(ActionSuite.SUSPEND_EXTERNAL);
-    List<ActionSuite> expectedDeleteActions = Arrays.asList(ActionSuite.WAITING_PAY_ENDED, ActionSuite.PRICE_ENDED);
+    List<TaskType> expectedActions = Arrays.asList(TaskType.SUSPEND_EXTERNAL);
+    List<TaskType> expectedDeleteActions = Arrays.asList(TaskType.WAITING_PAY_ENDED, TaskType.PRICE_ENDED);
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()

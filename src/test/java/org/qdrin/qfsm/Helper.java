@@ -12,9 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.params.provider.Arguments;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.model.ProductRelationship;
@@ -23,6 +20,7 @@ import org.qdrin.qfsm.model.dto.ProductRequestDto;
 import org.qdrin.qfsm.model.dto.ProductResponseDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.model.dto.ResponseEventDto;
+import org.qdrin.qfsm.tasks.*;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
@@ -407,6 +405,20 @@ public class Helper {
               .findFirst();
         assert(oactualProduct.isPresent()) : String.format("product not found: %s", expectedProduct.getProductId());
         assertProductEquals(expectedProduct, oactualProduct.get());
+      }
+    }
+
+    public static void assertTasksEquals(TaskSet expected, TaskSet actual, boolean withDates) throws Exception {
+      List<TaskDef> expList = expected.getTasks();
+      List<TaskDef> actList = actual.getTasks();
+      for(TaskDef exp: expList) {
+        List<TaskDef> tasks = actList.stream()
+          .filter(a -> a.equals(exp))
+          .toList();
+        assertEquals(1, tasks.size(), String.format("expected: %s, found: %d", exp.getType(), tasks.size()));
+        if(withDates) {
+          assertDates(exp.getWakeAt(), tasks.get(0).getWakeAt(), exp.getType().name());
+        }
       }
     }
   }

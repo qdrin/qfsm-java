@@ -6,7 +6,7 @@ import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 
-import org.qdrin.qfsm.tasks.ActionSuite;
+import org.qdrin.qfsm.tasks.*;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -14,7 +14,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.qdrin.qfsm.machine.actions.AddActionAction;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.model.*;
 
@@ -51,11 +50,15 @@ public class PriceActiveEntry implements Action<String, String> {
       }
       log.debug("activeEndDate: {}, trialEndDate: {}, priceEndedBefore: {}",
           product.getActiveEndDate(), product.getTrialEndDate(), priceEndedBefore);
-      new AddActionAction(ActionSuite.PRICE_ENDED
-          .withWakeAt(activeEndDate.minus(priceEndedBefore)))
-          .execute(context);
+      TaskSet tasks = extendedState.get("tasks", TaskSet.class);
+      tasks.put(TaskDef.builder()
+        .productId(context.getStateMachine().getId())
+        .type(TaskType.PRICE_ENDED)
+        .wakeAt(activeEndDate.minus(priceEndedBefore))
+        .build()  
+      );
       // TODO: Change direct task creation to post action variable here and everywhere
-      // var postActions = context.getExtendedState().get("postActions", PostActions);
+      // var postActions = context.getStateMachine().getExtendedState().get("postActions", PostActions);
       // postActions.addNewTask("startPriceEndedTask", product.getProductId(), activeEndDate);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
       // final SchedulerClient schedulerClient =
@@ -66,7 +69,7 @@ public class PriceActiveEntry implements Action<String, String> {
       // TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), activeEndDate.toInstant());
       // priceEndedFunc.accept(ctx);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-      context.getStateMachine().getExtendedState().getVariables().remove("nextPrice");
+      extendedState.getVariables().remove("nextPrice");
     }
   }
 }
