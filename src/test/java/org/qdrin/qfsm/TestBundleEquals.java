@@ -41,7 +41,6 @@ public class TestBundleEquals extends TypeSafeMatcher<Map<? extends Object,?>> {
       return false;
     }
     if(oc == null) return false;
-    // if(oc.getClass() != List.class) return false;
     List<Product> components = (List<Product>) oc;
     try {
       assertProductEquals(expected.components(), components);

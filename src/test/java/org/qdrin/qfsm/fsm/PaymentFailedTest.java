@@ -4,6 +4,8 @@ import org.springframework.statemachine.StateMachine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.qdrin.qfsm.Helper.Assertions.*;
+import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
+import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.SpringStarter;
-import org.qdrin.qfsm.tasks.TaskType;
+import org.qdrin.qfsm.tasks.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
@@ -141,8 +143,10 @@ public class PaymentFailedTest extends SpringStarter {
     Map<Object, Object> variables = machine.getExtendedState().getVariables();
     log.debug("actions: {}", variables.get("actions"));
 
-    List<TaskType> expectedActions = Arrays.asList(TaskType.SUSPEND_EXTERNAL);
-    List<TaskType> expectedDeleteActions = Arrays.asList(TaskType.WAITING_PAY_ENDED, TaskType.PRICE_ENDED);
+    TaskPlan expectedTasks = new TaskPlan(machine.getId());
+    expectedTasks.addToCreatePlan(TaskDef.builder().type(TaskType.SUSPEND_EXTERNAL).build());
+    expectedTasks.addToRemovePlan(TaskDef.builder().type(TaskType.WAITING_PAY_ENDED).build());
+    expectedTasks.addToRemovePlan(TaskDef.builder().type(TaskType.PRICE_ENDED).build());
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
@@ -154,15 +158,13 @@ public class PaymentFailedTest extends SpringStarter {
           .step()
               .sendEvent("payment_failed")
               .expectStates(Helper.stateSuite(expectedStates))
-              .expectVariable("deleteActions", expectedDeleteActions)
-              .expectVariable("actions", expectedActions)
+              .expectVariableWith(testBundleEqualTo(expectedBundle))
+              .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
           .build();
     plan.test();
-    log.debug("actions: {}", variables.get("actions"));
+    TaskPlan tasks = (TaskPlan) variables.get("tasks");
+    log.debug("tasks createPlan: {}, removePlan: {}", tasks.getCreatePlan(), tasks.getRemovePlan());
     releaseMachine(machine.getId());
-    log.debug("states: {}", machine.getState().getIds());
-    assertProductEquals(expectedBundle.drive, bundle.drive);
-    assertProductEquals(expectedBundle.components(), bundle.components());
   }
 }

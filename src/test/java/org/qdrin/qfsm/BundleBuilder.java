@@ -88,20 +88,11 @@ public class BundleBuilder {
                     components.add(product);
             }
         }
-        drive.getMachineContext().setIsIndependent(true);
         if(componentClass != null) {
             setComponentClass(componentClass);
             String relType = componentClass == ProductClass.BUNDLE_COMPONENT ? "BUNDLES" : "CUSTOM_BUNDLES";
             bundle.getProductRelationship().forEach((r) -> {r.setRelationshipType(relType);});
         }
-    }
-
-    public BundleBuilder(List<Product> products) {
-        for(Product p: products) {
-            Product product = new ProductBuilder(p).build();
-            this.products.add(product);
-        }
-        createFromProducts();
     }
 
     public BundleBuilder(TestBundle testBundle) {
@@ -119,7 +110,11 @@ public class BundleBuilder {
         if(! isBundleInProducts && testBundle.bundle != null) {
             this.bundle = new ProductBuilder(testBundle.bundle).build();
         }
-        createFromProducts();
+        components = new ArrayList<>();
+        for(Product product: products) {
+            if(product == drive) continue;
+            components.add(product);
+        }
     }
 
     public BundleBuilder(String mainOfferId, String priceId, List<String> componentOfferIds) {
@@ -129,6 +124,7 @@ public class BundleBuilder {
     public BundleBuilder(String mainOfferId, String priceId, String... componentOfferIds) {
         Product product = new ProductBuilder(mainOfferId, "", priceId).build();
         drive = product;
+        drive.getMachineContext().setIsIndependent(true);
         bundleClass = ProductClass.values()[product.getProductClass()];
         products.add(product);
         if(componentOfferIds == null) {

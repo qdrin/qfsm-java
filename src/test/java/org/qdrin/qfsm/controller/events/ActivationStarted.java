@@ -103,6 +103,7 @@ public class ActivationStarted extends ControllerStarter {
 
       Product product = getProduct(resultProduct.getProductId());
       TestBundle expectedBundle = new BundleBuilder(event)
+        .isIndependent(true)
         .productIds(Arrays.asList(product))
         .tarificationPeriod(0)
         .build();
@@ -133,6 +134,7 @@ public class ActivationStarted extends ControllerStarter {
       Assertions.assertResponseEquals(event, response);
       List<Product> actualProducts = getResponseProducts(response);
       TestBundle expectedBundle = new BundleBuilder(event)
+          .isIndependent(true)
           .productIds(actualProducts)
           .tarificationPeriod(0)
           .build();

@@ -1,15 +1,14 @@
 package org.qdrin.qfsm.fsm;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineEventResult;
-import org.springframework.statemachine.access.StateMachineAccessor;
 
 import static org.junit.Assert.assertEquals;
 import static org.qdrin.qfsm.Helper.Assertions.*;
+import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
+import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -23,7 +22,7 @@ import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.SpringStarter;
-import org.qdrin.qfsm.tasks.TaskType;
+import org.qdrin.qfsm.tasks.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
@@ -193,12 +192,11 @@ public class PaymentProcessedTest extends SpringStarter {
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .tarificationPeriod(1)
       .pricePeriod(pricePeriod)
-      .machineState(Helper.buildMachineState(expectedStates))
       .build();
     machine = createMachine(bundle);
     
-    List<TaskType> expectedActions = new ArrayList<>();
-    List<TaskType> expectedDeleteActions = Arrays.asList(TaskType.WAITING_PAY_ENDED);
+    TaskPlan expectedTasks = new TaskPlan(machine.getId());
+    expectedTasks.addToRemovePlan(TaskDef.builder().type(TaskType.WAITING_PAY_ENDED).build());
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
@@ -210,14 +208,11 @@ public class PaymentProcessedTest extends SpringStarter {
           .step()
               .sendEvent("payment_processed")
               .expectStates(Helper.stateSuite(expectedStates))
-              .expectVariable("deleteActions", expectedDeleteActions)
-              .expectVariable("actions", expectedActions)
+              .expectVariableWith(testBundleEqualTo(expectedBundle))
+              .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
           .build();
     plan.test();
     releaseMachine(machine.getId());
-    log.debug("states: {}", machine.getState().getIds());
-    assertProductEquals(expectedBundle.drive, bundle.drive);
-    assertProductEquals(expectedBundle.components(), bundle.components());
   }
 }

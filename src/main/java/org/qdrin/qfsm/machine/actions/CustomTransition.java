@@ -22,6 +22,7 @@ public class CustomTransition {
         StateContext<String, String> context
         ) {
     State<String, String> source = context.getSource();
+    State<String, String> target = context.getTarget();
     StateMachine<String, String> machine = context.getStateMachine();
     AbstractState<String, String> mstate = (AbstractState<String, String>) machine.getState();
     
@@ -29,7 +30,7 @@ public class CustomTransition {
     if(source != null && mstate.isComposite()) { 
       Collection<Function<StateContext<String, String>, Mono<Void>>> exitActions = source.getExitActions();
       for(Function<StateContext<String, String>, Mono<Void>> action: exitActions) {
-        log.debug("registerTransition run exitAction: {}", action.getClass().getSimpleName());
+        log.debug("exiting {} run exitAction: {}", source.getId(), action.getClass().getSimpleName());
         action.apply(context).block();
       }
     }

@@ -68,15 +68,12 @@ public class ActivationCompletedTest extends SpringStarter {
     String productId = bundle.drive.getProductId();
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("ACTIVE_TRIAL")
-      .machineState(Helper.buildMachineState("ActiveTrial", "Paid", "PriceActive"))
       .tarificationPeriod(1)
       .pricePeriod(1)
       .trialEndDate(t1)
       .activeEndDate(t1)
       .build();
     machine = createMachine(bundle);
-
-    TaskPlan tasks = machine.getExtendedState().get("tasks", TaskPlan.class);
     
     TaskPlan expectedTasks = new TaskPlan(productId);
     expectedTasks.addToCreatePlan(TaskDef.builder()
@@ -95,17 +92,12 @@ public class ActivationCompletedTest extends SpringStarter {
           .step()
               .sendEvent("activation_completed")
               .expectStates(expectedStates)
-              .expectVariable("tasks")
+              .expectVariableWith(testBundleEqualTo(expectedBundle))
+              .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
           .build();
     plan.test();
     releaseMachine(machine.getId());
-    log.debug("states: {}", machine.getState().getIds());
-    log.debug("createPlan: {}", tasks.getCreatePlan());
-    log.debug("removePlan: {}", tasks.getRemovePlan());
-    assertProductEquals(expectedBundle.drive, bundle.drive);
-    assertProductEquals(expectedBundle.components(), bundle.components());
-    assertTasksEquals(expectedTasks, tasks);
   }
 
   public static Stream<Arguments> testSuccessActive() {
@@ -134,7 +126,6 @@ public class ActivationCompletedTest extends SpringStarter {
     assertEquals(componentOfferIds.size(), bundle.components().size());
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("ACTIVE")
-      .machineState(Helper.buildMachineState("Active", "WaitingPayment", "PriceActive"))
       .tarificationPeriod(0)
       .pricePeriod(1)
       .activeEndDate(t1)
@@ -163,8 +154,6 @@ public class ActivationCompletedTest extends SpringStarter {
     plan.test();
     releaseMachine(machine.getId());
     log.debug("states: {}", machine.getState().getIds());
-    assertProductEquals(expectedBundle.drive, bundle.drive);
-    assertProductEquals(expectedBundle.components(), bundle.components());
   }
 
   public static Stream<Arguments> testSuccessNoNextPayDate() {
@@ -192,18 +181,14 @@ public class ActivationCompletedTest extends SpringStarter {
     assertEquals(componentOfferIds.size(), bundle.components().size());
     String productId = bundle.drive.getProductId();
     String expectedUsage = expectedStatus.equals("ACTIVE") ? "Active" : "ActiveTrial";
-    JsonNode expectedMachineState = Helper.buildMachineState(expectedUsage, "WaitingPayment", "PriceWaiting");
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status(expectedStatus)
-      .machineState(expectedMachineState)
       .tarificationPeriod(0)
       .pricePeriod(0)
       .activeEndDate(null)
       .build();
-    
     machine = createMachine(bundle);
     
-    TaskPlan tasks = machine.getExtendedState().get("tasks", TaskPlan.class);
     OffsetDateTime taskDate = t0.plus(getWaitingPayInterval());
     TaskPlan expectedTasks = new TaskPlan(productId);
     expectedTasks.addToCreatePlan(TaskDef.builder().type(TaskType.WAITING_PAY_ENDED).wakeAt(taskDate).build());
@@ -215,18 +200,15 @@ public class ActivationCompletedTest extends SpringStarter {
           .step()
               .sendEvent("activation_completed")
               .expectStates(Helper.stateSuite(expectedUsage, "WaitingPayment", "PriceWaiting"))
-              .expectVariable("tasks")
+              .expectVariableWith(testBundleEqualTo(expectedBundle))
+              .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
           .build();
     plan.test();
     releaseMachine(machine.getId());
-    log.debug("states: {}", machine.getState().getIds());
-    log.debug("creatPlan: {}", tasks.getCreatePlan());
-    assertProductEquals(expectedBundle.drive, bundle.drive);
-    assertTasksEquals(expectedTasks, tasks);
   }
 
-    @Nested
+  @Nested
   class CustomBundleComponent {
     private static Stream<Arguments> testCustomBundleComponentActivationCompleted() {
       return Stream.of(
@@ -239,8 +221,6 @@ public class ActivationCompletedTest extends SpringStarter {
 
     @ParameterizedTest
     @MethodSource
-    // (strings = {"custom1-price-trial", "custom1-price-active"})
-
     public void testCustomBundleComponentActivationCompleted(String offerId, String priceId,
         String status, List<String> states) throws Exception {
       OffsetDateTime t0 = OffsetDateTime.now();
@@ -251,12 +231,12 @@ public class ActivationCompletedTest extends SpringStarter {
         .productStartDate(t0)
         .status(status)
         .machineState(machineState)
-        .isIndependent(false)
         .build();
 
       TestBundle bundle = new BundleBuilder("component3", null)
         .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
         .tarificationPeriod(0)
+        .isIndependent(true)
         .addBundle(preBundle.bundle)
         .machineState(Helper.buildMachineState("PendingActivate"))
         .build();
@@ -265,12 +245,12 @@ public class ActivationCompletedTest extends SpringStarter {
       // TODO: Добавить анализ на состав бандла
       TestBundle expectedBundle = new BundleBuilder(bundle)
         .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
-        .machineState(null)  // means that leg is merged to bundle
+        .isIndependent(false)  // means leg becomes merged to bundle
         .tarificationPeriod(2)
         .status(status)
-        .isIndependent(false)
         .build();
 
+      TaskPlan expectedTasks = new TaskPlan(product.getProductId());
       machine = createMachine(bundle);
       assertEquals(bundle.bundle.getProductId(), preBundle.bundle.getProductId());
       StateMachineTestPlan<String, String> plan =
@@ -283,16 +263,12 @@ public class ActivationCompletedTest extends SpringStarter {
             .step()
                 .sendEvent("activation_completed")
                 .expectStates(Helper.stateSuite(states.get(0), "PaymentFinal", "PriceFinal"))
-                // .expectStateChanged(1)
+                .expectVariableWith(testBundleEqualTo(expectedBundle))
+                .expectVariableWith(taskPlanEqualTo(expectedTasks))
                 .and()
             .build();
       plan.test();
       releaseMachine(machine.getId());
-      log.debug("states: {}", machine.getState().getIds());
-      assertEquals(status, product.getStatus());
-      Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
-      Helper.Assertions.assertProductEquals(expectedBundle.bundle, bundle.bundle);
-      Helper.Assertions.assertProductEquals(expectedBundle.components(), bundle.components());
     }
 
     private static Stream<Arguments> testCustomBundleComponentActivationRejected() {
@@ -341,11 +317,13 @@ public class ActivationCompletedTest extends SpringStarter {
         .addBundle(preBundle.bundle)
         .machineState(Helper.buildMachineState("PendingActivate"))
         .status("PENDING_ACTIVATE")
+        .isIndependent(true)
         .build();
       log.debug("bundle: {}", bundle);
       Product product = bundle.drive;
       TestBundle expectedBundle = new BundleBuilder(bundle)
         .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
+        .isIndependent(true)
         .tarificationPeriod(0)
         .status("PENDING_ACTIVATE")
         .build();

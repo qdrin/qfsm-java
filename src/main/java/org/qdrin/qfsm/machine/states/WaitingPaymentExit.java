@@ -18,7 +18,7 @@ public class WaitingPaymentExit implements Action<String, String> {
   
   public void execute(StateContext<String, String> context) {
     log.debug("event: {}", context.getEvent());
-    TaskPlan tasks = context.getStateMachine().getExtendedState().get("Tasks", TaskPlan.class);
+    TaskPlan tasks = context.getStateMachine().getExtendedState().get("tasks", TaskPlan.class);
     tasks.addToRemovePlan(TaskDef.builder().type(TaskType.WAITING_PAY_ENDED).build());
   }
 }
