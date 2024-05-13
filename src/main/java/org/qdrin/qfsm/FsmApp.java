@@ -2,14 +2,12 @@ package org.qdrin.qfsm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineEventResult;
@@ -258,8 +256,7 @@ public class FsmApp {
 
 			StateMachine<String, String> machine = service.acquireStateMachine(product, bundle.getBundle(), components);
 			ExtendedState extendedState = machine.getExtendedState();
-			TaskSet tasks = extendedState.get("tasks", TaskSet.class);
-			TaskSet deleteTasks = extendedState.get("deleteTasks", TaskSet.class);
+			TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
 			String eventType = event.getEventType();
 
 			log.debug("machine acquired: {}", machine.getId());
@@ -303,10 +300,10 @@ public class FsmApp {
 			}
 
 			FsmActions fsmActions = new FsmActions();
-			for(TaskDef task: deleteTasks.getTasks()) {
+			for(TaskDef task: tasks.getRemovePlan()) {
 				fsmActions.deleteTask(task);
 			}
-			for(TaskDef task: tasks.getTasks()) {
+			for(TaskDef task: tasks.getCreatePlan()) {
 				fsmActions.createTask(task);
 			}
 			if(productBundle != null && ! productBundle.getProductId().equals(product.getProductId())) {

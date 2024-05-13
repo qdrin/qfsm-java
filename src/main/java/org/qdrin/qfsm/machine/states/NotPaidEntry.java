@@ -18,10 +18,7 @@ public class NotPaidEntry implements Action<String, String> {
   
   public void execute(StateContext<String, String> context) {
     log.debug("event: {}", context.getEvent());
-    TaskSet deleteTasks = context.getStateMachine().getExtendedState().get("deleteTasks", TaskSet.class);
-    deleteTasks.put(TaskDef.builder()
-      .productId(context.getStateMachine().getId())
-      .type(TaskType.PRICE_ENDED)
-      .build());
+    TaskPlan tasks = context.getStateMachine().getExtendedState().get("tasks", TaskPlan.class);
+    tasks.addToRemovePlan(TaskDef.builder().type(TaskType.PRICE_ENDED).build());
   }
 }

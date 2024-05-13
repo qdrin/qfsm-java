@@ -408,17 +408,23 @@ public class Helper {
       }
     }
 
-    public static void assertTasksEquals(TaskSet expected, TaskSet actual, boolean withDates) throws Exception {
-      List<TaskDef> expList = expected.getTasks();
-      List<TaskDef> actList = actual.getTasks();
-      for(TaskDef exp: expList) {
-        List<TaskDef> tasks = actList.stream()
+    public static void assertTasksEquals(TaskPlan expected, TaskPlan actual) throws Exception {
+      List<TaskDef> expListRemove = expected.getRemovePlan();
+      List<TaskDef> actListRemove = actual.getRemovePlan();
+      List<TaskDef> expListCreate = expected.getCreatePlan();
+      List<TaskDef> actListCreate = actual.getCreatePlan();
+      for(TaskDef exp: expListRemove) {
+        List<TaskDef> tasks = actListRemove.stream()
           .filter(a -> a.equals(exp))
           .toList();
-        assertEquals(1, tasks.size(), String.format("expected: %s, found: %d", exp.getType(), tasks.size()));
-        if(withDates) {
-          assertDates(exp.getWakeAt(), tasks.get(0).getWakeAt(), exp.getType().name());
-        }
+        assertEquals(1, tasks.size(), String.format("removePlan expected: %s, found: %d", exp.getType(), tasks.size()));
+      }
+      for(TaskDef exp: expListCreate) {
+        List<TaskDef> tasks = actListCreate.stream()
+          .filter(a -> a.equals(exp))
+          .toList();
+        assertEquals(1, tasks.size(), String.format("removePlan expected: %s, found: %d", exp.getType(), tasks.size()));
+        assertDates(exp.getWakeAt(), tasks.get(0).getWakeAt(), exp.getType().name());
       }
     }
   }

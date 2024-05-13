@@ -6,9 +6,7 @@ import org.springframework.statemachine.action.Action;
 
 import javax.sql.DataSource;
 
-import org.qdrin.qfsm.tasks.TaskDef;
-import org.qdrin.qfsm.tasks.TaskSet;
-import org.qdrin.qfsm.tasks.TaskType;
+import org.qdrin.qfsm.tasks.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,10 +18,7 @@ public class WaitingPaymentExit implements Action<String, String> {
   
   public void execute(StateContext<String, String> context) {
     log.debug("event: {}", context.getEvent());
-    TaskSet deleteTasks = context.getStateMachine().getExtendedState().get("deleteTasks", TaskSet.class);
-    deleteTasks.put(TaskDef.builder()
-      .productId(context.getStateMachine().getId())
-      .type(TaskType.WAITING_PAY_ENDED)
-      .build());
+    TaskPlan tasks = context.getStateMachine().getExtendedState().get("Tasks", TaskPlan.class);
+    tasks.addToRemovePlan(TaskDef.builder().type(TaskType.WAITING_PAY_ENDED).build());
   }
 }

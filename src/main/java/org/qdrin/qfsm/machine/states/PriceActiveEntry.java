@@ -50,9 +50,8 @@ public class PriceActiveEntry implements Action<String, String> {
       }
       log.debug("activeEndDate: {}, trialEndDate: {}, priceEndedBefore: {}",
           product.getActiveEndDate(), product.getTrialEndDate(), priceEndedBefore);
-      TaskSet tasks = extendedState.get("tasks", TaskSet.class);
-      tasks.put(TaskDef.builder()
-        .productId(context.getStateMachine().getId())
+      TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
+      tasks.addToCreatePlan(TaskDef.builder()
         .type(TaskType.PRICE_ENDED)
         .wakeAt(activeEndDate.minus(priceEndedBefore))
         .build()  

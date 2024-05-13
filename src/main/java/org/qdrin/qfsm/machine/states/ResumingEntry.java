@@ -19,10 +19,7 @@ public class ResumingEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
     log.debug("event: {}, message: {}", context.getEvent(), context.getMessage());
-    TaskSet tasks = context.getStateMachine().getExtendedState().get("tasks", TaskSet.class);
-    tasks.put(TaskDef.builder()
-      .productId(context.getStateMachine().getId())
-      .type(TaskType.RESUME_EXTERNAL)
-      .build());
+    TaskPlan tasks = context.getStateMachine().getExtendedState().get("tasks", TaskPlan.class);
+    tasks.addToCreatePlan(TaskDef.builder().type(TaskType.RESUME_EXTERNAL).build());
   }
 }

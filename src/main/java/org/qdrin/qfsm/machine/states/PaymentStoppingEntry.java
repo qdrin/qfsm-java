@@ -18,10 +18,7 @@ public class PaymentStoppingEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
     log.debug("event: {}, message: {}", context.getEvent());
-    TaskSet tasks = context.getStateMachine().getExtendedState().get("tasks", TaskSet.class);
-    tasks.put(TaskDef.builder()
-      .productId(context.getStateMachine().getId())
-      .type(TaskType.DISCONNECT_EXTERNAL_EXTERNAL)
-      .build());
+    TaskPlan tasks = context.getStateMachine().getExtendedState().get("tasks", TaskPlan.class);
+    tasks.addToCreatePlan(TaskDef.builder().type(TaskType.DISCONNECT_EXTERNAL_EXTERNAL).build());
   }
 }

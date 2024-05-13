@@ -21,9 +21,8 @@ public class SuspendedEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
     log.debug("event: {}", context.getEvent());
-    TaskSet tasks = context.getStateMachine().getExtendedState().get("tasks", TaskSet.class);
-    tasks.put(TaskDef.builder()
-      .productId(context.getStateMachine().getId())
+    TaskPlan tasks = context.getStateMachine().getExtendedState().get("tasks", TaskPlan.class);
+    tasks.addToCreatePlan(TaskDef.builder()
       .type(TaskType.SUSPEND_ENDED)
       .wakeAt(OffsetDateTime.now().plusSeconds(30*86400))
       .build()

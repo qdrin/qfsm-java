@@ -28,11 +28,8 @@ public class PriceChangingEntry implements Action<String, String> {
     ProductPrice currentPrice = product.getProductPrice(PriceType.RecurringCharge).get();
     SignalAction paymentProcessed = null;
     if(tPeriod != 0) {
-      TaskSet tasks = extendedState.get("tasks", TaskSet.class);
-      tasks.put(TaskDef.builder()
-        .productId(context.getStateMachine().getId())  
-        .type(TaskType.CHANGE_PRICE)
-        .build());
+      TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
+      tasks.addToCreatePlan(TaskDef.builder().type(TaskType.CHANGE_PRICE).build());
       return;
     } else {
       nextPrice = currentPrice;

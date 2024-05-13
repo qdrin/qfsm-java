@@ -49,19 +49,17 @@ public class PendingDisconnectEntry implements Action<String, String> {
       .withPayload("price_off").build());
     var paymentRes = context.getStateMachine().sendEvent(paymentOff).collectList();
     var priceRes = context.getStateMachine().sendEvent(priceOff).collectList();
-    TaskSet deleteTasks = extendedState.get("deleteTasks", TaskSet.class);
+    TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
     String productId = product.getProductId();
-    deleteTasks.put(TaskDef.builder().productId(productId).type(TaskType.PRICE_ENDED).build());
-    deleteTasks.put(TaskDef.builder().productId(productId).type(TaskType.SUSPEND_ENDED).build());
-    deleteTasks.put(TaskDef.builder().productId(productId).type(TaskType.WAITING_PAY_ENDED).build());
-    deleteTasks.put(TaskDef.builder().productId(productId).type(TaskType.CHANGE_PRICE).build());
-    deleteTasks.put(TaskDef.builder().productId(productId).type(TaskType.RESUME_EXTERNAL).build());
+    tasks.addToRemovePlan(TaskDef.builder().type(TaskType.PRICE_ENDED).build());
+    tasks.addToRemovePlan(TaskDef.builder().type(TaskType.SUSPEND_ENDED).build());
+    tasks.addToRemovePlan(TaskDef.builder().type(TaskType.WAITING_PAY_ENDED).build());
+    tasks.addToRemovePlan(TaskDef.builder().type(TaskType.CHANGE_PRICE).build());
+    tasks.addToRemovePlan(TaskDef.builder().type(TaskType.RESUME_EXTERNAL).build());
 
     // TODO: or characteristic-valued or event characteristic valued
     OffsetDateTime disconnectDate = product.getActiveEndDate();
-    TaskSet tasks = extendedState.get("tasks", TaskSet.class);
-    tasks.put(TaskDef.builder()
-      .productId(productId)
+    tasks.addToCreatePlan(TaskDef.builder()
       .type(TaskType.DISCONNECT)
       .wakeAt(disconnectDate)
       .build()  

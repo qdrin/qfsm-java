@@ -33,10 +33,7 @@ public class PriceChangedEntry implements Action<String, String> {
     currentPrices.removeIf(p -> p.getPriceType().equals(PriceType.RecurringCharge.name()));
     currentPrices.add(nextPrice);
     log.debug("productPrice: {}", product.getProductPrice());
-    TaskSet tasks = extendedState.get("tasks", TaskSet.class);
-    tasks.put(TaskDef.builder()
-      .productId(context.getStateMachine().getId())
-      .type(TaskType.CHANGE_PRICE_EXTERNAL)
-      .build());
+    TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
+    tasks.addToCreatePlan(TaskDef.builder().type(TaskType.CHANGE_PRICE_EXTERNAL).build());
   }
 }

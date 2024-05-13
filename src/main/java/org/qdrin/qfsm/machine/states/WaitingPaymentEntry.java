@@ -3,9 +3,7 @@ package org.qdrin.qfsm.machine.states;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
-import org.qdrin.qfsm.tasks.TaskDef;
-import org.qdrin.qfsm.tasks.TaskSet;
-import org.qdrin.qfsm.tasks.TaskType;
+import org.qdrin.qfsm.tasks.*;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -21,9 +19,8 @@ public class WaitingPaymentEntry implements Action<String, String> {
   @Override
   public void execute(StateContext<String, String> context) {
     log.debug("event: {}", context.getEvent());
-    TaskSet tasks = context.getStateMachine().getExtendedState().get("tasks", TaskSet.class);
-    tasks.put(TaskDef.builder()
-      .productId(context.getStateMachine().getId())
+    TaskPlan tasks = context.getStateMachine().getExtendedState().get("tasks", TaskPlan.class);
+    tasks.addToCreatePlan(TaskDef.builder()
       .type(TaskType.WAITING_PAY_ENDED)
       .wakeAt(OffsetDateTime.now().plus(waitingPayInterval))
       .build()
