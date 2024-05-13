@@ -18,6 +18,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
+import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
+import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
 import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.model.Product;
@@ -93,7 +95,6 @@ public class ActivationCompletedTest extends SpringStarter {
           .step()
               .sendEvent("activation_completed")
               .expectStates(expectedStates)
-              .expectVariable("deleteTasks")
               .expectVariable("tasks")
               .and()
           .build();
@@ -119,6 +120,7 @@ public class ActivationCompletedTest extends SpringStarter {
   public void testSuccessActive(String offerId, String priceId, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
     OffsetDateTime t1 = t0.plusDays(30);
+    OffsetDateTime waitPaymentTime = t0.plus(getWaitingPayInterval());
     String[] expectedStates = Helper.stateSuite("Active", "WaitingPayment", "PriceActive");
 
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
@@ -139,8 +141,10 @@ public class ActivationCompletedTest extends SpringStarter {
       .build();
     machine = createMachine(bundle);
     
-    List<TaskType> expectedActions = Arrays.asList(TaskType.WAITING_PAY_ENDED, TaskType.PRICE_ENDED);
-    List<TaskType> expectedDeleteActions = Arrays.asList();
+    TaskPlan expectedTasks = new TaskPlan(machine.getId());
+    expectedTasks.addToCreatePlan(TaskDef.builder().type(TaskType.WAITING_PAY_ENDED).wakeAt(waitPaymentTime).build());
+    expectedTasks.addToCreatePlan(TaskDef.builder().type(TaskType.PRICE_ENDED).wakeAt(t1.minus(getPriceEndedBefore())).build());
+
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
@@ -152,8 +156,8 @@ public class ActivationCompletedTest extends SpringStarter {
           .step()
               .sendEvent("activation_completed")
               .expectStates(expectedStates)
-              .expectVariable("deleteActions", expectedDeleteActions)
-              .expectVariable("actions", expectedActions)
+              .expectVariableWith(testBundleEqualTo(expectedBundle))
+              .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
           .build();
     plan.test();

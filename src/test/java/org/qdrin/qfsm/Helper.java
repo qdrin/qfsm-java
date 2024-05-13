@@ -217,6 +217,15 @@ public class Helper {
     }
   }
 
+  public static boolean isTasksEquals(TaskPlan expected, TaskPlan actual) {
+    try {
+      Assertions.assertTasksEquals(expected, actual);
+      return true;
+    } catch(Exception e) {
+        return false;
+    }
+  }
+
   public static class Assertions {
 
     public static void assertResponseEquals(RequestEventDto request, ResponseEventDto response) {
