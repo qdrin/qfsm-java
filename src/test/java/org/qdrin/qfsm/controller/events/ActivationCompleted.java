@@ -10,19 +10,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.qdrin.qfsm.EventBuilder;
-import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
-import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.controller.ControllerStarter;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.*;
+import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.statemachine.StateMachine;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import static org.qdrin.qfsm.Helper.Assertions.*;
@@ -54,7 +52,7 @@ public class ActivationCompleted extends ControllerStarter {
   public void activePriceSuccess(String offerId, String priceId, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
     OffsetDateTime t1 = t0.plusDays(30);
-    JsonNode machineState = Helper.buildMachineState("PendingActivate");
+    JsonNode machineState = buildMachineState("PendingActivate");
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds.toArray(new String[0]))
       .status("PENDING_ACTIVATE")
       .machineState(machineState)
@@ -63,7 +61,7 @@ public class ActivationCompleted extends ControllerStarter {
       .save(productRepository)
       .build();
     TestBundle expectedBundle = new BundleBuilder(bundle)
-      .machineState(Helper.buildMachineState("Active", "WaitingPayment", "PriceActive"))
+      .machineState(buildMachineState("Active", "WaitingPayment", "PriceActive"))
       .status("ACTIVE")
       .pricePeriod(1)
       .tarificationPeriod(0)

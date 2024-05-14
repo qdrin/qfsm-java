@@ -126,4 +126,70 @@ public class QStateMachineContextConverter {
     kryo.writeClassAndObject(output, context);
     return output.toBytes();
   }
+
+  public static JsonNode buildMachineState(List<String> states) {
+    return buildMachineState(states.toArray(new String[0]));
+  }
+
+  public static JsonNode buildMachineState(String... states) {
+    JsonNode result;
+    ObjectMapper mapper = new ObjectMapper();
+    ArrayNode provisions = mapper.createArrayNode();
+    JsonNode usage = null;
+    JsonNode payment = null;
+    JsonNode price = null;
+    if(states == null || states.length == 0) {
+      result = mapper.getNodeFactory().textNode("Entry");
+    } else if(states.length == 1) {
+      result = mapper.getNodeFactory().textNode(states[0]);
+    } else {
+      ObjectNode res = mapper.createObjectNode();
+      res.set("Provision", provisions);
+      result = res;
+      for(String s: states) {
+        switch(s) {
+          case "PendingDisconnect":
+          case "Disconnection":
+          case "UsageFinal":
+            usage = mapper.getNodeFactory().textNode(s);
+            break;
+          case "PaymentStopping":
+          case "PaymentStopped":
+          case "PaymentFinal":
+            payment = mapper.getNodeFactory().textNode(s);
+            break;
+          case "PriceOff":
+          case "PriceFinal":
+            price = mapper.getNodeFactory().textNode(s);
+            break;
+          case "Prolongation":
+          case "Suspending":
+          case "Resuming":
+          case "Suspended":
+            usage = mapper.createObjectNode().put("UsageOn", s);
+            break;
+          case "Active":
+          case "ActiveTrial":
+            usage = mapper.createObjectNode().set("UsageOn", mapper.createObjectNode().put("Activated", s));
+            break;
+          case "Paid":
+          case "WaitingPayment":
+          case "NotPaid":
+            payment = mapper.createObjectNode().put("PaymentOn", s);
+            break;
+          case "PriceActive":
+          case "PriceChanging":
+          case "PriceChanged":
+          case "PriceNotChanged":
+          case "PriceWaiting":
+            price = mapper.createObjectNode().put("PriceOn", s);
+            break;
+          default:
+            result = mapper.getNodeFactory().textNode(states[0]);
+        }
+      }
+      provisions.add(usage).add(payment).add(price);
+    }  
+    return result;
+  }
 }

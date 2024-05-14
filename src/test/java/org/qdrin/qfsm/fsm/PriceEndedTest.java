@@ -1,18 +1,13 @@
 package org.qdrin.qfsm.fsm;
 
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.state.RegionState;
-import org.springframework.statemachine.support.AbstractStateMachine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.qdrin.qfsm.Helper.Assertions.*;
-
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,15 +18,11 @@ import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
 import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
-import org.qdrin.qfsm.ProductClass;
+import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.qdrin.qfsm.SpringStarter;
-import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.tasks.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
-import org.springframework.statemachine.transition.Transition;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,7 +59,7 @@ public class PriceEndedTest extends SpringStarter {
     String[] expectedStates = {usageState, "WaitingPayment", "PriceChanging"};
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .status(status)
-      .machineState(Helper.buildMachineState(initialStates))
+      .machineState(buildMachineState(initialStates))
       .productStartDate(tstart)
       .priceNextPayDate(t0.plus(getPriceEndedBefore()))
       .pricePeriod(1)
@@ -125,7 +116,7 @@ public class PriceEndedTest extends SpringStarter {
     String [] initialStates = {usageState, "Paid", priceState};
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .status(status)
-      .machineState(Helper.buildMachineState(initialStates))
+      .machineState(buildMachineState(initialStates))
       .productStartDate(tstart)
       .priceNextPayDate(t0.plus(getPriceEndedBefore()))
       .pricePeriod(1)

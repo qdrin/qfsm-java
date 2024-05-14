@@ -20,9 +20,11 @@ import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
 import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
+import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.service.QStateMachineContextConverter;
 import org.qdrin.qfsm.tasks.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
@@ -58,7 +60,7 @@ public class ActivationCompletedTest extends SpringStarter {
     String[] expectedStates = Helper.stateSuite("ActiveTrial", "Paid", "PriceActive");
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .status("PENDING_ACTIVATE")
-      .machineState(Helper.buildMachineState("PendingActivate"))
+      .machineState(buildMachineState("PendingActivate"))
       .productStartDate(t0)
       .priceNextPayDate(t1)
       .pricePeriod(0)
@@ -117,7 +119,7 @@ public class ActivationCompletedTest extends SpringStarter {
 
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .status("PENDING_ACTIVATE")
-      .machineState(Helper.buildMachineState("PendingActivate"))
+      .machineState(buildMachineState("PendingActivate"))
       .productStartDate(t0)
       .priceNextPayDate(t1)
       .pricePeriod(0)
@@ -176,7 +178,7 @@ public class ActivationCompletedTest extends SpringStarter {
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .tarificationPeriod(0)
       .status("PENDING_ACTIVATE")
-      .machineState(Helper.buildMachineState("PendingActivate"))
+      .machineState(buildMachineState("PendingActivate"))
       .build();
     assertEquals(componentOfferIds.size(), bundle.components().size());
     String productId = bundle.drive.getProductId();
@@ -224,7 +226,7 @@ public class ActivationCompletedTest extends SpringStarter {
     public void testCustomBundleComponentActivationCompleted(String offerId, String priceId,
         String status, List<String> states) throws Exception {
       OffsetDateTime t0 = OffsetDateTime.now();
-      JsonNode machineState = Helper.buildMachineState(states.toArray(new String[0]));
+      JsonNode machineState = buildMachineState(states.toArray(new String[0]));
       TestBundle preBundle = new BundleBuilder("customBundleOffer1", priceId,
         "component1", "component2")
         .tarificationPeriod(2)
@@ -238,7 +240,7 @@ public class ActivationCompletedTest extends SpringStarter {
         .tarificationPeriod(0)
         .isIndependent(true)
         .addBundle(preBundle.bundle)
-        .machineState(Helper.buildMachineState("PendingActivate"))
+        .machineState(buildMachineState("PendingActivate"))
         .build();
       log.debug("bundle: {}", bundle);
       Product product = bundle.drive;
@@ -302,7 +304,7 @@ public class ActivationCompletedTest extends SpringStarter {
     public void testCustomBundleComponentActivationRejected(String offerId, String priceId,
         String status, List<String> states) throws Exception {
       OffsetDateTime t0 = OffsetDateTime.now();
-      JsonNode machineState = Helper.buildMachineState(states.toArray(new String[0]));
+      JsonNode machineState = buildMachineState(states.toArray(new String[0]));
       TestBundle preBundle = new BundleBuilder("customBundleOffer1", priceId,
         "component1", "component2")
         .tarificationPeriod(2)
@@ -315,7 +317,7 @@ public class ActivationCompletedTest extends SpringStarter {
         .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
         .tarificationPeriod(0)
         .addBundle(preBundle.bundle)
-        .machineState(Helper.buildMachineState("PendingActivate"))
+        .machineState(buildMachineState("PendingActivate"))
         .status("PENDING_ACTIVATE")
         .isIndependent(true)
         .build();

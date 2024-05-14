@@ -13,6 +13,7 @@ import org.qdrin.qfsm.TestOffers.OfferDef;
 import org.qdrin.qfsm.controller.ControllerStarter;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.*;
+import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -47,7 +48,7 @@ public class ActivationAborted extends ControllerStarter {
       OfferDef offerDef = Helper.testOffers.getOffers().get(offerId);
 
       OffsetDateTime t0 = OffsetDateTime.now();
-      JsonNode machineState = Helper.buildMachineState("PendingActivate");
+      JsonNode machineState = buildMachineState("PendingActivate");
       TestBundle bundle = new BundleBuilder(offerId, priceId)
         .machineState(machineState)
         .tarificationPeriod(0)
@@ -71,7 +72,7 @@ public class ActivationAborted extends ControllerStarter {
       Product product = getProduct(resultProducts.get(0).getProductId());
       TestBundle expectedBundle = new BundleBuilder(bundle)
         .productIds(Arrays.asList(product))
-        .machineState(Helper.buildMachineState("Aborted"))
+        .machineState(buildMachineState("Aborted"))
         .status("ABORTED")
         .tarificationPeriod(0)
         .build();

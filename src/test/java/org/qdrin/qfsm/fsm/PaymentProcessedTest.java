@@ -9,6 +9,7 @@ import static org.junit.Assert.assertEquals;
 import static org.qdrin.qfsm.Helper.Assertions.*;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
 import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
+import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -56,7 +57,7 @@ public class PaymentProcessedTest extends SpringStarter {
   @MethodSource
   public void testDeferredAtPendingActivate(String offerId, String priceId, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
-    JsonNode machineState = Helper.buildMachineState("PendingActivate");
+    JsonNode machineState = buildMachineState("PendingActivate");
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .status("PENDING_ACTIVATE")
       .productStartDate(t0)
@@ -108,7 +109,7 @@ public class PaymentProcessedTest extends SpringStarter {
   @MethodSource
   public void testFirstTrialPrice(String offerId, String priceId, List<String> states, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
-    JsonNode machineState = Helper.buildMachineState(states);
+    JsonNode machineState = buildMachineState(states);
     List<String> expectedStates = new ArrayList<>(states);
     expectedStates.set(1, "Paid");
 
@@ -174,7 +175,7 @@ public class PaymentProcessedTest extends SpringStarter {
   @MethodSource
   public void testFirstActivePrice(String offerId, String priceId, List<String> states, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
-    JsonNode machineState = Helper.buildMachineState(states);
+    JsonNode machineState = buildMachineState(states);
     List<String> expectedStates = new ArrayList<>(states);
     expectedStates.set(1, "Paid");
     int pricePeriod = states.contains("PriceActive") ? 1 : 0;

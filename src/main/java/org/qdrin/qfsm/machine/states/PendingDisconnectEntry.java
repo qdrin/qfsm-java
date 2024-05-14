@@ -7,11 +7,14 @@ import org.qdrin.qfsm.model.MachineContext;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductCharacteristic;
 import org.qdrin.qfsm.tasks.*;
+import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -70,11 +73,12 @@ public class PendingDisconnectEntry implements Action<String, String> {
     - делаем их независимыми
     - Выставляем им machineState*/
     List<Product> components = (List<Product>) extendedState.getVariables().get("components");
+    JsonNode machineState = buildMachineState("PendingDisconnect", "PaymentFinal", "PriceFinal");
     for(Product component: components) {
       MachineContext machineContext = component.getMachineContext();
       if(machineContext.getIsIndependent()) continue;
       machineContext.setIsIndependent(true);
-      machineContext.setMachineState("PendingActivate");
+      machineContext.setMachineState(machineState);
       tasks.addToCreatePlan(TaskDef.builder()
         .productId(component.getProductId())
         .type(TaskType.DISCONNECT)

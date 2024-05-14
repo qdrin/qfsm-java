@@ -3,7 +3,6 @@ package org.qdrin.qfsm.fsm;
 import org.springframework.statemachine.StateMachine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.qdrin.qfsm.Helper.Assertions.*;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
 import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
 
@@ -22,6 +21,7 @@ import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.SpringStarter;
+import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.qdrin.qfsm.tasks.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
@@ -70,7 +70,7 @@ public class WaitingPayEndedTest extends SpringStarter {
   @MethodSource
   public void testFirstActivePrice(String offerId, String priceId, List<String> states, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
-    JsonNode machineState = Helper.buildMachineState(states);
+    JsonNode machineState = buildMachineState(states);
     List<String> expectedStates = new ArrayList<>(states);
     expectedStates = Arrays.asList("Suspending", "NotPaid", expectedStates.get(2));
     int pricePeriod = states.contains("PriceActive") ? 1 : 0;
@@ -88,7 +88,7 @@ public class WaitingPayEndedTest extends SpringStarter {
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .tarificationPeriod(0)
       .pricePeriod(0)
-      .machineState(Helper.buildMachineState(expectedStates))
+      .machineState(buildMachineState(expectedStates))
       .build();
     machine = createMachine(bundle);
     Map<Object, Object> variables = machine.getExtendedState().getVariables();

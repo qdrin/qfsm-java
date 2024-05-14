@@ -4,11 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
-import org.springframework.statemachine.access.StateMachineAccess;
 
 import static org.junit.Assert.*;
-
-import java.util.function.Consumer;
 
 import java.util.Arrays;
 
@@ -19,6 +16,7 @@ import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.service.QStateMachineContextConverter;
+import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
@@ -131,7 +129,7 @@ public class ContextConverterTest extends SpringStarter {
 
   @Test
   public void testOrthogonalStateSetMachineStateBuilder() throws Exception {
-    JsonNode machineState = Helper.buildMachineState("Prolongation", "Paid", "PriceActive");
+    JsonNode machineState = buildMachineState("Prolongation", "Paid", "PriceActive");
     TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active").build();
     bundle.drive.getMachineContext().setMachineState(machineState);
     machine = createMachine(bundle);
@@ -153,7 +151,7 @@ public class ContextConverterTest extends SpringStarter {
   @Test
   public void testMachineStateSequence() throws Exception {
     TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active")
-      .machineState(Helper.buildMachineState("Prolongation", "Paid", "PriceActive"))
+      .machineState(buildMachineState("Prolongation", "Paid", "PriceActive"))
       .build();
     machine = createMachine(bundle);
     assertEquals("Provision", machine.getState().getId());

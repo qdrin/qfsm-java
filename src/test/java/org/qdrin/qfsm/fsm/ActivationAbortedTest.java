@@ -3,7 +3,6 @@ package org.qdrin.qfsm.fsm;
 import org.springframework.statemachine.StateMachine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.qdrin.qfsm.Helper.buildMachineState;
 import static org.qdrin.qfsm.Helper.Assertions.*;
 
 import java.time.OffsetDateTime;
@@ -22,6 +21,7 @@ import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.model.*;
+import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
@@ -62,13 +62,13 @@ public class ActivationAbortedTest extends SpringStarter {
       .productStartDate(t0)
       .tarificationPeriod(0)
       .status("PENDING_ACTIVATE")
-      .machineState(Helper.buildMachineState("PendingActivate"))
+      .machineState(buildMachineState("PendingActivate"))
       .pricePeriod(0)
       .priceNextPayDate(t1)
       .build();
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("ABORTED")
-      .machineState(Helper.buildMachineState("Aborted"))
+      .machineState(buildMachineState("Aborted"))
       .tarificationPeriod(0)
       .pricePeriod(0)
       .build();
@@ -108,7 +108,7 @@ public class ActivationAbortedTest extends SpringStarter {
         .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
         .tarificationPeriod(0)
         .addBundle(preBundle.bundle)
-        .machineState(Helper.buildMachineState("PendingActivate"))
+        .machineState(buildMachineState("PendingActivate"))
         .build();
       log.debug("bundle: {}", bundle);
       Product product = bundle.drive;
@@ -117,7 +117,7 @@ public class ActivationAbortedTest extends SpringStarter {
         .tarificationPeriod(0)
         .productStartDate(t0)
         .status("ABORTED")
-        .machineState(Helper.buildMachineState("Aborted"))
+        .machineState(buildMachineState("Aborted"))
         .build();
       machine = createMachine(bundle);
       assertEquals(bundle.bundle.getProductId(), preBundle.bundle.getProductId());

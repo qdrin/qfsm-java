@@ -1,18 +1,14 @@
 package org.qdrin.qfsm.fsm;
 
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.state.RegionState;
-import org.springframework.statemachine.support.AbstractStateMachine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.qdrin.qfsm.Helper.Assertions.*;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,6 +20,7 @@ import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.Helper;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
 import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
+import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.tasks.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
@@ -46,11 +43,7 @@ public class DeactivationStartedTest extends SpringStarter {
   public static Stream<Arguments> testPostponed() {
     List<String> components = Arrays.asList("component1", "component2", "component3");
     List<String> empty = new ArrayList<>();
-    List<List<String>> possibleStates = Arrays.asList(
-      Arrays.asList("ActiveTrial", "Paid", "PriceActive"),
-      Arrays.asList("Prolongation", "Paid", "PriceActive"),
-      Arrays.asList("Resuming", "Paid", "PriceActive")
-    );
+
     return Stream.of(
       Arguments.of("simpleOffer1", "simple1-price-trial",
         Arrays.asList("ActiveTrial", "Paid", "PriceActive"), empty),
@@ -58,10 +51,12 @@ public class DeactivationStartedTest extends SpringStarter {
         Arrays.asList("Active", "Paid", "PriceActive"), empty),
       Arguments.of("bundleOffer1", "bundle1-price-trial",
         Arrays.asList("ActiveTrial", "Paid", "PriceActive"), components),
-      Arguments.of("bundleOffer1", "bundle1-price-active", components),
+      Arguments.of("bundleOffer1", "bundle1-price-active", 
+        Arrays.asList("Active", "Paid", "PriceActive"), components),
       Arguments.of("customBundleOffer1", "custom1-price-trial",
-        Arrays.asList("ActiveTrial", "Paid", "PriceActive"), 
-      Arguments.of("customBundleOffer1", "custom1-price-active", components)),
+        Arrays.asList("ActiveTrial", "Paid", "PriceActive"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-active", 
+        Arrays.asList("Active", "Paid", "PriceActive"), components),
 
       Arguments.of("simpleOffer1", "simple1-price-trial",
         Arrays.asList("Prolongation", "Paid", "PriceActive"), empty),
@@ -69,10 +64,12 @@ public class DeactivationStartedTest extends SpringStarter {
         Arrays.asList("Prolongation", "Paid", "PriceActive"), empty),
       Arguments.of("bundleOffer1", "bundle1-price-trial",
         Arrays.asList("Prolongation", "Paid", "PriceActive"), components),
-      Arguments.of("bundleOffer1", "bundle1-price-active", components),
+      Arguments.of("bundleOffer1", "bundle1-price-active", 
+        Arrays.asList("Prolongation", "Paid", "PriceActive"), components),
       Arguments.of("customBundleOffer1", "custom1-price-trial",
-        Arrays.asList("Prolongation", "Paid", "PriceActive"), 
-      Arguments.of("customBundleOffer1", "custom1-price-active", components)),
+        Arrays.asList("Prolongation", "Paid", "PriceActive"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-active", 
+        Arrays.asList("Prolongation", "Paid", "PriceActive"), components),
 
       Arguments.of("simpleOffer1", "simple1-price-trial",
         Arrays.asList("Resuming", "Paid", "PriceActive"), empty),
@@ -80,10 +77,12 @@ public class DeactivationStartedTest extends SpringStarter {
         Arrays.asList("Resuming", "Paid", "PriceActive"), empty),
       Arguments.of("bundleOffer1", "bundle1-price-trial",
         Arrays.asList("Resuming", "Paid", "PriceActive"), components),
-      Arguments.of("bundleOffer1", "bundle1-price-active", components),
+      Arguments.of("bundleOffer1", "bundle1-price-active", 
+        Arrays.asList("Resuming", "Paid", "PriceActive"), components),
       Arguments.of("customBundleOffer1", "custom1-price-trial",
-        Arrays.asList("Resuming", "Paid", "PriceActive"), 
-      Arguments.of("customBundleOffer1", "custom1-price-active", components))
+        Arrays.asList("Resuming", "Paid", "PriceActive"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-active", 
+        Arrays.asList("Resuming", "Paid", "PriceActive"), components)
       );
   }
   @ParameterizedTest
@@ -96,7 +95,7 @@ public class DeactivationStartedTest extends SpringStarter {
     String status = states.get(0).equals("ActiveTrial") ? "ACTIVE_TRIAL" : "ACTIVE";
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .status(status)
-      .machineState(Helper.buildMachineState(states))
+      .machineState(buildMachineState(states))
       .productStartDate(tstart)
       .activeEndDate(t1)
       .pricePeriod(1)

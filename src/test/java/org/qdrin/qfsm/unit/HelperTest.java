@@ -13,8 +13,8 @@ import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
+import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.qdrin.qfsm.EventBuilder;
-import org.qdrin.qfsm.Helper;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -100,7 +100,7 @@ public class HelperTest {
     public void testBuildMachineStateInitial() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         TextNode expected = mapper.getNodeFactory().textNode("Entry");
-        JsonNode machineState = Helper.buildMachineState();
+        JsonNode machineState = buildMachineState();
         System.out.println(String.format("machineState: %s", machineState));
         System.out.println(String.format("expected: %s", expected));
         JSONAssert.assertEquals(expected.toString(), machineState.toString(), false);
@@ -115,7 +115,7 @@ public class HelperTest {
                 mapper.createObjectNode().set("UsageOn", mapper.createObjectNode().put("Activated", "ActiveTrial")))
                 .add(mapper.createObjectNode().put("PaymentOn", "Paid"))
                 .add(mapper.createObjectNode().put("PriceOn", "PriceActive"));
-        JsonNode machineState = Helper.buildMachineState("ActiveTrial", "Paid", "PriceActive");
+        JsonNode machineState = buildMachineState("ActiveTrial", "Paid", "PriceActive");
         expected.set("Provision", provisions);
         log.debug("machineState: {}", machineState);
         log.debug("expected: {}", expected);
