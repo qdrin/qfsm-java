@@ -1,5 +1,7 @@
 package org.qdrin.qfsm.machine.states;
 
+import java.time.OffsetDateTime;
+
 import javax.sql.DataSource;
 
 import org.qdrin.qfsm.PriceType;
@@ -26,6 +28,7 @@ public class SuspendingEntry implements Action<String, String> {
     ExtendedState extendedState = context.getStateMachine().getExtendedState();
     Product product = extendedState.get("product", Product.class);
     ProductPrice price = product.getProductPrice(PriceType.RecurringCharge).get();
+    product.setActiveEndDate(OffsetDateTime.now());
     price.setPeriod(0);
     log.debug("productPrice: {}", price);
     TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
