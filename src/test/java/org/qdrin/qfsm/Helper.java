@@ -422,6 +422,8 @@ public class Helper {
       List<TaskDef> actListRemove = actual.getRemovePlan();
       List<TaskDef> expListCreate = expected.getCreatePlan();
       List<TaskDef> actListCreate = actual.getCreatePlan();
+      assertEquals(expListRemove.size(), actListRemove.size(), "size of removePlan");
+      assertEquals(expListCreate.size(), actListCreate.size(), "size of createPlan");
       for(TaskDef exp: expListRemove) {
         List<TaskDef> tasks = actListRemove.stream()
           .filter(a -> a.equals(exp))

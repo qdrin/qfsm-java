@@ -3,6 +3,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.qdrin.qfsm.model.MachineContext;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductCharacteristic;
 import org.qdrin.qfsm.tasks.*;
@@ -64,6 +65,23 @@ public class PendingDisconnectEntry implements Action<String, String> {
       .wakeAt(disconnectDate)
       .build()  
     );
+    /* Для всех зависимых ножек мы
+    - добавляем таск на disconnect
+    - делаем их независимыми
+    - Выставляем им machineState*/
+    List<Product> components = (List<Product>) extendedState.getVariables().get("components");
+    for(Product component: components) {
+      MachineContext machineContext = component.getMachineContext();
+      if(machineContext.getIsIndependent()) continue;
+      machineContext.setIsIndependent(true);
+      machineContext.setMachineState("PendingActivate");
+      tasks.addToCreatePlan(TaskDef.builder()
+        .productId(component.getProductId())
+        .type(TaskType.DISCONNECT)
+        .wakeAt(disconnectDate)
+        .build()
+        );
+    }
     paymentRes.block();
     priceRes.block();
   }
