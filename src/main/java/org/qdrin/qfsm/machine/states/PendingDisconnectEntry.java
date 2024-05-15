@@ -63,6 +63,7 @@ public class PendingDisconnectEntry implements Action<String, String> {
 
     // TODO: or characteristic-valued or event characteristic valued
     OffsetDateTime disconnectDate = product.getActiveEndDate();
+    product.setActiveEndDate(disconnectDate);
     tasks.addToCreatePlan(TaskDef.builder()
       .type(TaskType.DISCONNECT)
       .wakeAt(disconnectDate)
@@ -76,15 +77,19 @@ public class PendingDisconnectEntry implements Action<String, String> {
     JsonNode machineState = buildMachineState("PendingDisconnect", "PaymentFinal", "PriceFinal");
     for(Product component: components) {
       MachineContext machineContext = component.getMachineContext();
-      if(machineContext.getIsIndependent()) continue;
-      machineContext.setIsIndependent(true);
-      machineContext.setMachineState(machineState);
-      tasks.addToCreatePlan(TaskDef.builder()
-        .productId(component.getProductId())
-        .type(TaskType.DISCONNECT)
-        .wakeAt(disconnectDate)
-        .build()
-        );
+      if(! machineContext.getIsIndependent()) {
+        component.setActiveEndDate(disconnectDate);
+        machineContext.setIsIndependent(true);
+        machineContext.setMachineState(machineState);
+        tasks.addToCreatePlan(TaskDef.builder()
+          .productId(component.getProductId())
+          .type(TaskType.DISCONNECT)
+          .wakeAt(disconnectDate)
+          .build()
+          );
+      } else {
+        tasks.addToCreatePlan(TaskDef.builder().productId(component.getProductId()).type(TaskType.ABORT).build());
+      }
     }
     paymentRes.block();
     priceRes.block();

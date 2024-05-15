@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 
 public enum TaskType {
   // tasks
+  ABORT,
   PRICE_ENDED,
   CHANGE_PRICE,
   DISCONNECT,
@@ -15,12 +16,7 @@ public enum TaskType {
   RESUME_EXTERNAL,
   CHANGE_PRICE_EXTERNAL,
   DISCONNECT_EXTERNAL,
-  DISCONNECT_EXTERNAL_EXTERNAL,
-
-  // bundle convertions
-  CREATE_CONTEXT,   // создать контекст у "ноги" и ждать по ней событий
-  COPY_CONTEXT,     // Скопировать контекст с "головы" бандла (в части Usage, Payment и Price - ???)
-  REMOVE_CONTEXT;   // удалить контекст у "ноги"
+  DISCONNECT_EXTERNAL_EXTERNAL;
 
   private OffsetDateTime wakeAt = OffsetDateTime.now();
 

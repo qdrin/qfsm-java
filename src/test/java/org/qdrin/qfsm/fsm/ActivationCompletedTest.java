@@ -210,69 +210,8 @@ public class ActivationCompletedTest extends SpringStarter {
     releaseMachine(machine.getId());
   }
 
-  public static Stream<Arguments> testSuccessWithCustomComponentIndependent() {
-    return Stream.of(
-      Arguments.of("custom1-price-trial", Arrays.asList("component1", "component2"), "component3"),
-      Arguments.of("custom1-price-active", Arrays.asList("component1", "component2"), "component3")
-    );
-  }
-  @ParameterizedTest
-  @MethodSource
-  public void testSuccessWithCustomComponentIndependent(String priceId, List<String> componentOfferIds, String independentOfferId) throws Exception {
-    String offerId = "customBundleOffer1";
-    List<String> fullComponentOffers = new ArrayList<>(componentOfferIds);
-    fullComponentOffers.add(independentOfferId);
-    OffsetDateTime t0 = OffsetDateTime.now().minusSeconds(30);
-    OffsetDateTime t1 = t0.plusDays(30);
-    OffsetDateTime waitPaymentTime = t0.plus(getWaitingPayInterval());
-
-    TestBundle bundle = new BundleBuilder(offerId, priceId, fullComponentOffers)
-      .status("PENDING_ACTIVATE")
-      .machineState(buildMachineState("PendingActivate"))
-      .productStartDate(t0)
-      .priceNextPayDate(t1)
-      .pricePeriod(0)
-      .tarificationPeriod(0)
-      .build();
-    assertEquals(componentOfferIds.size()+1, bundle.components().size());
-    String status = priceId.contains("trial") ? "ACTIVE_TRIAL" : "ACTIVE";
-    Product independent = bundle.getByOfferId(independentOfferId);
-    independent.getMachineContext().setIsIndependent(true);
-    independent.setProductStartDate(t0.plusSeconds(30));
-    independent.getMachineContext().setMachineState(buildMachineState("PendingActivate"));
-
-    TestBundle expectedBundle = new BundleBuilder(bundle)
-      .status(status)
-      .pricePeriod(1)
-      .tarificationPeriod(-1)
-      .activeEndDate(t1)
-      .build();
-    independent = expectedBundle.getByOfferId(independentOfferId);
-    // Leg is independent yet and its parameters must stay unchanged
-    independent.setActiveEndDate(null);
-    independent.setStatus("PENDING_ACTIVATE");
-    machine = createMachine(bundle);
-    
-    StateMachineTestPlan<String, String> plan =
-        StateMachineTestPlanBuilder.<String, String>builder()
-          .defaultAwaitTime(2)
-          .stateMachine(machine)
-          .step()
-              .expectState("PendingActivate")
-              .and()
-          .step()
-              .sendEvent("activation_completed")
-              .expectVariableWith(testBundleEqualTo(expectedBundle))
-              .and()
-          .build();
-    plan.test();
-    releaseMachine(machine.getId());
-    assertEquals(null, bundle.getByOfferId(independentOfferId).getActiveEndDate());
-    log.debug("states: {}", machine.getState().getIds());
-  }
-
   @Nested
-  class CustomBundleComponent {
+  class CustomBundle {
     private static Stream<Arguments> testCustomBundleComponentActivationCompleted() {
       return Stream.of(
         Arguments.of("customOffer1", "custom1-price-trial",
@@ -414,6 +353,66 @@ public class ActivationCompletedTest extends SpringStarter {
       Helper.Assertions.assertProductEquals(expectedBundle.drive, product);
       Helper.Assertions.assertProductEquals(expectedBundle.bundle, bundle.bundle);
       Helper.Assertions.assertProductEquals(expectedBundle.components(), bundle.components());
+    }
+
+    public static Stream<Arguments> testBundleActivationWithCustomComponentIndependent() {
+      return Stream.of(
+        Arguments.of("custom1-price-trial", Arrays.asList("component1", "component2", "component3"), "component3"),
+        Arguments.of("custom1-price-active", Arrays.asList("component1", "component2", "component3"), "component3")
+      );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    public void testBundleActivationWithCustomComponentIndependent(String priceId, List<String> componentOfferIds, String independentOfferId) throws Exception {
+      String offerId = "customBundleOffer1";
+      OffsetDateTime t0 = OffsetDateTime.now().minusSeconds(30);
+      OffsetDateTime t1 = t0.plusDays(30);
+      OffsetDateTime waitPaymentTime = t0.plus(getWaitingPayInterval());
+  
+      TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
+        .status("PENDING_ACTIVATE")
+        .machineState(buildMachineState("PendingActivate"))
+        .productStartDate(t0)
+        .priceNextPayDate(t1)
+        .pricePeriod(0)
+        .tarificationPeriod(0)
+        .build();
+      assertEquals(componentOfferIds.size(), bundle.components().size());
+      String status = priceId.contains("trial") ? "ACTIVE_TRIAL" : "ACTIVE";
+      Product independent = bundle.getByOfferId(independentOfferId);
+      independent.getMachineContext().setIsIndependent(true);
+      independent.setProductStartDate(t0.plusSeconds(30));
+      independent.getMachineContext().setMachineState(buildMachineState("PendingActivate"));
+  
+      TestBundle expectedBundle = new BundleBuilder(bundle)
+        .status(status)
+        .pricePeriod(1)
+        .tarificationPeriod(-1)
+        .activeEndDate(t1)
+        .build();
+      independent = expectedBundle.getByOfferId(independentOfferId);
+      // Leg is independent yet and its parameters must stay unchanged
+      independent.setActiveEndDate(null);
+      independent.setStatus("PENDING_ACTIVATE");
+      machine = createMachine(bundle);
+      
+      StateMachineTestPlan<String, String> plan =
+          StateMachineTestPlanBuilder.<String, String>builder()
+            .defaultAwaitTime(2)
+            .stateMachine(machine)
+            .step()
+                .expectState("PendingActivate")
+                .and()
+            .step()
+                .sendEvent("activation_completed")
+                .expectVariableWith(testBundleEqualTo(expectedBundle))
+                .and()
+            .build();
+      plan.test();
+      releaseMachine(machine.getId());
+      assertEquals(null, bundle.getByOfferId(independentOfferId).getActiveEndDate());
+      log.debug("states: {}", machine.getState().getIds());
     }
   }
 }
