@@ -1,5 +1,7 @@
 package org.qdrin.qfsm.fsm;
 
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,13 +18,16 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
+import org.qdrin.qfsm.model.Characteristic;
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.model.ProductCharacteristic;
 import org.qdrin.qfsm.Helper;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
 import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
 import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.tasks.*;
+import org.qdrin.qfsm.utils.DisconnectModeCalculator.DisconnectMode;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 
@@ -31,6 +36,10 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DeactivationStartedTest extends SpringStarter {
+
+  private static final String productTrialCharName = "TrialDeactivationMode";
+  private static final String productActiveCharName = "ActiveDeactivationMode";
+  private static final String eventCharName = "deactivationMode";
 
   StateMachine<String, String> machine = null;
   
@@ -59,74 +68,153 @@ public class DeactivationStartedTest extends SpringStarter {
     return tasks;
   }
 
-  public static Stream<Arguments> testPostponed() {
+  public static Stream<Arguments> postponedableData() {
     List<String> components = Arrays.asList("component1", "component2", "component3");
     List<String> empty = new ArrayList<>();
 
+    List<String> trial = Arrays.asList("ActiveTrial", "Paid", "PriceActive");
+    List<String> active = Arrays.asList("Active", "Paid", "PriceActive");
+    List<String> prolongation = Arrays.asList("Prolongation", "Paid", "PriceActive");
+    List<String> resuming = Arrays.asList("Resuming", "Paid", "PriceActive");
+
     return Stream.of(
-      Arguments.of("simpleOffer1", "simple1-price-trial",
-        Arrays.asList("ActiveTrial", "Paid", "PriceActive"), empty),
-      Arguments.of("simpleOffer1", "simple1-price-active",
-        Arrays.asList("Active", "Paid", "PriceActive"), empty),
-      Arguments.of("bundleOffer1", "bundle1-price-trial",
-        Arrays.asList("ActiveTrial", "Paid", "PriceActive"), components),
-      Arguments.of("bundleOffer1", "bundle1-price-active", 
-        Arrays.asList("Active", "Paid", "PriceActive"), components),
-      Arguments.of("customBundleOffer1", "custom1-price-trial",
-        Arrays.asList("ActiveTrial", "Paid", "PriceActive"), components),
-      Arguments.of("customBundleOffer1", "custom1-price-active", 
-        Arrays.asList("Active", "Paid", "PriceActive"), components),
+      Arguments.of("simpleOffer1", "simple1-price-trial", trial, empty, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("simpleOffer1", "simple1-price-active", active, empty, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", trial, components, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("bundleOffer1", "bundle1-price-active", active, components, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", trial, components, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("customBundleOffer1", "custom1-price-active", active, components, DisconnectMode.POSTPONED, null, null),
 
-      Arguments.of("simpleOffer1", "simple1-price-trial",
-        Arrays.asList("Prolongation", "Paid", "PriceActive"), empty),
-      Arguments.of("simpleOffer1", "simple1-price-active",
-        Arrays.asList("Prolongation", "Paid", "PriceActive"), empty),
-      Arguments.of("bundleOffer1", "bundle1-price-trial",
-        Arrays.asList("Prolongation", "Paid", "PriceActive"), components),
-      Arguments.of("bundleOffer1", "bundle1-price-active", 
-        Arrays.asList("Prolongation", "Paid", "PriceActive"), components),
-      Arguments.of("customBundleOffer1", "custom1-price-trial",
-        Arrays.asList("Prolongation", "Paid", "PriceActive"), components),
-      Arguments.of("customBundleOffer1", "custom1-price-active", 
-        Arrays.asList("Prolongation", "Paid", "PriceActive"), components),
+      Arguments.of("simpleOffer1", "simple1-price-trial", prolongation, empty, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("simpleOffer1", "simple1-price-active", prolongation, empty, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", prolongation, components, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("bundleOffer1", "bundle1-price-active", prolongation, components, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", prolongation, components, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("customBundleOffer1", "custom1-price-active", prolongation, components, DisconnectMode.POSTPONED, null, null),
 
-      Arguments.of("simpleOffer1", "simple1-price-trial",
-        Arrays.asList("Resuming", "Paid", "PriceActive"), empty),
-      Arguments.of("simpleOffer1", "simple1-price-active",
-        Arrays.asList("Resuming", "Paid", "PriceActive"), empty),
-      Arguments.of("bundleOffer1", "bundle1-price-trial",
-        Arrays.asList("Resuming", "Paid", "PriceActive"), components),
-      Arguments.of("bundleOffer1", "bundle1-price-active", 
-        Arrays.asList("Resuming", "Paid", "PriceActive"), components),
-      Arguments.of("customBundleOffer1", "custom1-price-trial",
-        Arrays.asList("Resuming", "Paid", "PriceActive"), components),
-      Arguments.of("customBundleOffer1", "custom1-price-active", 
-        Arrays.asList("Resuming", "Paid", "PriceActive"), components)
+      Arguments.of("simpleOffer1", "simple1-price-trial", resuming, empty, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("simpleOffer1", "simple1-price-active", resuming, empty, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", resuming, components, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("bundleOffer1", "bundle1-price-active", resuming, components, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", resuming, components, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("customBundleOffer1", "custom1-price-active", resuming, components, DisconnectMode.POSTPONED, null, null),
+      
+      // productCharacteristic = "Immediate"
+      Arguments.of("simpleOffer1", "simple1-price-trial", trial, empty, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("simpleOffer1", "simple1-price-active", active, empty, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", trial, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("bundleOffer1", "bundle1-price-active", active, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", trial, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("customBundleOffer1", "custom1-price-active", active, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+
+      Arguments.of("simpleOffer1", "simple1-price-trial", prolongation, empty, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("simpleOffer1", "simple1-price-active", prolongation, empty, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", prolongation, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("bundleOffer1", "bundle1-price-active", prolongation, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", prolongation, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("customBundleOffer1", "custom1-price-active", prolongation, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+
+      Arguments.of("simpleOffer1", "simple1-price-trial", resuming, empty, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("simpleOffer1", "simple1-price-active", resuming, empty, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", resuming, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("bundleOffer1", "bundle1-price-active", resuming, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", resuming, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("customBundleOffer1", "custom1-price-active", resuming, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+
+      // productCharacteristic = "Immediate" and eventCharacteristic = "Postponed"
+      Arguments.of("simpleOffer1", "simple1-price-trial", trial, empty, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("simpleOffer1", "simple1-price-active", active, empty, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", trial, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("bundleOffer1", "bundle1-price-active", active, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", trial, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("customBundleOffer1", "custom1-price-active", active, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+
+      Arguments.of("simpleOffer1", "simple1-price-trial", prolongation, empty, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("simpleOffer1", "simple1-price-active", prolongation, empty, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", prolongation, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("bundleOffer1", "bundle1-price-active", prolongation, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", prolongation, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("customBundleOffer1", "custom1-price-active", prolongation, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+
+      Arguments.of("simpleOffer1", "simple1-price-trial", resuming, empty, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("simpleOffer1", "simple1-price-active", resuming, empty, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", resuming, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("bundleOffer1", "bundle1-price-active", resuming, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", resuming, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("customBundleOffer1", "custom1-price-active", resuming, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+
+      // productCharacteristic = "Postponed" and eventCharacteristic = "Immediate"
+      Arguments.of("simpleOffer1", "simple1-price-trial", trial, empty, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("simpleOffer1", "simple1-price-active", active, empty, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", trial, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("bundleOffer1", "bundle1-price-active", active, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", trial, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("customBundleOffer1", "custom1-price-active", active, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+
+      Arguments.of("simpleOffer1", "simple1-price-trial", prolongation, empty, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("simpleOffer1", "simple1-price-active", prolongation, empty, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", prolongation, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("bundleOffer1", "bundle1-price-active", prolongation, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", prolongation, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("customBundleOffer1", "custom1-price-active", prolongation, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+
+      Arguments.of("simpleOffer1", "simple1-price-trial", resuming, empty, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("simpleOffer1", "simple1-price-active", resuming, empty, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", resuming, components, DisconnectMode.IMMEDIATE,"Postponed", "Immediate"),
+      Arguments.of("bundleOffer1", "bundle1-price-active", resuming, components, DisconnectMode.IMMEDIATE,"Postponed", "Immediate"),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", resuming, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("customBundleOffer1", "custom1-price-active", resuming, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate")
       );
   }
+
   @ParameterizedTest
-  @MethodSource
-  public void testPostponed(String offerId, String priceId, List<String> states,
-        List<String> componentOfferIds) throws Exception {
+  @MethodSource("postponedableData")
+  public void testPostpondable(String offerId, String priceId, List<String> states,
+        List<String> componentOfferIds, DisconnectMode expectedMode, String productCharValue, String eventCharValue) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
-    OffsetDateTime t1 = t0.plusDays(15);
+    OffsetDateTime activeEndDate = t0.plusDays(15);
+    OffsetDateTime t1 = expectedMode == DisconnectMode.POSTPONED ? activeEndDate : t0;
     OffsetDateTime tstart = t0.minusDays(30);
     String status = states.get(0).equals("ActiveTrial") ? "ACTIVE_TRIAL" : "ACTIVE";
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .status(status)
       .machineState(buildMachineState(states))
       .productStartDate(tstart)
-      .activeEndDate(t1)
+      .activeEndDate(activeEndDate)
       .pricePeriod(1)
       .tarificationPeriod(2)
       .build();
     assertEquals(componentOfferIds.size(), bundle.components().size());
+
+    if(productCharValue != null) {
+      ProductCharacteristic ch = new ProductCharacteristic();
+      String productCharName = priceId.contains("trial") ? productTrialCharName : productActiveCharName;
+      ch.setRefName(productCharName);
+      ch.setValueType("string");
+      ch.setValue(productCharValue);
+      bundle.drive.getCharacteristic().add(ch);
+    }
     String productId = bundle.drive.getProductId();
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("PENDING_DISCONNECT")
+      .activeEndDate(t1)
       .build();
     expectedBundle.components().stream().forEach(c -> c.getMachineContext().setIsIndependent(true));
     TaskPlan expectedTasks = createDefaultTaskPlan(expectedBundle, t1);
+
+    List<Characteristic> eventChars = null;
+    if(eventCharValue != null) {
+      eventChars = new ArrayList<>();
+      Characteristic evch = new Characteristic();
+      evch.setName(eventCharName);
+      evch.setValue(eventCharValue);
+      eventChars.add(evch);
+    }
+
+    Message<String> message = MessageBuilder
+        .withPayload("deactivation_started")
+        .setHeader("characteristics", eventChars)
+			  .build();
 
     machine = createMachine(bundle);
 
@@ -138,7 +226,7 @@ public class DeactivationStartedTest extends SpringStarter {
               .expectStates(Helper.stateSuite(states))
               .and()
           .step()
-              .sendEvent("deactivation_started")
+              .sendEvent(message)
               .expectStates(Helper.stateSuite("PendingDisconnect", "PaymentFinal", "PriceFinal"))
               .expectVariableWith(testBundleEqualTo(expectedBundle))
               .expectVariableWith(taskPlanEqualTo(expectedTasks))

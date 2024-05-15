@@ -33,9 +33,9 @@ public class PendingDisconnectEntry implements Action<String, String> {
     log.debug("PendingActivateEntry started. event: {}, message: {}", context.getEvent());
 
     DisconnectMode disconnectMode = DisconnectModeCalculator.calculate(
-        product
-        , (List<Characteristic>) context.getMessageHeader("eventCharacteristics")
-        , (EventProperties) context.getMessageHeader("eventProperties"));
+        product,
+        (List<Characteristic>) context.getMessageHeader("characteristics"), 
+        (EventProperties) context.getMessageHeader("eventProperties"));
     
     log.debug("DisconnectMode: {}", disconnectMode);
     OffsetDateTime disconnectDate = disconnectMode == DisconnectMode.POSTPONED ? product.getActiveEndDate() : OffsetDateTime.now();
