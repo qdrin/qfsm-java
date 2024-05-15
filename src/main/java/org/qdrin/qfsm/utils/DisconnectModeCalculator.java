@@ -35,9 +35,10 @@ public class DisconnectModeCalculator {
     public static DisconnectMode calculate(Product product, List<Characteristic> eventChars, EventProperties eventProperties) {        
 
         DisconnectMode mode = DisconnectMode.POSTPONED;
-        ProductPrice price = product.getProductPrice().get(0);
-        String productCharName = productCharNames.getOrDefault(price.getProductStatus(), productCharNames.get("ACTIVE"));
-        if(product != null) {
+        List<ProductPrice> prices = product.getProductPrice();
+        if(prices != null && prices.size() > 0) {
+            ProductPrice price = prices.get(0);
+            String productCharName = productCharNames.getOrDefault(price.getProductStatus(), productCharNames.get("ACTIVE"));
             List<ProductCharacteristic> productChars = new ArrayList<>(product.getCharacteristic());
             Optional<ProductCharacteristic> productChar = productChars.stream()
                 .filter(c -> {return c.getRefName().equals(productCharName);})

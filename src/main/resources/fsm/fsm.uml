@@ -47,6 +47,9 @@
           <transition xmi:type="uml:Transition" xmi:id="_tsWv4L9NEe65db1_bM-TwQ" source="_iIPMcL9NEe65db1_bM-TwQ" target="_pUzTQLz8Ee6WIIctFrkbQg">
             <trigger xmi:type="uml:Trigger" xmi:id="_vS-IYL9NEe65db1_bM-TwQ" event="_ZOkncLCDEe6zeo6uvgVLWA"/>
           </transition>
+          <transition xmi:type="uml:Transition" xmi:id="_Ce-l0BL2Ee-Kkb3itWWqQQ" source="_dafD4L9NEe65db1_bM-TwQ" target="_dafD4L9NEe65db1_bM-TwQ">
+            <trigger xmi:type="uml:Trigger" xmi:id="_RuhSIBL2Ee-Kkb3itWWqQQ" event="_VSTmMLCDEe6zeo6uvgVLWA"/>
+          </transition>
           <subvertex xmi:type="uml:Pseudostate" xmi:id="_rT7YALn_Ee6yNs2FzguhlQ"/>
           <subvertex xmi:type="uml:State" xmi:id="_uSPjQLn_Ee6yNs2FzguhlQ" name="UsageOn">
             <region xmi:type="uml:Region" xmi:id="_s3O7ML9MEe65db1_bM-TwQ" name="Region2">

@@ -383,5 +383,57 @@ public class DeactivationStartedTest extends SpringStarter {
       assertEquals(null, bundle.getByOfferId(independentOfferId).getActiveEndDate());
       log.debug("states: {}", machine.getState().getIds());
     }
+
+    @Test
+    public void testPostponedToImmediate() throws Exception {
+      String offerId = "component1";
+      OffsetDateTime t0 = OffsetDateTime.now();
+      OffsetDateTime t1 = t0.plusDays(15);
+      OffsetDateTime tstart = t0.minusDays(30);
+      List<String> states = Arrays.asList("PendingDisconnect", "PaymentFinal", "PriceFinal");
+      TestBundle bundle = new BundleBuilder(offerId, null)
+        .status("PENDING_DISCONNECT")
+        .machineState(buildMachineState(states))
+        .productStartDate(tstart)
+        .activeEndDate(t1)
+        .build();
+  
+      String productId = bundle.drive.getProductId();
+      TestBundle expectedBundle = new BundleBuilder(bundle)
+        .activeEndDate(t0)
+        .build();
+      TaskPlan expectedTasks = createDefaultTaskPlan(expectedBundle, t0);
+      expectedTasks.getRemovePlan().add(TaskDef.builder().type(TaskType.DISCONNECT).build());
+  
+      List<Characteristic> eventChars =  new ArrayList<>();
+      Characteristic evch = new Characteristic();
+      evch.setName(eventCharName);
+      evch.setValue("Immediate");
+      eventChars.add(evch);
+  
+      Message<String> message = MessageBuilder
+          .withPayload("deactivation_started")
+          .setHeader("characteristics", eventChars)
+          .build();
+  
+      machine = createMachine(bundle);
+  
+      StateMachineTestPlan<String, String> plan =
+          StateMachineTestPlanBuilder.<String, String>builder()
+            .defaultAwaitTime(2)
+            .stateMachine(machine)
+            .step()
+                .expectStates(Helper.stateSuite(states))
+                .and()
+            .step()
+                .sendEvent(message)
+                .expectStates(Helper.stateSuite(states))
+                .expectVariableWith(testBundleEqualTo(expectedBundle))
+                .expectVariableWith(taskPlanEqualTo(expectedTasks))
+                .and()
+            .build();
+      plan.test();
+      releaseMachine(machine.getId());
+    }
   }
 }
