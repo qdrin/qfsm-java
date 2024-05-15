@@ -40,13 +40,11 @@ public class PriceActiveEntry implements Action<String, String> {
       OffsetDateTime activeEndDate = nextPrice.getNextPayDate();
       product.setActiveEndDate(activeEndDate);
       List<Product> components = (List<Product>) extendedState.getVariables().get("components");
-      components.forEach((c) -> {c.setActiveEndDate(activeEndDate);});
-      for(Product component: components) {
-        component.setActiveEndDate(activeEndDate);
-      }
+      components.stream().filter(c -> ! c.getMachineContext().getIsIndependent()).forEach((c) -> {c.setActiveEndDate(activeEndDate);});
+
       if(nextPrice.getProductStatus().equals("ACTIVE_TRIAL")) {
         product.setTrialEndDate(activeEndDate);
-        components.forEach((c) -> {c.setTrialEndDate(activeEndDate);});
+        components.stream().filter(c -> ! c.getMachineContext().getIsIndependent()).forEach((c) -> {c.setTrialEndDate(activeEndDate);});
       }
       log.debug("activeEndDate: {}, trialEndDate: {}, priceEndedBefore: {}",
           product.getActiveEndDate(), product.getTrialEndDate(), priceEndedBefore);
