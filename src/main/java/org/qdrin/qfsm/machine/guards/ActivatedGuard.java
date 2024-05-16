@@ -22,10 +22,9 @@ public class ActivatedGuard implements Guard<String, String> {
     if(product.getProductClass() == ProductClass.CUSTOM_BUNDLE_COMPONENT.ordinal()) {
       product = extendedState.get("bundle", Product.class);
     }
+    if(product == null) return false;
     ProductPrice price = product.getProductPrice(PriceType.RecurringCharge).get();
-    if(price == null) {
-      return false;
-    }
+    if(price == null) return false;
     String prstatus = price.getProductStatus();
     // log.debug("productStatus: {}, match: {}", prstatus, match);
     return ObjectUtils.nullSafeEquals(match, prstatus);

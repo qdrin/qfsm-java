@@ -2,6 +2,7 @@ package org.qdrin.qfsm.service;
 
 import org.springframework.statemachine.StateMachineContext;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.statemachine.ExtendedState;
@@ -189,6 +190,33 @@ public class QStateMachineContextConverter {
         }
       }
       provisions.add(usage).add(payment).add(price);
+    }  
+    return result;
+  }
+
+  public static JsonNode buildComponentMachineState(JsonNode bundleMachineState) {
+    JsonNode result;
+    ObjectMapper mapper = new ObjectMapper();
+    ArrayNode provisions = mapper.createArrayNode();
+    JsonNode usage = null;
+    if(bundleMachineState == null || bundleMachineState.isEmpty()) {
+      result = mapper.getNodeFactory().textNode("Entry");
+    } else if(bundleMachineState.getNodeType() == JsonNodeType.STRING) {
+      result = bundleMachineState.deepCopy();
+    } else {
+      ObjectNode res = mapper.createObjectNode();
+      ArrayNode bundleProvisions = (ArrayNode) bundleMachineState.get("Provision");
+      for(JsonNode prov: bundleProvisions) {
+        String name = prov.getNodeType() == JsonNodeType.STRING ? prov.toString() : ((ObjectNode) prov).fieldNames().next();
+        if(Arrays.asList("UsageOn", "PendingDisconnect", "Disconnection", "UsageFinal").contains(name)) {
+          usage = prov.deepCopy();
+          provisions.add(usage);
+        }
+      }
+      provisions.add("PaymentFinal");
+      provisions.add("PriceFinal");
+      res.set("Provision", provisions);
+      result = res;
     }  
     return result;
   }

@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 
 public enum TaskType {
   // tasks
+  RESEND,  // task for immediate execution and resending event to machine
   ABORT,
   PRICE_ENDED,
   CHANGE_PRICE,
