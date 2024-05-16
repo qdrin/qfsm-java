@@ -1,5 +1,6 @@
 package org.qdrin.qfsm.machine.config;
 
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -272,6 +273,17 @@ public class StateMachineConfig {
     @Bean
     public Guard<String, String> canActivate() {
       return new CanActivateGuard();
+    }
+
+    @Bean
+    public Guard<String, String> activeEndDateInFuture() {
+      return new Guard<String, String>() {
+        @Override
+        public boolean evaluate(StateContext<String, String> context) {
+          Product product = context.getExtendedState().get("product", Product.class);
+          return product.getActiveEndDate().isAfter(OffsetDateTime.now());
+        }
+      };
     }
   }
 }

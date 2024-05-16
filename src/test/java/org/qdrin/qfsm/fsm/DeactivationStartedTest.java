@@ -50,19 +50,21 @@ public class DeactivationStartedTest extends SpringStarter {
   }
 
   private static TaskPlan createDefaultTaskPlan(TestBundle bundle, OffsetDateTime activeEndDate) {
-    TaskPlan tasks = new TaskPlan(bundle.drive.getProductId());
+    String productId = bundle.drive.getProductId();
+    TaskPlan tasks = new TaskPlan(productId);
     tasks.addToRemovePlan(TaskDef.builder().type(TaskType.PRICE_ENDED).build());
     tasks.addToRemovePlan(TaskDef.builder().type(TaskType.SUSPEND_ENDED).build());
     tasks.addToRemovePlan(TaskDef.builder().type(TaskType.WAITING_PAY_ENDED).build());
     tasks.addToRemovePlan(TaskDef.builder().type(TaskType.CHANGE_PRICE).build());
     tasks.addToRemovePlan(TaskDef.builder().type(TaskType.RESUME_EXTERNAL).build());
+    tasks.addToRemovePlan(TaskDef.builder().type(TaskType.DISCONNECT).build());
 
     for(Product product: bundle.products) {
       tasks.addToCreatePlan(TaskDef.builder()
         .productId(product.getProductId())
         .type(TaskType.DISCONNECT)
         .wakeAt(activeEndDate)
-        .build());
+        .build(), false);
     }
 
     return tasks;
@@ -403,7 +405,6 @@ public class DeactivationStartedTest extends SpringStarter {
         .activeEndDate(t0)
         .build();
       TaskPlan expectedTasks = createDefaultTaskPlan(expectedBundle, t0);
-      expectedTasks.getRemovePlan().add(TaskDef.builder().type(TaskType.DISCONNECT).build());
   
       List<Characteristic> eventChars =  new ArrayList<>();
       Characteristic evch = new Characteristic();
@@ -430,6 +431,57 @@ public class DeactivationStartedTest extends SpringStarter {
                 .expectStates(Helper.stateSuite(states))
                 .expectVariableWith(testBundleEqualTo(expectedBundle))
                 .expectVariableWith(taskPlanEqualTo(expectedTasks))
+                .and()
+            .build();
+      plan.test();
+      releaseMachine(machine.getId());
+    }
+
+    @Test
+    public void testImmediateToPostponed() throws Exception {
+      String offerId = "component1";
+      OffsetDateTime t0 = OffsetDateTime.now();
+      OffsetDateTime t1 = t0.minusDays(15);  // In past
+      OffsetDateTime tstart = t0.minusDays(30);
+      List<String> states = Arrays.asList("PendingDisconnect", "PaymentFinal", "PriceFinal");
+      TestBundle bundle = new BundleBuilder(offerId, null)
+        .status("PENDING_DISCONNECT")
+        .machineState(buildMachineState(states))
+        .productStartDate(tstart)
+        .activeEndDate(t1)
+        .build();
+  
+      String productId = bundle.drive.getProductId();
+      // TestBundle expectedBundle = new BundleBuilder(bundle)
+      //   .activeEndDate(t0)
+      //   .build();
+      // TaskPlan expectedTasks = createDefaultTaskPlan(expectedBundle, t0);
+      // expectedTasks.getRemovePlan().add(TaskDef.builder().productId(productId).type(TaskType.DISCONNECT).build());
+  
+      List<Characteristic> eventChars =  new ArrayList<>();
+      Characteristic evch = new Characteristic();
+      evch.setName(eventCharName);
+      evch.setValue("Postponed");
+      eventChars.add(evch);
+  
+      Message<String> message = MessageBuilder
+          .withPayload("deactivation_started")
+          .setHeader("characteristics", eventChars)
+          .build();
+  
+      machine = createMachine(bundle);
+  
+      StateMachineTestPlan<String, String> plan =
+          StateMachineTestPlanBuilder.<String, String>builder()
+            .defaultAwaitTime(2)
+            .stateMachine(machine)
+            .step()
+                .expectStates(Helper.stateSuite(states))
+                .and()
+            .step()
+                .sendEvent(message)
+                .expectStateChanged(0)
+                .expectEventNotAccepted(6)
                 .and()
             .build();
       plan.test();

@@ -294,13 +294,13 @@
                   </children>
                   <children xmi:type="notation:Shape" xmi:id="_pVG1QLz8Ee6WIIctFrkbQg" type="FinalState_Shape">
                     <children xmi:type="notation:DecorationNode" xmi:id="_pVG1Qrz8Ee6WIIctFrkbQg" type="FinalState_FloatingNameLabel">
-                      <layoutConstraint xmi:type="notation:Location" xmi:id="_pVHcULz8Ee6WIIctFrkbQg" x="-57" y="19"/>
+                      <layoutConstraint xmi:type="notation:Location" xmi:id="_pVHcULz8Ee6WIIctFrkbQg" x="-19" y="19"/>
                     </children>
                     <children xmi:type="notation:DecorationNode" xmi:id="_pVHcUbz8Ee6WIIctFrkbQg" type="FinalState_StereotypeLabel">
                       <layoutConstraint xmi:type="notation:Location" xmi:id="_pVHcUrz8Ee6WIIctFrkbQg" x="25" y="-10"/>
                     </children>
                     <element xmi:type="uml:FinalState" href="fsm.uml#_pUzTQLz8Ee6WIIctFrkbQg"/>
-                    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_pVG1Qbz8Ee6WIIctFrkbQg" x="490" y="564"/>
+                    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_pVG1Qbz8Ee6WIIctFrkbQg" x="528" y="545"/>
                   </children>
                   <children xmi:type="notation:Shape" xmi:id="_dbP44L9NEe65db1_bM-TwQ" type="State_Shape">
                     <children xmi:type="notation:DecorationNode" xmi:id="_dbP44r9NEe65db1_bM-TwQ" type="State_NameLabel">
@@ -340,7 +340,7 @@
                       <layoutConstraint xmi:type="notation:Location" xmi:id="_NPAk0edPEe6ty6sBqXkWnw" x="-10" y="-10"/>
                     </children>
                     <element xmi:type="uml:State" href="fsm.uml#_iIPMcL9NEe65db1_bM-TwQ"/>
-                    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_iJKZgb9NEe65db1_bM-TwQ" x="338" y="526"/>
+                    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_iJKZgb9NEe65db1_bM-TwQ" x="338" y="507"/>
                   </children>
                   <layoutConstraint xmi:type="notation:Bounds" xmi:id="_0jJA87n8Ee6yNs2FzguhlQ"/>
                 </children>
@@ -1404,7 +1404,7 @@
     </children>
     <children xmi:type="notation:DecorationNode" xmi:id="_ttLPRb9NEe65db1_bM-TwQ" type="Transition_GuardLabel">
       <styles xmi:type="notation:BooleanValueStyle" xmi:id="_uyUYwL9VEe65db1_bM-TwQ" name="IS_UPDATED_POSITION" booleanValue="true"/>
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_ttLPRr9NEe65db1_bM-TwQ" x="6" y="-31"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_ttLPRr9NEe65db1_bM-TwQ" x="12" y="-11"/>
     </children>
     <children xmi:type="notation:DecorationNode" xmi:id="_ttLPR79NEe65db1_bM-TwQ" type="Transition_StereotypeLabel">
       <styles xmi:type="notation:BooleanValueStyle" xmi:id="_uzDYkL9VEe65db1_bM-TwQ" name="IS_UPDATED_POSITION" booleanValue="true"/>

@@ -19,7 +19,7 @@ public class PaidEntry implements Action<String, String> {
   public void execute(StateContext<String, String> context) {
     Product product = context.getStateMachine().getExtendedState().get("product", Product.class);
     int tPeriod = product.getTarificationPeriod() + 1;
-    log.debug("setting tarificationPeriod={}", tPeriod);
+    log.info("[{}] setting tarificationPeriod={}", product.getProductId(), tPeriod);
     product.setTarificationPeriod(tPeriod);
   }
 }

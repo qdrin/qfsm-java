@@ -1,6 +1,7 @@
 package org.qdrin.qfsm;
 
 import org.hamcrest.TypeSafeMatcher;
+import org.qdrin.qfsm.tasks.TaskDef;
 import org.qdrin.qfsm.tasks.TaskPlan;
 
 import java.util.Map;
@@ -9,6 +10,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 
 public class TaskPlanEquals extends TypeSafeMatcher<Map<? extends Object,?>> {
+  
   TaskPlan expected;
 
   TaskPlanEquals(TaskPlan expected) {
@@ -24,8 +26,12 @@ public class TaskPlanEquals extends TypeSafeMatcher<Map<? extends Object,?>> {
     return Helper.isTasksEquals(expected, actual);
   }
 
-  public void describeTo(Description description) { 
-    description.appendText("TestPlan equals"); 
+  public void describeTo(Description description) {
+    String desc = "TaskPlan equals to removePlan: ";
+    for(TaskDef rd: expected.getRemovePlan()) desc += rd + ", ";
+    desc += " createPlan: ";
+    for(TaskDef rd: expected.getCreatePlan()) desc += rd + ", ";
+    description.appendText(desc); 
   }
 
   public static Matcher<Map<? extends Object,?>> taskPlanEqualTo(TaskPlan expected) { 

@@ -54,15 +54,16 @@ public class PendingDisconnectEntry implements Action<String, String> {
     tasks.addToRemovePlan(TaskDef.builder().type(TaskType.WAITING_PAY_ENDED).build());
     tasks.addToRemovePlan(TaskDef.builder().type(TaskType.CHANGE_PRICE).build());
     tasks.addToRemovePlan(TaskDef.builder().type(TaskType.RESUME_EXTERNAL).build());
+    tasks.addToRemovePlan(TaskDef.builder().type(TaskType.DISCONNECT).build());
 
     product.setActiveEndDate(disconnectDate);
     tasks.addToCreatePlan(TaskDef.builder()
       .type(TaskType.DISCONNECT)
       .wakeAt(disconnectDate)
-      .build()  
+      .build(),
+      false
     );
     // Some kind of trick. Here we need to have DISCONNECT in removePlan and createPlan cause we need to delete postponed and create immediate
-    tasks.getRemovePlan().add(TaskDef.builder().type(TaskType.DISCONNECT).build());
     /* Для всех зависимых ножек мы
     - добавляем таск на disconnect
     - делаем их независимыми

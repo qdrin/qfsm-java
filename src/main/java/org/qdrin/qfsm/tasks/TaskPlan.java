@@ -15,9 +15,13 @@ public class TaskPlan {
    }
    
    public boolean addToCreatePlan(TaskDef taskDef) {
+      return addToCreatePlan(taskDef, true);
+   }
+
+   public boolean addToCreatePlan(TaskDef taskDef, boolean touchRemovePlan) {
       if(taskDef.getProductId() == null) taskDef.setProductId(defaultProductId);
       if(createPlan.contains(taskDef)) createPlan.remove(taskDef);
-      if(removePlan.contains(taskDef)) removePlan.remove(taskDef);
+      if(touchRemovePlan && removePlan.contains(taskDef)) removePlan.remove(taskDef);
       return createPlan.add(taskDef);
    }
 
