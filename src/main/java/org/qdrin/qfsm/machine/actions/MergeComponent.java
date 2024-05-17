@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @WithStateMachine
 public class MergeComponent implements Action<String, String> {
+
   @Override
   public void execute(StateContext<String, String> context) {
     ExtendedState extendedState = context.getStateMachine().getExtendedState();

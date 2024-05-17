@@ -12,6 +12,7 @@ import org.springframework.statemachine.kryo.StateMachineContextSerializer;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
+import org.springframework.statemachine.support.AbstractStateMachine;
 import org.springframework.statemachine.support.DefaultExtendedState;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 
@@ -66,7 +67,7 @@ public class QStateMachineContextConverter {
     return context;
   }
 
-  public static JsonNode toJsonNode(State<String, String> state) {
+  public static JsonNode toJsonNode_old(State<String, String> state) {
     ObjectMapper mapper = new ObjectMapper();
     // ObjectNode jcontext = mapper.createObjectNode();
 		String stateId = state.getId();
@@ -79,6 +80,33 @@ public class QStateMachineContextConverter {
 			for(var r: rstate.getRegions()) {
         JsonNode child = toJsonNode(r.getState());
         childs.add(child);
+			}
+      regions.set(stateId, childs);
+      result = regions;
+		}
+		if(state.isSubmachineState()) {
+			StateMachine<String, String> submachine = ((AbstractState<String, String>) state).getSubmachine();
+			State<String, String> sstate = submachine.getState();
+      JsonNode child = toJsonNode(sstate);
+      ObjectNode subMachine = mapper.createObjectNode().set(stateId, child);
+      result = subMachine;
+		}
+    return result;
+	}
+
+  public static JsonNode toJsonNode(State<String, String> state) {
+    ObjectMapper mapper = new ObjectMapper();
+    // ObjectNode jcontext = mapper.createObjectNode();
+		String stateId = state.getId();
+    JsonNode result = mapper.getNodeFactory().textNode(stateId);
+
+		if (state.isOrthogonal()) {
+			RegionState<String, String> rstate = (RegionState<String, String>) state;
+      ObjectNode regions = mapper.createObjectNode();
+      ObjectNode childs = mapper.createObjectNode();
+			for(var r: rstate.getRegions()) {
+        JsonNode child = toJsonNode(r.getState());
+        childs.set(r.getId(), child);
 			}
       regions.set(stateId, childs);
       result = regions;
@@ -199,7 +227,7 @@ public class QStateMachineContextConverter {
     ObjectMapper mapper = new ObjectMapper();
     ArrayNode provisions = mapper.createArrayNode();
     JsonNode usage = null;
-    if(bundleMachineState == null || bundleMachineState.isEmpty()) {
+    if(bundleMachineState == null || bundleMachineState.getNodeType() == JsonNodeType.NULL) {
       result = mapper.getNodeFactory().textNode("Entry");
     } else if(bundleMachineState.getNodeType() == JsonNodeType.STRING) {
       result = bundleMachineState.deepCopy();

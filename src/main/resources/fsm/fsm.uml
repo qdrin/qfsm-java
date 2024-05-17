@@ -38,7 +38,17 @@
         <region xmi:type="uml:Region" xmi:id="_0jIZ4Ln8Ee6yNs2FzguhlQ" name="UsageRegion">
           <transition xmi:type="uml:Transition" xmi:id="_21ZQELn_Ee6yNs2FzguhlQ" kind="local" source="_rT7YALn_Ee6yNs2FzguhlQ" target="_uSPjQLn_Ee6yNs2FzguhlQ"/>
           <transition xmi:type="uml:Transition" xmi:id="_sU7cYLz8Ee6WIIctFrkbQg" source="_pUzTQLz8Ee6WIIctFrkbQg" target="_lUS-kLoEEe6yNs2FzguhlQ"/>
-          <transition xmi:type="uml:Transition" xmi:id="_mnF9YL9NEe65db1_bM-TwQ" source="_uSPjQLn_Ee6yNs2FzguhlQ" target="_dafD4L9NEe65db1_bM-TwQ">
+          <transition xmi:type="uml:Transition" xmi:id="_mnF9YL9NEe65db1_bM-TwQ" guard="__4rokBQfEe-C2sZjbu6Aqg" source="_uSPjQLn_Ee6yNs2FzguhlQ" target="_dafD4L9NEe65db1_bM-TwQ">
+            <ownedRule xmi:type="uml:Constraint" xmi:id="__4rokBQfEe-C2sZjbu6Aqg">
+              <specification xmi:type="uml:OpaqueExpression" xmi:id="__4rokRQfEe-C2sZjbu6Aqg">
+                <language>bean</language>
+                <body>canDisconnect</body>
+              </specification>
+            </ownedRule>
+            <effect xmi:type="uml:OpaqueBehavior" xmi:id="_EOFikBQgEe-C2sZjbu6Aqg">
+              <language>bean</language>
+              <body>unmergeComponent</body>
+            </effect>
             <trigger xmi:type="uml:Trigger" xmi:id="_oNodYL9NEe65db1_bM-TwQ" event="_VSTmMLCDEe6zeo6uvgVLWA"/>
           </transition>
           <transition xmi:type="uml:Transition" xmi:id="_pfBz0L9NEe65db1_bM-TwQ" source="_dafD4L9NEe65db1_bM-TwQ" target="_iIPMcL9NEe65db1_bM-TwQ">

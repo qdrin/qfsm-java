@@ -11,6 +11,7 @@ import org.qdrin.qfsm.model.*;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
 import org.qdrin.qfsm.repository.ProductRepository;
+import org.qdrin.qfsm.service.QStateMachineContextConverter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -285,6 +286,17 @@ public class BundleBuilder {
 
     public BundleBuilder machineState(JsonNode machineState) {
         drive.getMachineContext().setMachineState(machineState);
+        JsonNode componentMachineState = QStateMachineContextConverter.buildComponentMachineState(machineState);
+        components.stream()
+            .filter(c -> ! c.getMachineContext().getIsIndependent())
+            .forEach(c -> c.getMachineContext().setMachineState(componentMachineState));
+        return this;
+    }
+
+    public BundleBuilder componentMachineState(JsonNode componentState) {
+        components.stream()
+            .filter(c -> ! c.getMachineContext().getIsIndependent())
+            .forEach(c -> c.getMachineContext().setMachineState(componentState));
         return this;
     }
 

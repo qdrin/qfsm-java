@@ -224,6 +224,17 @@ public class StateMachineConfig {
       return new MergeComponent();
     }
 
+    @Bean
+    Action<String, String> unmergeComponent() {
+      return new Action<String, String>() {
+        public void execute(StateContext<String, String> context) {
+          Product product = context.getStateMachine().getExtendedState().get("product", Product.class);
+          log.info("[{}] unmerging", product.getProductId());
+          product.getMachineContext().setIsIndependent(true);
+        }
+      };
+    }
+
     // -----------------------------------------------------------------
     // guards
     @Bean
@@ -273,6 +284,13 @@ public class StateMachineConfig {
     @Bean
     public Guard<String, String> canActivate() {
       return new CanActivateGuard();
+    }
+
+    @Bean
+    public Guard<String, String> canDisconnect() {
+      return new ProductClassGuard(Arrays.asList(
+        ProductClass.SIMPLE, ProductClass.BUNDLE, ProductClass.CUSTOM_BUNDLE, ProductClass.CUSTOM_BUNDLE_COMPONENT
+      ));
     }
 
     @Bean

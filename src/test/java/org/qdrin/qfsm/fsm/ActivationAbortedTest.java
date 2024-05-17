@@ -69,6 +69,7 @@ public class ActivationAbortedTest extends SpringStarter {
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("ABORTED")
       .machineState(buildMachineState("Aborted"))
+      .componentMachineState(buildMachineState("Aborted"))
       .tarificationPeriod(0)
       .pricePeriod(0)
       .build();

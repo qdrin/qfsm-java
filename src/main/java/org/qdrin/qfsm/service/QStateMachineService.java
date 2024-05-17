@@ -8,6 +8,7 @@ import java.util.Map;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.tasks.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.config.StateMachineFactory;
@@ -71,9 +72,7 @@ public class QStateMachineService {
 	public void releaseStateMachine(String machineId) {
 		log.info("Releasing machine with id " + machineId);
 		synchronized (machines) {
-			StateMachine<String, String> stateMachine = machines.remove(machineId);
-			Product product = stateMachine.getExtendedState().get("product", Product.class);
-			product.getMachineContext().setMachineState(QStateMachineContextConverter.toJsonNode(stateMachine.getState()));
+			machines.remove(machineId);
 		}
 	}
 

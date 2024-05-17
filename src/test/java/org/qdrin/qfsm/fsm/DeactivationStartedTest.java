@@ -310,7 +310,7 @@ public class DeactivationStartedTest extends SpringStarter {
   @Nested
   class CustomBundle {
 
-    public static Stream<Arguments> testCustomBundleComponentUnmerge() {
+    private static Stream<Arguments> testCustomBundleComponent() {
       return Stream.of(
         Arguments.of("customOffer1", "custom1-price-trial",
             "ACTIVE_TRIAL", Arrays.asList("ActiveTrial", "Paid", "PriceActive")),
@@ -321,73 +321,7 @@ public class DeactivationStartedTest extends SpringStarter {
 
     @ParameterizedTest
     @MethodSource
-    public void testCustomBundleComponentUnmerge(String offerId, String priceId,
-        String status, List<String> states) throws Exception {
-      OffsetDateTime t0 = OffsetDateTime.now();
-      OffsetDateTime t1 = t0.plusDays(15);
-      int tarificationPeriod = 2;
-      JsonNode machineState = buildMachineState(states.toArray(new String[0]));
-      TestBundle preBundle = new BundleBuilder("customBundleOffer1", priceId,
-        "component1", "component2", "component3")
-        .tarificationPeriod(tarificationPeriod)
-        .productStartDate(t0.minusDays(30))
-        .activeEndDate(t1)
-        .status(status)
-        .machineState(machineState)
-        .build();
-
-      TestBundle bundle = new BundleBuilder("component3", null)
-        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
-        .tarificationPeriod(tarificationPeriod)
-        .isIndependent(false)
-        .addBundle(preBundle.bundle)
-        .machineState(null)
-        .build();
-      log.debug("bundle: {}", bundle);
-      Product product = bundle.drive;
-      TestBundle expectedBundle = new BundleBuilder(bundle)
-        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
-        .isIndependent(true)  // means leg becomes independently processed
-        .tarificationPeriod(2)
-        .status("PENDING_DISCONNECT")
-        .machineState(buildMachineState("PendingDisconnect"))
-        .build();
-
-      TaskPlan expectedTasks = new TaskPlan(product.getProductId());
-      expectedTasks.addToCreatePlan(TaskDef.builder().type(TaskType.RESEND).build());
-      machine = createMachine(bundle);
-      assertEquals(bundle.bundle.getProductId(), preBundle.bundle.getProductId());
-      StateMachineTestPlan<String, String> plan =
-          StateMachineTestPlanBuilder.<String, String>builder()
-            .defaultAwaitTime(2)
-            .stateMachine(machine)
-            .step()
-                .expectState("Entry")
-                .and()
-            .step()
-                .sendEvent("deactivation_started")
-                .expectState("Entry")
-                .expectExtendedStateChanged(1)
-                .expectVariableWith(testBundleEqualTo(expectedBundle))
-                .expectVariableWith(taskPlanEqualTo(expectedTasks))
-                .and()
-            .build();
-      plan.test();
-      releaseMachine(machine.getId());
-    }
-
-    private static Stream<Arguments> testCustomBundleComponentResended() {
-      return Stream.of(
-        Arguments.of("customOffer1", "custom1-price-trial",
-            "ACTIVE_TRIAL", Arrays.asList("ActiveTrial", "Paid", "PriceActive")),
-        Arguments.of("customOffer1", "custom1-price-active",
-            "ACTIVE", Arrays.asList("Active", "Paid", "PriceActive"))
-      );  
-    }
-
-    @ParameterizedTest
-    @MethodSource
-    public void testCustomBundleComponentResended(String offerId, String priceId,
+    public void testCustomBundleComponent(String offerId, String priceId,
         String status, List<String> states) throws Exception {
       OffsetDateTime t0 = OffsetDateTime.now();
       OffsetDateTime t1 = t0.plusDays(15);
@@ -402,16 +336,13 @@ public class DeactivationStartedTest extends SpringStarter {
         .status(status)
         .machineState(machineState)
         .build();
-      Product component3 = preBundle.components().get(2);
-      component3.getMachineContext().setIsIndependent(true);
-      component3.getMachineContext().setMachineState(machineState);
+      Product component3 = preBundle.getByOfferId("component3");
       TestBundle bundle = new BundleBuilder("component3", null)
+        .productIds(Arrays.asList(component3))
         .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)  
         .tarificationPeriod(tarificationPeriod)
         .activeEndDate(t1)
-        .isIndependent(true)
         .addBundle(preBundle.bundle)
-        .machineState(buildMachineState(usage, "PaymentFinal", "PriceFinal"))
         .status(status)
         .build();
 
@@ -419,9 +350,8 @@ public class DeactivationStartedTest extends SpringStarter {
       Product product = bundle.drive;
       // TODO: Добавить анализ на состав бандла
       TestBundle expectedBundle = new BundleBuilder(bundle)
-        .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
         .isIndependent(true)  // means leg becomes independently processed
-        .tarificationPeriod(2)
+        .tarificationPeriod(tarificationPeriod)
         .status("PENDING_DISCONNECT")
         .machineState(buildMachineState("PendingDisconnect", "PaymentFinal", "PriceFinal"))
         .build();

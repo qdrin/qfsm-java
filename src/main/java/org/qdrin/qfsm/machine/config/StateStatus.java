@@ -3,11 +3,17 @@ package org.qdrin.qfsm.machine.config;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.annotation.OnStateEntry;
 import org.springframework.statemachine.annotation.WithStateMachine;
 import org.springframework.statemachine.state.State;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.service.QStateMachineContextConverter;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,15 +34,20 @@ public class StateStatus {
   public void setStatus(StateContext<String, String> context) {
     State<String, String> state = context.getTarget();
     log.debug("enter state '{}'", state.getId());
-    var extendedState = context.getStateMachine().getExtendedState();
+    StateMachine<String, String> machine = context.getStateMachine();
+    ExtendedState extendedState = machine.getExtendedState();
+    Product product = extendedState.get("product", Product.class);
+    List<Product> components = extendedState.get("components", List.class);
+    JsonNode machineState = QStateMachineContextConverter.toJsonNode(machine.getState());
+    JsonNode componentState = QStateMachineContextConverter.buildComponentMachineState(machineState);
+    product.getMachineContext().setMachineState(machineState);
+    components.stream()
+      .filter(c -> ! c.getMachineContext().getIsIndependent())
+      .forEach(c -> c.getMachineContext().setMachineState(componentState));
     String status = statusMap.getOrDefault(state.getId(), null);
     if(status != null) {
       log.debug("setting status to {}", status);
-      Product product = (Product) extendedState.get("product", Product.class);
       product.setStatus(status);
-      log.debug("productId: {}, new status: {}", product.getProductId(), product.getStatus());
-      List<Product> components = (List<Product>) extendedState.getVariables().get("components");
-      log.debug("components isIndepended: {}", components.stream().map(c -> c.getMachineContext().getIsIndependent()).toList());
       components.stream().filter(c -> ! c.getMachineContext().getIsIndependent()).forEach(c -> c.setStatus(status));
       log.info("[{}] status: {}", product.getProductId(), product.getStatus());
       log.debug("components: {}", components.stream().map(c -> c.getStatus()).toList());

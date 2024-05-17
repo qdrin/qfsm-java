@@ -8,9 +8,14 @@ import org.springframework.statemachine.StateMachineContext;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.qdrin.qfsm.Helper;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.BundleBuilder;
@@ -160,5 +165,58 @@ public class ContextConverterTest extends SpringStarter {
     machine = createMachine(bundle);
     log.debug("2nd stage. machine: {}, state: {}", machine, machine.getState());
     assertEquals("Entry", machine.getState().getId());
+  }
+
+  private static Stream<Arguments> testFromStateContext() {
+    return Stream.of(
+      Arguments.of(Arrays.asList("Entry")),
+      Arguments.of(Arrays.asList("Suspending", "NotPaid", "PriceWaiting")),
+      Arguments.of(Arrays.asList("Active", "Paid", "PriceActive")),
+      Arguments.of(Arrays.asList("PendingActivate")),
+      Arguments.of(Arrays.asList("PendingDisconnect", "PaymentFinal", "PriceFinal")),
+      Arguments.of(Arrays.asList("Suspending", "NotPaid", "PriceWaiting")),
+      Arguments.of(Arrays.asList("Disconnect"))
+    );
+  }
+  
+  @ParameterizedTest
+  @MethodSource
+  public void testFromStateContext(List<String> states) throws Exception {
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active")
+      .machineState(buildMachineState(states))
+      .build();
+    machine = createMachine(bundle);
+    List<String> expectedStates = Arrays.asList(Helper.stateSuite(states));
+    for(String exp: expectedStates) {
+      assert(machine.getState().getIds().contains(exp));
+    }
+
+    JsonNode machineState = QStateMachineContextConverter.toJsonNode(machine.getState());
+    log.debug("machineState: {}", machineState);
+    for(String state: states) {
+      assert(machineState.toString().contains(state));
+      if(states.size() == 3) assert(machineState.has("Provision"));
+    }
+  }
+
+  private static Stream<Arguments> testBuildComponentMachineState() {
+    return Stream.of(
+      Arguments.of(Arrays.asList("Entry"), Arrays.asList("Entry")),
+      Arguments.of(Arrays.asList("Disconnect"), Arrays.asList("Disconnect")),
+      Arguments.of(Arrays.asList("PendingActivate"), Arrays.asList("PendingActivate")),
+      Arguments.of(Arrays.asList("Suspending", "NotPaid", "PriceWaiting"), Arrays.asList("Suspending", "PaymentFinal", "PriceFinal")),
+      Arguments.of(Arrays.asList("Active", "Paid", "PriceActive", Arrays.asList("Active", "PaymentFinal", "PriceFinal"))),
+      Arguments.of(Arrays.asList("PendingDisconnect", "PaymentFinal", "PriceFinal"), Arrays.asList("PendingDisconnect", "PaymentFinal", "PriceFinal")),
+      Arguments.of(Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), Arrays.asList("Suspended", "PaymentFinal", "PriceFinal"))
+    );
+  }
+  
+  @ParameterizedTest
+  @MethodSource
+  public void testBuildComponentMachineState(List<String> states, List<String> expectedStates) throws Exception {
+    JsonNode machineState = buildMachineState(states);
+    JsonNode componentState = QStateMachineContextConverter.buildComponentMachineState(machineState);
+    JsonNode expectedComponentState = buildMachineState(expectedStates);
+    assertEquals(expectedComponentState, componentState);
   }
 }
