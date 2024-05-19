@@ -20,7 +20,8 @@ public class TestBundleEquals extends TypeSafeMatcher<Map<? extends Object,?>> {
   TestBundle expected;
 
   TestBundleEquals(TestBundle expected) {
-    this.expected = new BundleBuilder(expected).machineState(null).build();
+    // this.expected = new BundleBuilder(expected).machineState(null).build();
+    this.expected = new BundleBuilder(expected).build();
   }
 
   private BundleBuilder BundleBuilder(TestBundle expected2) {

@@ -7,6 +7,7 @@ import org.springframework.statemachine.StateMachineContext;
 
 import static org.junit.Assert.*;
 
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,7 +22,7 @@ import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.service.QStateMachineContextConverter;
-import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
+import static org.qdrin.qfsm.Helper.buildMachineState;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
@@ -71,17 +72,29 @@ public class ContextConverterTest extends SpringStarter {
     // assertThat(context.getExtendedState()).isNotNull();
   }
 
-  @Test
-  public void testJsonBuilder() throws Exception {
-    ClassPathResource resource = new ClassPathResource("/contexts/machinestate_sample.json", getClass());
+  private static Stream<Arguments> testJsonBuilder() {
+    return Stream.of(
+      Arguments.of("'PendingActivate'"),
+      Arguments.of("'Disconnect'"),
+      Arguments.of("{'Provision': [{'UsageRegion': 'PendingDisconnect'}, {'PaymentRegion': 'PaymentFinal'}, {'PriceRegion': 'PriceFinal'}]}"),
+      Arguments.of("{'Provision': [{'UsageRegion': {'UsageOn': 'Suspended'}}, {'PaymentRegion': {'PaymentOn': 'NotPaid'}}, {'PriceRegion': {'PriceOn': 'PriceWaiting'}}]}"),
+      Arguments.of("{'Provision': [{'UsageRegion': {'UsageOn': {'Activated': 'Active'}}}, {'PaymentRegion': {'PaymentOn': 'NotPaid'}}, {'PriceRegion': {'PriceOn': 'PriceWaiting'}}]}")
+    );
+  }
+  @ParameterizedTest
+  @MethodSource
+  public void testJsonBuilder(String machineStateSample) throws Exception {
     ObjectMapper mapper = new ObjectMapper();
-    JsonNode machineState = mapper.readTree(resource.getInputStream());
+    JsonNode machineState = mapper.readTree(machineStateSample.replace("'", "\""));
     TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-active")
       .machineState(machineState)
       .build();
     machine = createMachine(bundle);
+    log.debug("machine started. states: {}", machine.getState().getIds());
     JsonNode machineStateTarget = QStateMachineContextConverter.toJsonNode(machine.getState());
+    releaseMachine(machine.getId());
     log.debug("expected: {}", machineState.toString());
+    log.debug("actual:", machineStateTarget);
     JSONAssert.assertEquals(machineState.toString(), machineState.toString(), false);
     JSONAssert.assertEquals(machineState.toString(), machineStateTarget.toString(), false);
   }
@@ -167,6 +180,37 @@ public class ContextConverterTest extends SpringStarter {
     assertEquals("Entry", machine.getState().getId());
   }
 
+  @Test 
+  public void fromStateContextFromStart() throws Exception {
+    List<String> states = Arrays.asList("ActiveTrial", "Paid", "PriceActive");
+    TestBundle bundle = new BundleBuilder("simpleOffer1", "simple1-price-trial")
+      .priceNextPayDate(OffsetDateTime.now().plusDays(30))
+      .build();
+    machine = createMachine(bundle);
+
+    StateMachineTestPlan<String, String> plan =
+    StateMachineTestPlanBuilder.<String, String>builder()
+      .defaultAwaitTime(2)
+      .stateMachine(machine)
+      .step()
+          .expectState("Entry")
+          .and()
+      .step()
+          .sendEvent("activation_started")
+          .sendEvent("activation_completed")
+          .expectStates(Helper.stateSuite(states))
+          .and()
+      .build();
+    plan.test();
+    JsonNode machineState = QStateMachineContextConverter.toJsonNode(machine.getState());
+    releaseMachine(machine.getId());
+    log.debug("machineState: {}", machineState);
+    for(String state: states) {
+      assert(machineState.toString().contains(state));
+      if(states.size() == 3) assert(machineState.has("Provision"));
+    }
+  }
+
   private static Stream<Arguments> testFromStateContext() {
     return Stream.of(
       Arguments.of(Arrays.asList("Entry")),
@@ -205,7 +249,7 @@ public class ContextConverterTest extends SpringStarter {
       Arguments.of(Arrays.asList("Disconnect"), Arrays.asList("Disconnect")),
       Arguments.of(Arrays.asList("PendingActivate"), Arrays.asList("PendingActivate")),
       Arguments.of(Arrays.asList("Suspending", "NotPaid", "PriceWaiting"), Arrays.asList("Suspending", "PaymentFinal", "PriceFinal")),
-      Arguments.of(Arrays.asList("Active", "Paid", "PriceActive", Arrays.asList("Active", "PaymentFinal", "PriceFinal"))),
+      Arguments.of(Arrays.asList("Active", "Paid", "PriceActive"), Arrays.asList("Active", "PaymentFinal", "PriceFinal")),
       Arguments.of(Arrays.asList("PendingDisconnect", "PaymentFinal", "PriceFinal"), Arrays.asList("PendingDisconnect", "PaymentFinal", "PriceFinal")),
       Arguments.of(Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), Arrays.asList("Suspended", "PaymentFinal", "PriceFinal"))
     );
@@ -215,6 +259,9 @@ public class ContextConverterTest extends SpringStarter {
   @MethodSource
   public void testBuildComponentMachineState(List<String> states, List<String> expectedStates) throws Exception {
     JsonNode machineState = buildMachineState(states);
+    for(String state: states) {
+      assert(machineState.toString().contains(state));
+    }
     JsonNode componentState = QStateMachineContextConverter.buildComponentMachineState(machineState);
     JsonNode expectedComponentState = buildMachineState(expectedStates);
     assertEquals(expectedComponentState, componentState);

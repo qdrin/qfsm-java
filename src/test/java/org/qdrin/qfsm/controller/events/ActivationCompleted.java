@@ -15,7 +15,7 @@ import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.controller.ControllerStarter;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.dto.*;
-import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
+import static org.qdrin.qfsm.Helper.buildMachineState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;

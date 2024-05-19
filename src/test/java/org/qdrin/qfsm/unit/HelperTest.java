@@ -1,25 +1,32 @@
 package org.qdrin.qfsm.unit;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import org.qdrin.qfsm.ProductBuilder;
 import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.model.dto.RequestEventDto;
-import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.qdrin.qfsm.EventBuilder;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.*;
+
+import static org.qdrin.qfsm.Helper.buildMachineState;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -106,19 +113,26 @@ public class HelperTest {
         JSONAssert.assertEquals(expected.toString(), machineState.toString(), false);
     }
 
-    @Test
-    public void testBuildMachineState() throws Exception {
+    private static Stream<Arguments> testBuildMachineState() {
+        return Stream.of(
+        Arguments.of(Arrays.asList("PendingActivate"), "'PendingActivate'"),
+        Arguments.of(Arrays.asList("Disconnect"), "'Disconnect'"),
+        Arguments.of(Arrays.asList("ActiveTrial", "Paid", "PriceActive"),
+            "{'Provision': [{'UsageRegion': {'UsageOn': {'Activated': 'ActiveTrial'}}}, {'PaymentRegion': {'PaymentOn': 'Paid'}}, {'PriceRegion': {'PriceOn': 'PriceActive'}}]}"),
+        Arguments.of(Arrays.asList("Suspended", "NotPaid", "PriceWaiting"),
+            "{'Provision': [{'UsageRegion': {'UsageOn': 'Suspended'}}, {'PaymentRegion': {'PaymentOn': 'NotPaid'}}, {'PriceRegion': {'PriceOn': 'PriceWaiting'}}]}"),
+        Arguments.of(Arrays.asList("PendingDisconnect", "PaymentFinal", "PriceFinal"),
+            "{'Provision': [{'UsageRegion': 'PendingDisconnect'}, {'PaymentRegion': 'PaymentFinal'}, {'PriceRegion': 'PriceFinal'}]}")
+        );
+    } 
+    @ParameterizedTest
+    @MethodSource
+    public void testBuildMachineState(List<String> states, String expectedString) throws Exception {
+
+        String exp = expectedString.replace("'", "\"");
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode expected = mapper.createObjectNode();
-        ArrayNode provisions = mapper.createArrayNode();
-        provisions.add(
-                mapper.createObjectNode().set("UsageOn", mapper.createObjectNode().put("Activated", "ActiveTrial")))
-                .add(mapper.createObjectNode().put("PaymentOn", "Paid"))
-                .add(mapper.createObjectNode().put("PriceOn", "PriceActive"));
-        JsonNode machineState = buildMachineState("ActiveTrial", "Paid", "PriceActive");
-        expected.set("Provision", provisions);
-        log.debug("machineState: {}", machineState);
-        log.debug("expected: {}", expected);
+        JsonNode expected = mapper.readTree(exp);
+        JsonNode machineState = buildMachineState(states);
         JSONAssert.assertEquals(expected.toString(), machineState.toString(), false);
     }
 

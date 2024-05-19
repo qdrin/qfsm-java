@@ -18,10 +18,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
+import static org.qdrin.qfsm.Helper.buildMachineState;
 import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.model.*;
-import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 

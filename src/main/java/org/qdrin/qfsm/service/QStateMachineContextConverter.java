@@ -2,17 +2,21 @@ package org.qdrin.qfsm.service;
 
 import org.springframework.statemachine.StateMachineContext;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
 
+import org.qdrin.qfsm.model.Product;
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.kryo.StateMachineContextSerializer;
+import org.springframework.statemachine.region.Region;
 import org.springframework.statemachine.state.AbstractState;
 import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
-import org.springframework.statemachine.support.AbstractStateMachine;
 import org.springframework.statemachine.support.DefaultExtendedState;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 
@@ -29,6 +33,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class QStateMachineContextConverter {
   private static final int maxBufSize = 1024*1024*2048;
+  public enum ProvisionOrder {
+    Usage,
+    Payment,
+    Price
+  }
+
+  public static void recalcMachineStates(StateContext<String, String> context) {
+    State<String, String> state = context.getStateMachine().getState();
+    ExtendedState extendedState = context.getExtendedState();
+    JsonNode machineState = toJsonNode(state);
+    JsonNode componentMachineState = buildComponentMachineState(machineState);
+    Product product = extendedState.get("product", Product.class);
+    log.debug("machineState: {}, componentMachineState: {}", machineState, componentMachineState);
+    List<Product> components = extendedState.get("components", List.class);
+    product.getMachineContext().setMachineState(machineState);
+    components.stream()
+      .filter(c -> ! c.getMachineContext().getIsIndependent())
+      .forEach(c -> c.getMachineContext().setMachineState(componentMachineState));
+  }
   
   public static StateMachineContext<String, String> toContext(byte[] buffer) {
     Kryo kryo = new Kryo();
@@ -46,12 +69,14 @@ public class QStateMachineContextConverter {
     String state = null;
     switch(jstate.getNodeType()) {
       case OBJECT:
-        state = jstate.fieldNames().next();
+        Entry<String, JsonNode> entry = jstate.fields().next();
+        state = entry.getKey();
+        JsonNode jchild = entry.getValue();
         context = new DefaultStateMachineContext<>(state, null, null, estate);
-        JsonNode jchild = jstate.get(state);
         if(jchild.getNodeType() == JsonNodeType.ARRAY) {
-          for(var j: jchild) {
-            StateMachineContext<String, String> child = toContext(j);
+          for(JsonNode j: jchild) {
+            Entry<String, JsonNode> regionEntry = ((ObjectNode) j).fields().next();
+            StateMachineContext<String, String> child = toContext(regionEntry.getValue());
             context.getChilds().add(child);
           }
         } else {
@@ -67,8 +92,9 @@ public class QStateMachineContextConverter {
     return context;
   }
 
-  public static JsonNode toJsonNode_old(State<String, String> state) {
+  public static JsonNode toJsonNode(State<String, String> state) {
     ObjectMapper mapper = new ObjectMapper();
+    if(state == null) return null;  // mapper.getNodeFactory().nullNode();
     // ObjectNode jcontext = mapper.createObjectNode();
 		String stateId = state.getId();
     JsonNode result = mapper.getNodeFactory().textNode(stateId);
@@ -77,10 +103,25 @@ public class QStateMachineContextConverter {
 			RegionState<String, String> rstate = (RegionState<String, String>) state;
       ObjectNode regions = mapper.createObjectNode();
       ArrayNode childs = mapper.createArrayNode();
-			for(var r: rstate.getRegions()) {
+      ObjectNode usage = mapper.createObjectNode();
+      ObjectNode payment = mapper.createObjectNode();
+      ObjectNode price = mapper.createObjectNode();
+			for(Region<String, String> r: rstate.getRegions()) {
+        Collection<State<String, String>> regionStates = r.getStates();
+        List<String> stateIds = new ArrayList<>();
+        regionStates.stream().forEach(s -> stateIds.add(s.getId()));
         JsonNode child = toJsonNode(r.getState());
-        childs.add(child);
+        if(stateIds.contains("UsageFinal")) {
+          usage.set("UsageRegion", child);
+        }
+        if(stateIds.contains("PaymentFinal")) {
+          payment.set("PaymentRegion", child);
+        }
+        if(stateIds.contains("PriceFinal")) {
+          price.set("PriceRegion", child);
+        }
 			}
+      childs.add(usage).add(payment).add(price);
       regions.set(stateId, childs);
       result = regions;
 		}
@@ -88,38 +129,12 @@ public class QStateMachineContextConverter {
 			StateMachine<String, String> submachine = ((AbstractState<String, String>) state).getSubmachine();
 			State<String, String> sstate = submachine.getState();
       JsonNode child = toJsonNode(sstate);
-      ObjectNode subMachine = mapper.createObjectNode().set(stateId, child);
-      result = subMachine;
+      ObjectNode subNode = mapper.createObjectNode().set(stateId, child);
+      result = subNode;
 		}
     return result;
 	}
 
-  public static JsonNode toJsonNode(State<String, String> state) {
-    ObjectMapper mapper = new ObjectMapper();
-    // ObjectNode jcontext = mapper.createObjectNode();
-		String stateId = state.getId();
-    JsonNode result = mapper.getNodeFactory().textNode(stateId);
-
-		if (state.isOrthogonal()) {
-			RegionState<String, String> rstate = (RegionState<String, String>) state;
-      ObjectNode regions = mapper.createObjectNode();
-      ObjectNode childs = mapper.createObjectNode();
-			for(var r: rstate.getRegions()) {
-        JsonNode child = toJsonNode(r.getState());
-        childs.set(r.getId(), child);
-			}
-      regions.set(stateId, childs);
-      result = regions;
-		}
-		if(state.isSubmachineState()) {
-			StateMachine<String, String> submachine = ((AbstractState<String, String>) state).getSubmachine();
-			State<String, String> sstate = submachine.getState();
-      JsonNode child = toJsonNode(sstate);
-      ObjectNode subMachine = mapper.createObjectNode().set(stateId, child);
-      result = subMachine;
-		}
-    return result;
-	}
 
   // TODO: We cannot get StateMachine context from machine or state, should we remove this method?
   public static JsonNode toJsonNode(StateMachineContext<String, String> context) {
@@ -156,77 +171,10 @@ public class QStateMachineContextConverter {
     return output.toBytes();
   }
 
-  public static JsonNode buildMachineState(List<String> states) {
-    return buildMachineState(states.toArray(new String[0]));
-  }
-
-  public static JsonNode buildMachineState(String... states) {
-    JsonNode result;
-    ObjectMapper mapper = new ObjectMapper();
-    ArrayNode provisions = mapper.createArrayNode();
-    JsonNode usage = null;
-    JsonNode payment = null;
-    JsonNode price = null;
-    if(states == null || states.length == 0) {
-      result = mapper.getNodeFactory().textNode("Entry");
-    } else if(states.length == 1) {
-      result = mapper.getNodeFactory().textNode(states[0]);
-    } else {
-      ObjectNode res = mapper.createObjectNode();
-      res.set("Provision", provisions);
-      result = res;
-      for(String s: states) {
-        switch(s) {
-          case "PendingDisconnect":
-          case "Disconnection":
-          case "UsageFinal":
-            usage = mapper.getNodeFactory().textNode(s);
-            break;
-          case "PaymentStopping":
-          case "PaymentStopped":
-          case "PaymentFinal":
-            payment = mapper.getNodeFactory().textNode(s);
-            break;
-          case "PriceOff":
-          case "PriceFinal":
-            price = mapper.getNodeFactory().textNode(s);
-            break;
-          case "Prolongation":
-          case "Suspending":
-          case "Resuming":
-          case "Suspended":
-            usage = mapper.createObjectNode().put("UsageOn", s);
-            break;
-          case "Active":
-          case "ActiveTrial":
-            usage = mapper.createObjectNode().set("UsageOn", mapper.createObjectNode().put("Activated", s));
-            break;
-          case "Paid":
-          case "WaitingPayment":
-          case "NotPaid":
-            payment = mapper.createObjectNode().put("PaymentOn", s);
-            break;
-          case "PriceActive":
-          case "PriceChanging":
-          case "PriceChanged":
-          case "PriceNotChanged":
-          case "PriceWaiting":
-            price = mapper.createObjectNode().put("PriceOn", s);
-            break;
-          default:
-            result = mapper.getNodeFactory().textNode(states[0]);
-        }
-      }
-      provisions.add(usage).add(payment).add(price);
-    }  
-    return result;
-  }
-
   public static JsonNode buildComponentMachineState(JsonNode bundleMachineState) {
     JsonNode result;
     ObjectMapper mapper = new ObjectMapper();
     ArrayNode provisions = mapper.createArrayNode();
-    JsonNode usage = null;
     if(bundleMachineState == null || bundleMachineState.getNodeType() == JsonNodeType.NULL) {
       result = mapper.getNodeFactory().textNode("Entry");
     } else if(bundleMachineState.getNodeType() == JsonNodeType.STRING) {
@@ -234,15 +182,29 @@ public class QStateMachineContextConverter {
     } else {
       ObjectNode res = mapper.createObjectNode();
       ArrayNode bundleProvisions = (ArrayNode) bundleMachineState.get("Provision");
+      ObjectNode usage = mapper.createObjectNode();
+      ObjectNode payment = mapper.createObjectNode();
+      ObjectNode price = mapper.createObjectNode();
       for(JsonNode prov: bundleProvisions) {
-        String name = prov.getNodeType() == JsonNodeType.STRING ? prov.toString() : ((ObjectNode) prov).fieldNames().next();
-        if(Arrays.asList("UsageOn", "PendingDisconnect", "Disconnection", "UsageFinal").contains(name)) {
-          usage = prov.deepCopy();
-          provisions.add(usage);
+        Entry<String, JsonNode> entry = prov.fields().next();
+        switch(entry.getKey()) {
+          case "UsageRegion":
+            usage.set("UsageRegion", entry.getValue().deepCopy());
+            break;
+          case "PaymentRegion":
+            JsonNode payval = entry.getValue();
+            payval = payval != null ? mapper.getNodeFactory().textNode("PaymentFinal") : null;
+            payment.set("PaymentRegion", payval);
+            break;
+          case "PriceRegion":
+            JsonNode priceval = entry.getValue();
+            priceval = priceval != null ? mapper.getNodeFactory().textNode("PriceFinal") : null;
+            price.set("PriceRegion", priceval);
+            break;
+          default:
         }
       }
-      provisions.add("PaymentFinal");
-      provisions.add("PriceFinal");
+      provisions.add(usage).add(payment).add(price);
       res.set("Provision", provisions);
       result = res;
     }  

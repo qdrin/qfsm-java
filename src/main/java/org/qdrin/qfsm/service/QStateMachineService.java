@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
+import org.springframework.statemachine.access.StateMachineAccessor;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.support.AbstractStateMachine;
 import org.springframework.stereotype.Component;
@@ -72,6 +73,13 @@ public class QStateMachineService {
 	public void releaseStateMachine(String machineId) {
 		log.info("Releasing machine with id " + machineId);
 		synchronized (machines) {
+			// StateMachine<String, String> stateMachine = machines.remove(machineId);
+			// Product product = stateMachine.getExtendedState().get("product", Product.class);
+			// List<Product> components = stateMachine.getExtendedState().get("components", List.class);
+			// JsonNode machineState = QStateMachineContextConverter.toJsonNode(stateMachine.getState());
+			// JsonNode componentState = QStateMachineContextConverter.buildComponentMachineState(machineState);
+			// product.getMachineContext().setMachineState(QStateMachineContextConverter.toJsonNode(stateMachine.getState()));
+			// components.stream().filter(c -> ! c.getMachineContext().getIsIndependent()).forEach(c -> c.getMachineContext().setMachineState(componentState));
 			machines.remove(machineId);
 		}
 	}

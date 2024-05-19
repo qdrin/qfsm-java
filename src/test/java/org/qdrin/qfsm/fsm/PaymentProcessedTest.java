@@ -9,7 +9,6 @@ import static org.junit.Assert.assertEquals;
 import static org.qdrin.qfsm.Helper.Assertions.*;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
 import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
-import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -22,6 +21,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
+import static org.qdrin.qfsm.Helper.buildMachineState;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.tasks.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
@@ -181,6 +181,7 @@ public class PaymentProcessedTest extends SpringStarter {
     int pricePeriod = states.contains("PriceActive") ? 1 : 0;
 
     log.debug("expectedStates: {}", expectedStates);
+    JsonNode expectedMachineState = buildMachineState(expectedStates);
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .status("ACTIVE")
       .productStartDate(t0)
@@ -193,6 +194,7 @@ public class PaymentProcessedTest extends SpringStarter {
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .tarificationPeriod(1)
       .pricePeriod(pricePeriod)
+      .machineState(expectedMachineState)
       .build();
     machine = createMachine(bundle);
     

@@ -2,6 +2,7 @@ package org.qdrin.qfsm.machine.states;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import org.qdrin.qfsm.machine.actions.MergeComponent;
 import org.qdrin.qfsm.model.Characteristic;
 import org.qdrin.qfsm.model.EventProperties;
 import org.qdrin.qfsm.model.MachineContext;
@@ -10,7 +11,6 @@ import org.qdrin.qfsm.tasks.*;
 import org.qdrin.qfsm.utils.DisconnectModeCalculator;
 import org.qdrin.qfsm.utils.DisconnectModeCalculator.DisconnectMode;
 
-import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.ExtendedState;
@@ -41,12 +41,6 @@ public class PendingDisconnectEntry implements Action<String, String> {
     OffsetDateTime disconnectDate = disconnectMode == DisconnectMode.POSTPONED ? product.getActiveEndDate() : OffsetDateTime.now();
 
 
-    Mono<Message<String>> paymentOff = Mono.just(MessageBuilder
-      .withPayload("payment_off").build());
-    Mono<Message<String>> priceOff = Mono.just(MessageBuilder
-      .withPayload("price_off").build());
-    var paymentRes = context.getStateMachine().sendEvent(paymentOff).collectList();
-    var priceRes = context.getStateMachine().sendEvent(priceOff).collectList();
     TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
     String productId = product.getProductId();
     tasks.addToRemovePlan(TaskDef.builder().type(TaskType.PRICE_ENDED).build());
@@ -68,14 +62,13 @@ public class PendingDisconnectEntry implements Action<String, String> {
     - добавляем таск на disconnect
     - делаем их независимыми
     - Выставляем им machineState*/
+    product.getMachineContext().setIsIndependent(true);  // if we disconnecting custom bundle component
     List<Product> components = (List<Product>) extendedState.getVariables().get("components");
-    JsonNode machineState = buildMachineState("PendingDisconnect", "PaymentFinal", "PriceFinal");
     for(Product component: components) {
       MachineContext machineContext = component.getMachineContext();
       if(! machineContext.getIsIndependent()) {
         component.setActiveEndDate(disconnectDate);
         machineContext.setIsIndependent(true);
-        machineContext.setMachineState(machineState);
         tasks.addToCreatePlan(TaskDef.builder()
           .productId(component.getProductId())
           .type(TaskType.DISCONNECT)
@@ -86,7 +79,5 @@ public class PendingDisconnectEntry implements Action<String, String> {
         tasks.addToCreatePlan(TaskDef.builder().productId(component.getProductId()).type(TaskType.ABORT).build());
       }
     }
-    paymentRes.block();
-    priceRes.block();
   }
 }

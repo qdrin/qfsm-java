@@ -45,9 +45,9 @@
                 <body>canDisconnect</body>
               </specification>
             </ownedRule>
-            <effect xmi:type="uml:OpaqueBehavior" xmi:id="_EOFikBQgEe-C2sZjbu6Aqg">
+            <effect xmi:type="uml:OpaqueBehavior" xmi:id="_tOy8YBXMEe-BZ4Qv75fHoA">
               <language>bean</language>
-              <body>unmergeComponent</body>
+              <body>sendPaymentOffAndPriceOff</body>
             </effect>
             <trigger xmi:type="uml:Trigger" xmi:id="_oNodYL9NEe65db1_bM-TwQ" event="_VSTmMLCDEe6zeo6uvgVLWA"/>
           </transition>
@@ -153,7 +153,7 @@
           </subvertex>
           <subvertex xmi:type="uml:FinalState" xmi:id="_pUzTQLz8Ee6WIIctFrkbQg" name="UsageFinal"/>
           <subvertex xmi:type="uml:State" xmi:id="_dafD4L9NEe65db1_bM-TwQ" name="PendingDisconnect">
-            <entry xmi:type="uml:OpaqueBehavior" xmi:id="_tqX5QL9VEe65db1_bM-TwQ" name="pendingDisconnectEntry">
+            <entry xmi:type="uml:OpaqueBehavior" xmi:id="_tqX5QL9VEe65db1_bM-TwQ" name="pendingDisconnectEntry" visibility="protected">
               <language>bean</language>
               <body>pendingDisconnectEntry</body>
             </entry>
@@ -286,6 +286,10 @@
                 <body>isNotTarificated</body>
               </specification>
             </ownedRule>
+            <effect xmi:type="uml:OpaqueBehavior" xmi:id="_Wcr3gBXBEe-BZ4Qv75fHoA">
+              <language>bean</language>
+              <body>mergeComponent</body>
+            </effect>
           </transition>
           <transition xmi:type="uml:Transition" xmi:id="_tjpdcArIEe-F_I8jzb-Dqg" source="_pzb7MArIEe-F_I8jzb-Dqg" target="__C9pcArHEe-F_I8jzb-Dqg"/>
           <subvertex xmi:type="uml:State" xmi:id="_5uBHwL9JEe65db1_bM-TwQ" name="PriceOn">
@@ -390,7 +394,7 @@
             </region>
           </subvertex>
           <subvertex xmi:type="uml:State" xmi:id="_aVZ0ML9LEe65db1_bM-TwQ" name="PriceOff"/>
-          <subvertex xmi:type="uml:FinalState" xmi:id="_c28j4L9LEe65db1_bM-TwQ" name="PriceFinal"/>
+          <subvertex xmi:type="uml:FinalState" xmi:id="_c28j4L9LEe65db1_bM-TwQ" name="PriceFinal" visibility="public"/>
           <subvertex xmi:type="uml:State" xmi:id="__C9pcArHEe-F_I8jzb-Dqg" name="PriceEntry"/>
           <subvertex xmi:type="uml:Pseudostate" xmi:id="_pzb7MArIEe-F_I8jzb-Dqg" name=""/>
         </region>

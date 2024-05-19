@@ -16,13 +16,15 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
+import static org.qdrin.qfsm.Helper.buildMachineState;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
 import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
-import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.tasks.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,6 +59,7 @@ public class PriceEndedTest extends SpringStarter {
     String status = usageState.equals("ActiveTrial") ? "ACTIVE_TRIAL" : "ACTIVE";
     String [] initialStates = {usageState, "Paid", "PriceActive"};
     String[] expectedStates = {usageState, "WaitingPayment", "PriceChanging"};
+    JsonNode expectedMachineState = buildMachineState(expectedStates);
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .status(status)
       .machineState(buildMachineState(initialStates))
@@ -67,7 +70,9 @@ public class PriceEndedTest extends SpringStarter {
       .build();
     assertEquals(componentOfferIds.size(), bundle.components().size());
     String productId = bundle.drive.getProductId();
-    TestBundle expectedBundle = new BundleBuilder(bundle).build();
+    TestBundle expectedBundle = new BundleBuilder(bundle)
+      .machineState(expectedMachineState)
+      .build();
     TaskPlan expectedTasks = new TaskPlan(productId);
     expectedTasks.addToCreatePlan(TaskDef.builder()
       .type(TaskType.WAITING_PAY_ENDED)

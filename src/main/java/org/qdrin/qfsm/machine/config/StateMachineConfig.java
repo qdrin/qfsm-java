@@ -12,6 +12,7 @@ import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
+import org.qdrin.qfsm.service.QStateMachineContextConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.StateContext;
@@ -21,6 +22,7 @@ import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
 import org.springframework.statemachine.guard.Guard;
+import org.springframework.statemachine.state.State;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
 
 import lombok.extern.slf4j.Slf4j;
@@ -193,6 +195,11 @@ public class StateMachineConfig {
     }
 
     @Bean
+    SignalAction sendPaymentOffAndPriceOff() {
+      return new SignalAction(Arrays.asList("payment_off", "price_off"));
+    }
+
+    @Bean
     Action<String, String> clearProductPrice() {
       return new Action<String, String>() {
         public void execute(StateContext<String, String> context) {
@@ -205,16 +212,12 @@ public class StateMachineConfig {
 
     // TODO: Remove
     // @Bean
-    // Action<String, String> resetPricePeriod() {
+    // Action<String, String> recalcMachineState() {
     //   return new Action<String, String>() {
     //     public void execute(StateContext<String, String> context) {
-    //       Product product = context.getStateMachine().getExtendedState().get("product", Product.class);
-    //       log.info("Reset price period. productId: {}", product.getProductId());
-    //       product.setTarificationPeriod(0);
-    //       Optional<ProductPrice> price = product.getProductPrice(PriceType.RecurringCharge);
-    //       if(price.isPresent()) {
-    //         price.get().setPeriod(0);
-    //       }
+    //       State<String, String> state = context.getTarget();
+    //       log.debug("recalcMachineState. state: {}", state.getId());
+    //       QStateMachineContextConverter.recalcMachineStates(context);
     //     }
     //   };
     // }
@@ -222,17 +225,6 @@ public class StateMachineConfig {
     @Bean
     MergeComponent mergeComponent() {
       return new MergeComponent();
-    }
-
-    @Bean
-    Action<String, String> unmergeComponent() {
-      return new Action<String, String>() {
-        public void execute(StateContext<String, String> context) {
-          Product product = context.getStateMachine().getExtendedState().get("product", Product.class);
-          log.info("[{}] unmerging", product.getProductId());
-          product.getMachineContext().setIsIndependent(true);
-        }
-      };
     }
 
     // -----------------------------------------------------------------

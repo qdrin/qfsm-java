@@ -28,7 +28,10 @@ import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -140,6 +143,75 @@ public class Helper {
     } catch(Exception e) {
         return false;
     }
+  }
+
+  public static JsonNode buildMachineState(List<String> states) {
+    return buildMachineState(states.toArray(new String[0]));
+  }
+
+  public static JsonNode buildMachineState(String... states) {
+    JsonNode result;
+    ObjectMapper mapper = new ObjectMapper();
+    ArrayNode provisions = mapper.createArrayNode();
+    // ObjectNode provisions = mapper.createObjectNode();
+
+    if(states == null || states.length == 0) {
+      result = mapper.getNodeFactory().textNode("Entry");
+    } else if(states.length == 1) {
+      result = mapper.getNodeFactory().textNode(states[0]);
+    } else {
+      ObjectNode res = mapper.createObjectNode();
+      res.set("Provision", provisions);
+      ObjectNode usage = mapper.createObjectNode();
+      ObjectNode payment = mapper.createObjectNode();
+      ObjectNode price = mapper.createObjectNode();
+      result = res;
+      for(String s: states) {
+        switch(s) {
+          case "PendingDisconnect":
+          case "Disconnection":
+          case "UsageFinal":
+            usage.put("UsageRegion", s);
+            break;
+          case "PaymentStopping":
+          case "PaymentStopped":
+          case "PaymentFinal":
+            payment.put("PaymentRegion", s);
+            break;
+          case "PriceOff":
+          case "PriceFinal":
+            price.put("PriceRegion", s);
+            break;
+          case "Prolongation":
+          case "Suspending":
+          case "Resuming":
+          case "Suspended":
+            usage.set("UsageRegion", mapper.createObjectNode().put("UsageOn", s));
+            break;
+          case "Active":
+          case "ActiveTrial":
+            usage.set("UsageRegion", mapper.createObjectNode().set("UsageOn", mapper.createObjectNode().put("Activated", s)));
+            break;
+          case "Paid":
+          case "WaitingPayment":
+          case "NotPaid":
+            payment.set("PaymentRegion", mapper.createObjectNode().put("PaymentOn", s));
+            break;
+          case "PriceActive":
+          case "PriceChanging":
+          case "PriceChanged":
+          case "PriceNotChanged":
+          case "PriceWaiting":
+            price.set("PriceRegion", mapper.createObjectNode().put("PriceOn", s));
+            break;
+          default:
+            result = mapper.getNodeFactory().textNode(states[0]);
+        }
+      }
+      provisions.add(usage).add(payment).add(price);
+      result = res;
+    }  
+    return result;
   }
 
   public static class Assertions {

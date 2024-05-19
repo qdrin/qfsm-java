@@ -26,7 +26,7 @@ import org.qdrin.qfsm.ProductClass;
 
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
 import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
-import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
+import static org.qdrin.qfsm.Helper.buildMachineState;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.tasks.*;
 import org.qdrin.qfsm.utils.DisconnectModeCalculator.DisconnectMode;
@@ -182,6 +182,7 @@ public class DeactivationStartedTest extends SpringStarter {
     OffsetDateTime t1 = expectedMode == DisconnectMode.POSTPONED ? activeEndDate : t0;
     OffsetDateTime tstart = t0.minusDays(30);
     String status = states.get(0).equals("ActiveTrial") ? "ACTIVE_TRIAL" : "ACTIVE";
+    List<String> expectedStates = Arrays.asList("PendingDisconnect", "PaymentFinal", "PriceFinal");
     TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
       .status(status)
       .machineState(buildMachineState(states))
@@ -203,6 +204,7 @@ public class DeactivationStartedTest extends SpringStarter {
     String productId = bundle.drive.getProductId();
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("PENDING_DISCONNECT")
+      .machineState(buildMachineState(expectedStates))
       .activeEndDate(t1)
       .build();
     expectedBundle.components().stream().forEach(c -> c.getMachineContext().setIsIndependent(true));
@@ -233,7 +235,7 @@ public class DeactivationStartedTest extends SpringStarter {
               .and()
           .step()
               .sendEvent(message)
-              .expectStates(Helper.stateSuite("PendingDisconnect", "PaymentFinal", "PriceFinal"))
+              .expectStates(Helper.stateSuite(expectedStates))
               .expectVariableWith(testBundleEqualTo(expectedBundle))
               .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()

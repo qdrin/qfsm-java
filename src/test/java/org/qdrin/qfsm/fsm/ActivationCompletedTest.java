@@ -3,7 +3,6 @@ package org.qdrin.qfsm.fsm;
 import org.springframework.statemachine.StateMachine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.qdrin.qfsm.Helper.Assertions.*;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -18,13 +17,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
+import static org.qdrin.qfsm.Helper.buildMachineState;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
 import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
-import static org.qdrin.qfsm.service.QStateMachineContextConverter.buildMachineState;
 import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.model.Product;
-import org.qdrin.qfsm.service.QStateMachineContextConverter;
 import org.qdrin.qfsm.tasks.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
@@ -70,6 +68,7 @@ public class ActivationCompletedTest extends SpringStarter {
     String productId = bundle.drive.getProductId();
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("ACTIVE_TRIAL")
+      .machineState(buildMachineState(expectedStates))
       .tarificationPeriod(1)
       .pricePeriod(1)
       .trialEndDate(t1)
@@ -128,6 +127,7 @@ public class ActivationCompletedTest extends SpringStarter {
     assertEquals(componentOfferIds.size(), bundle.components().size());
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status("ACTIVE")
+      .machineState(buildMachineState(expectedStates))
       .tarificationPeriod(0)
       .pricePeriod(1)
       .activeEndDate(t1)
@@ -183,8 +183,10 @@ public class ActivationCompletedTest extends SpringStarter {
     assertEquals(componentOfferIds.size(), bundle.components().size());
     String productId = bundle.drive.getProductId();
     String expectedUsage = expectedStatus.equals("ACTIVE") ? "Active" : "ActiveTrial";
+    List<String> expectedStates = Arrays.asList(expectedUsage, "WaitingPayment", "PriceWaiting");
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status(expectedStatus)
+      .machineState(buildMachineState(expectedStates))
       .tarificationPeriod(0)
       .pricePeriod(0)
       .activeEndDate(null)
@@ -201,7 +203,7 @@ public class ActivationCompletedTest extends SpringStarter {
           .stateMachine(machine)
           .step()
               .sendEvent("activation_completed")
-              .expectStates(Helper.stateSuite(expectedUsage, "WaitingPayment", "PriceWaiting"))
+              .expectStates(Helper.stateSuite(expectedStates))
               .expectVariableWith(testBundleEqualTo(expectedBundle))
               .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
@@ -226,6 +228,7 @@ public class ActivationCompletedTest extends SpringStarter {
     public void testCustomBundleComponentActivationCompleted(String offerId, String priceId,
         String status, List<String> states) throws Exception {
       OffsetDateTime t0 = OffsetDateTime.now();
+      List<String> expectedStates = Arrays.asList(states.get(0), "PaymentFinal", "PriceFinal");
       JsonNode machineState = buildMachineState(states.toArray(new String[0]));
       TestBundle preBundle = new BundleBuilder("customBundleOffer1", priceId,
         "component1", "component2")
@@ -247,6 +250,7 @@ public class ActivationCompletedTest extends SpringStarter {
       // TODO: Добавить анализ на состав бандла
       TestBundle expectedBundle = new BundleBuilder(bundle)
         .driveClass(ProductClass.CUSTOM_BUNDLE_COMPONENT)
+        .machineState(buildMachineState(expectedStates))
         .isIndependent(false)  // means leg becomes merged to bundle
         .tarificationPeriod(2)
         .status(status)
@@ -264,7 +268,7 @@ public class ActivationCompletedTest extends SpringStarter {
                 .and()
             .step()
                 .sendEvent("activation_completed")
-                .expectStates(Helper.stateSuite(states.get(0), "PaymentFinal", "PriceFinal"))
+                .expectStates(Helper.stateSuite(expectedStates))
                 .expectVariableWith(testBundleEqualTo(expectedBundle))
                 .expectVariableWith(taskPlanEqualTo(expectedTasks))
                 .and()
@@ -357,14 +361,17 @@ public class ActivationCompletedTest extends SpringStarter {
 
     public static Stream<Arguments> testBundleActivationWithCustomComponentIndependent() {
       return Stream.of(
-        Arguments.of("custom1-price-trial", Arrays.asList("component1", "component2", "component3"), "component3"),
-        Arguments.of("custom1-price-active", Arrays.asList("component1", "component2", "component3"), "component3")
+        Arguments.of("custom1-price-trial", Arrays.asList("ActiveTrial", "Paid", "PriceActive")),
+        Arguments.of("custom1-price-active", Arrays.asList("Active", "WaitingPayment", "PriceActive"))
       );
     }
 
     @ParameterizedTest
     @MethodSource
-    public void testBundleActivationWithCustomComponentIndependent(String priceId, List<String> componentOfferIds, String independentOfferId) throws Exception {
+    public void testBundleActivationWithCustomComponentIndependent(String priceId, List<String> expectedStates) throws Exception {
+      List<String> componentOfferIds = Arrays.asList("component1", "component2", "component3");
+      String independentOfferId = "component3";
+
       String offerId = "customBundleOffer1";
       OffsetDateTime t0 = OffsetDateTime.now().minusSeconds(30);
       OffsetDateTime t1 = t0.plusDays(30);
@@ -387,6 +394,7 @@ public class ActivationCompletedTest extends SpringStarter {
   
       TestBundle expectedBundle = new BundleBuilder(bundle)
         .status(status)
+        .machineState(buildMachineState(expectedStates))
         .pricePeriod(1)
         .tarificationPeriod(-1)
         .activeEndDate(t1)
