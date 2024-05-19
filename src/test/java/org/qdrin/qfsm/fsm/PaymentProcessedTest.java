@@ -139,6 +139,7 @@ public class PaymentProcessedTest extends SpringStarter {
               .and()
           .step()
               .sendEvent("payment_processed")
+              .expectStateChanged(0)
               .expectEventNotAccepted(19)
               .and()
           .build();
@@ -211,11 +212,12 @@ public class PaymentProcessedTest extends SpringStarter {
           .step()
               .sendEvent("payment_processed")
               .expectStates(Helper.stateSuite(expectedStates))
-              .expectVariableWith(testBundleEqualTo(expectedBundle))
               .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
           .build();
     plan.test();
     releaseMachine(machine.getId());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
   }
 }

@@ -286,7 +286,7 @@ public class BundleBuilder {
 
     public BundleBuilder machineState(JsonNode machineState) {
         drive.getMachineContext().setMachineState(machineState);
-        JsonNode componentMachineState = QStateMachineContextConverter.buildComponentMachineState(machineState);
+        JsonNode componentMachineState = machineState != null ? QStateMachineContextConverter.buildComponentMachineState(machineState) : null;
         components.stream()
             .filter(c -> ! c.getMachineContext().getIsIndependent())
             .forEach(c -> c.getMachineContext().setMachineState(componentMachineState));

@@ -1,6 +1,9 @@
 package org.qdrin.qfsm.fsm;
 
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.StateMachineEventResult;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.qdrin.qfsm.Helper.Assertions.*;
@@ -30,6 +33,7 @@ import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 
 @Slf4j
@@ -43,6 +47,55 @@ public class PaymentFailedTest extends SpringStarter {
   public void setup() throws Exception {
     machine = null;
     clearDb();
+  }
+
+  private static Stream<Arguments> testDeferredAtPendingActivate() {
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-active", Arrays.asList()),
+      Arguments.of("bundleOffer1", "bundle1-price-active", Arrays.asList("component1", "component2")),
+      Arguments.of("customBundleOffer1", "custom1-price-active", Arrays.asList("component1", "component2"))
+    );  
+  }
+  @ParameterizedTest
+  @MethodSource
+  public void testDeferredAtPendingActivate(String offerId, String priceId, List<String> componentOfferIds) throws Exception {
+    OffsetDateTime t0 = OffsetDateTime.now();
+    JsonNode machineState = buildMachineState("PendingActivate");
+    TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
+      .status("PENDING_ACTIVATE")
+      .productStartDate(t0)
+      .tarificationPeriod(0)
+      .priceNextPayDate(nextPayDate)
+      .pricePeriod(1)
+      .machineState(machineState)
+      .build();
+    assertEquals(componentOfferIds.size(), bundle.components().size());
+    StateMachine<String, String> machine = createMachine(bundle);
+    Mono<Message<String>> msg = Mono.just((MessageBuilder.withPayload("payment_failed").build()));
+    StateMachineEventResult<String, String> res = machine.sendEvent(msg).blockLast();
+    log.debug("res: {}", res);
+    assertEquals(StateMachineEventResult.ResultType.DEFERRED, res.getResultType());
+    Message<String> deferred = res.getMessage();
+    releaseMachine(machine.getId());
+    machine = createMachine(bundle);
+    StateMachineTestPlan<String, String> plan =
+    StateMachineTestPlanBuilder.<String, String>builder()
+      .defaultAwaitTime(2)
+      .stateMachine(machine)
+      .step()
+          .expectState("PendingActivate")
+          .and()
+      .step()
+          .sendEvent("activation_completed")
+          .expectStates(Helper.stateSuite("Active", "WaitingPayment", "PriceActive"))
+          .and()
+      .step()
+          .sendEvent(deferred)
+          .expectStates(Helper.stateSuite("Suspending", "NotPaid", "PriceActive"))
+          .and()
+      .build();
+    plan.test();
+    releaseMachine(machine.getId());
   }
 
   private static Stream<Arguments> testFirstTrialPrice() {
@@ -83,6 +136,7 @@ public class PaymentFailedTest extends SpringStarter {
               .and()
           .step()
               .sendEvent("payment_failed")
+              .expectStateChanged(0)
               .expectEventNotAccepted(19)
               .and()
           .build();
@@ -159,13 +213,12 @@ public class PaymentFailedTest extends SpringStarter {
           .step()
               .sendEvent("payment_failed")
               .expectStates(Helper.stateSuite(expectedStates))
-              .expectVariableWith(testBundleEqualTo(expectedBundle))
               .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
           .build();
     plan.test();
-    TaskPlan tasks = (TaskPlan) variables.get("tasks");
-    log.debug("tasks createPlan: {}, removePlan: {}", tasks.getCreatePlan(), tasks.getRemovePlan());
     releaseMachine(machine.getId());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
   }
 }

@@ -40,8 +40,13 @@ public class QStateMachineContextConverter {
   }
 
   public static void recalcMachineStates(StateContext<String, String> context) {
-    State<String, String> state = context.getStateMachine().getState();
-    ExtendedState extendedState = context.getExtendedState();
+    StateMachine<String, String> machine = context.getStateMachine();
+    recalcMachineStates(machine);
+  }
+
+  public static void recalcMachineStates(StateMachine<String, String> machine) {
+    State<String, String> state = machine.getState();
+    ExtendedState extendedState = machine.getExtendedState();
     JsonNode machineState = toJsonNode(state);
     JsonNode componentMachineState = buildComponentMachineState(machineState);
     Product product = extendedState.get("product", Product.class);

@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
+import static org.qdrin.qfsm.Helper.Assertions.*;
 import static org.qdrin.qfsm.Helper.buildMachineState;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.tasks.*;
@@ -109,12 +110,13 @@ public class WaitingPayEndedTest extends SpringStarter {
           .step()
               .sendEvent("waiting_pay_ended")
               .expectStates(Helper.stateSuite(expectedStates))
-              .expectVariableWith(testBundleEqualTo(expectedBundle))
               .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
           .build();
     plan.test();
     log.debug("actions: {}", variables.get("actions"));
     releaseMachine(machine.getId());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
   }
 }

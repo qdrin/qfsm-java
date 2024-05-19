@@ -38,7 +38,6 @@ public class StateStatus {
     ExtendedState extendedState = machine.getExtendedState();
     Product product = extendedState.get("product", Product.class);
     List<Product> components = extendedState.get("components", List.class);
-    QStateMachineContextConverter.recalcMachineStates(context);
     String status = statusMap.getOrDefault(state.getId(), null);
     if(status != null) {
       log.debug("setting status to {}", status);

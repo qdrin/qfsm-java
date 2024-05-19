@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
+import static org.qdrin.qfsm.Helper.Assertions.*;
 import static org.qdrin.qfsm.Helper.buildMachineState;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
 import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
@@ -93,12 +94,13 @@ public class ActivationCompletedTest extends SpringStarter {
           .step()
               .sendEvent("activation_completed")
               .expectStates(expectedStates)
-              .expectVariableWith(testBundleEqualTo(expectedBundle))
               .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
           .build();
     plan.test();
     releaseMachine(machine.getId());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
   }
 
   public static Stream<Arguments> testSuccessActive() {
@@ -149,13 +151,13 @@ public class ActivationCompletedTest extends SpringStarter {
           .step()
               .sendEvent("activation_completed")
               .expectStates(expectedStates)
-              .expectVariableWith(testBundleEqualTo(expectedBundle))
               .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
           .build();
     plan.test();
     releaseMachine(machine.getId());
-    log.debug("states: {}", machine.getState().getIds());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
   }
 
   public static Stream<Arguments> testSuccessNoNextPayDate() {
@@ -204,12 +206,13 @@ public class ActivationCompletedTest extends SpringStarter {
           .step()
               .sendEvent("activation_completed")
               .expectStates(Helper.stateSuite(expectedStates))
-              .expectVariableWith(testBundleEqualTo(expectedBundle))
               .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
           .build();
     plan.test();
     releaseMachine(machine.getId());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
   }
 
   @Nested
@@ -269,12 +272,13 @@ public class ActivationCompletedTest extends SpringStarter {
             .step()
                 .sendEvent("activation_completed")
                 .expectStates(Helper.stateSuite(expectedStates))
-                .expectVariableWith(testBundleEqualTo(expectedBundle))
                 .expectVariableWith(taskPlanEqualTo(expectedTasks))
                 .and()
             .build();
       plan.test();
       releaseMachine(machine.getId());
+      assertProductEquals(expectedBundle.drive, bundle.drive);
+      assertProductEquals(expectedBundle.components(), bundle.components());
     }
 
     private static Stream<Arguments> testCustomBundleComponentActivationRejected() {
@@ -414,13 +418,13 @@ public class ActivationCompletedTest extends SpringStarter {
                 .and()
             .step()
                 .sendEvent("activation_completed")
-                .expectVariableWith(testBundleEqualTo(expectedBundle))
                 .and()
             .build();
       plan.test();
       releaseMachine(machine.getId());
       assertEquals(null, bundle.getByOfferId(independentOfferId).getActiveEndDate());
-      log.debug("states: {}", machine.getState().getIds());
+      assertProductEquals(expectedBundle.drive, bundle.drive);
+      assertProductEquals(expectedBundle.components(), bundle.components());
     }
   }
 }

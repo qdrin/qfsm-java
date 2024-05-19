@@ -3,6 +3,7 @@ package org.qdrin.qfsm.fsm;
 import org.springframework.statemachine.StateMachine;
 
 import static org.junit.Assert.*;
+import static org.qdrin.qfsm.Helper.buildMachineState;
 import static org.qdrin.qfsm.Helper.Assertions.assertProductEquals;
 
 import java.time.OffsetDateTime;
@@ -72,6 +73,7 @@ public class ActivationStartedTest extends SpringStarter {
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .tarificationPeriod(0)
       .status(expectedStatus)
+      .machineState(buildMachineState("PendingActivate"))
       .productStartDate(t0)
       .build();
     ProductClass actualClass = ProductClass.values()[bundle.drive.getProductClass()];
@@ -94,8 +96,8 @@ public class ActivationStartedTest extends SpringStarter {
     plan.test();
     releaseMachine(machine.getId());
     assertEquals(expectedStatus, bundle.drive.getStatus());
-    Helper.Assertions.assertProductEquals(expectedBundle.drive, bundle.drive);
-    Helper.Assertions.assertProductEquals(expectedBundle.components(), bundle.components());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
   }
 
   @Nested
@@ -127,6 +129,7 @@ public class ActivationStartedTest extends SpringStarter {
         .tarificationPeriod(0)
         .productStartDate(t0)
         .status("PENDING_ACTIVATE")
+        .machineState(buildMachineState("PendingActivate"))
         .isIndependent(true)
         .build();
       expectedBundle.bundle.getProductRelationship().add(new ProductRelationship(bundle.drive));

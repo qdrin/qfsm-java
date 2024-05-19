@@ -7,6 +7,7 @@ import org.qdrin.qfsm.model.Characteristic;
 import org.qdrin.qfsm.model.EventProperties;
 import org.qdrin.qfsm.model.MachineContext;
 import org.qdrin.qfsm.model.Product;
+import org.qdrin.qfsm.service.QStateMachineContextConverter;
 import org.qdrin.qfsm.tasks.*;
 import org.qdrin.qfsm.utils.DisconnectModeCalculator;
 import org.qdrin.qfsm.utils.DisconnectModeCalculator.DisconnectMode;
@@ -67,8 +68,11 @@ public class PendingDisconnectEntry implements Action<String, String> {
     for(Product component: components) {
       MachineContext machineContext = component.getMachineContext();
       if(! machineContext.getIsIndependent()) {
+        JsonNode componentMachineState = QStateMachineContextConverter.buildComponentMachineState(
+          QStateMachineContextConverter.toJsonNode(context.getStateMachine().getState()));
         component.setActiveEndDate(disconnectDate);
         machineContext.setIsIndependent(true);
+        machineContext.setMachineState(componentMachineState);
         tasks.addToCreatePlan(TaskDef.builder()
           .productId(component.getProductId())
           .type(TaskType.DISCONNECT)

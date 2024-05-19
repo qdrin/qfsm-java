@@ -16,9 +16,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
 import org.qdrin.qfsm.Helper;
+import static org.qdrin.qfsm.Helper.Assertions.*;
 import static org.qdrin.qfsm.Helper.buildMachineState;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
-import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
 import org.qdrin.qfsm.SpringStarter;
 import org.qdrin.qfsm.tasks.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
@@ -94,12 +94,13 @@ public class PriceEndedTest extends SpringStarter {
           .step()
               .sendEvent("price_ended")
               .expectStates(Helper.stateSuite(expectedStates))
-              .expectVariableWith(testBundleEqualTo(expectedBundle))
               .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
           .build();
     plan.test();
     releaseMachine(machine.getId());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
   }
 
   public static Stream<Arguments> testRejectedNotPriceActive() {
@@ -140,6 +141,7 @@ public class PriceEndedTest extends SpringStarter {
               .and()
           .step()
               .sendEvent("price_ended")
+              .expectStateChanged(0)
               .expectEventNotAccepted(19)
               .and()
           .build();
