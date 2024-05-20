@@ -28,7 +28,7 @@ public class PriceChangedEntry implements Action<String, String> {
     ExtendedState extendedState = context.getStateMachine().getExtendedState();
     Product product = extendedState.get("product", Product.class);
     ProductPrice nextPrice = extendedState.get("nextPrice", ProductPrice.class);
-    nextPrice.setPeriod(1);
+    nextPrice.setPeriod(0);
     List<ProductPrice> currentPrices = product.getProductPrice();
     currentPrices.removeIf(p -> p.getPriceType().equals(PriceType.RecurringCharge.name()));
     currentPrices.add(nextPrice);
