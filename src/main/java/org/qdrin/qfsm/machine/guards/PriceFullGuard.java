@@ -6,6 +6,8 @@ import org.springframework.statemachine.guard.Guard;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,24 +15,16 @@ import org.qdrin.qfsm.PriceType;
 import org.qdrin.qfsm.model.*;
 
 @Slf4j
-public class PriceGuard implements Guard<String, String> {
-  private boolean equalDir;
-  private boolean fullDir;
-  private boolean equalCompare;
-  private boolean fullCompare;
+public class PriceFullGuard implements Guard<String, String> {
 
-  public PriceGuard(Optional<Boolean> full, Optional<Boolean> equal) {
-    equalCompare = false;
-    fullCompare = false;
-    if(! full.isEmpty()) {
-      fullCompare = true;
-      this.fullDir = (boolean) full.get();
-    }
+  boolean notFull;
 
-    if(! equal.isEmpty()) {
-      this.equalCompare = true;
-      this.equalDir = (boolean) equal.get();
-    }
+  public PriceFullGuard(boolean notFull) {
+    this.notFull = notFull;
+  }
+
+  public PriceFullGuard() {
+    this(false);
   }
 
   @Override
@@ -40,23 +34,16 @@ public class PriceGuard implements Guard<String, String> {
     String priceId = price == null ? "" : price.getId();
     
     List<Characteristic> eventChars = (List<Characteristic>) context.getMessageHeader("characteristics");
+    eventChars = eventChars == null ? new ArrayList<>() : eventChars;
     List<Characteristic> nextPrices = eventChars.stream().filter(c -> c.getName().equals("nextPrice")).toList();
     if(nextPrices.isEmpty()) {
       log.error("No nextPrice characteristic found");
-      return false;
+      return notFull;
     }
     ProductPrice nextPrice = (ProductPrice) nextPrices.get(0).getValue();
-
-    boolean res = true;
-    if(fullCompare) {
-      boolean isFull = nextPrice.getNextPayDate() != null;
-      res = fullDir? isFull : ! isFull;
-    }
-    if(equalCompare) {
-      boolean isEqual = priceId.equals(nextPrice.getId());
-      res = res && (equalDir? isEqual : ! isEqual);
-    }
-    return res;
+    OffsetDateTime nextPayDate = nextPrice.getNextPayDate();
+    if(nextPayDate == null || nextPayDate.isBefore(OffsetDateTime.now())) return notFull;
+    return ! notFull;
   }
   
 }

@@ -218,12 +218,14 @@ public class StateMachineConfig {
       return new Action<String, String>() {
         public void execute(StateContext<String, String> context) {
           ExtendedState extendedState = context.getExtendedState();
+          ProductPrice nextPrice = null;
           List<Characteristic> eventChars = (List<Characteristic>) context.getMessageHeader("characteristics");
-          Optional<Characteristic> nextPriceChar = eventChars.stream().filter(c -> c.getName().equals("nextPrice")).findFirst();
-          ProductPrice nextPrice;
-          if(nextPriceChar.isPresent()) {
-            nextPrice = (ProductPrice) nextPriceChar.get().getValue();
-          } else nextPrice = new ProductPrice();
+          if(eventChars != null) {
+            Optional<Characteristic> nextPriceChar = eventChars.stream().filter(c -> c.getName().equals("nextPrice")).findFirst();
+            if(nextPriceChar.isPresent()) {
+              nextPrice = (ProductPrice) nextPriceChar.get().getValue();
+            }
+          }
           log.info("[{}] setting nextPrice: {}", extendedState.get("product", Product.class).getProductId(), nextPrice);
           extendedState.getVariables().put("nextPrice", nextPrice);
         }
@@ -254,17 +256,22 @@ public class StateMachineConfig {
 
     @Bean
     public Guard<String, String> notFullPrice() {
-      return new PriceGuard(Optional.of(false), Optional.empty());
+      return new PriceFullGuard(true);
+    }
+
+    @Bean
+    public Guard<String, String> fullPrice() {
+      return new PriceFullGuard(false);
     }
 
     @Bean
     public Guard<String, String> newPrice() {
-      return new PriceGuard(Optional.of(true), Optional.of(false));
+      return new PriceEqualsGuard(true);
     }
 
     @Bean
     public Guard<String, String> samePrice() {
-      return new PriceGuard(Optional.of(true), Optional.of(true));
+      return new PriceEqualsGuard(false);
     }
 
     @Bean

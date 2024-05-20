@@ -275,7 +275,7 @@ public class ChangePriceTest extends SpringStarter {
         .setHeader("characteristics", eventChars)
         .build();
     } else {
-      message = MessageBuilder.withPayload("chang_price").build();
+      message = MessageBuilder.withPayload("change_price").build();
     }
     machine = createMachine(bundle);
     

@@ -313,20 +313,27 @@
                 </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_VOxMQMNWEe6X9syf-CmCRw" event="_a_mX4MNVEe6X9syf-CmCRw"/>
               </transition>
-              <transition xmi:type="uml:Transition" xmi:id="_R4k8cMNqEe6X9syf-CmCRw" source="_YsCfJr9KEe65db1_bM-TwQ" target="_QYmEgMN3Ee6X9syf-CmCRw">
+              <transition xmi:type="uml:Transition" xmi:id="_R4k8cMNqEe6X9syf-CmCRw" guard="_9IqYYBbaEe-h0e9geuINvw" source="_YsCfJr9KEe65db1_bM-TwQ" target="_QYmEgMN3Ee6X9syf-CmCRw">
+                <ownedRule xmi:type="uml:Constraint" xmi:id="_9IqYYBbaEe-h0e9geuINvw">
+                  <specification xmi:type="uml:OpaqueExpression" xmi:id="_9IqYYRbaEe-h0e9geuINvw">
+                    <language>bean</language>
+                    <body>fullPrice</body>
+                  </specification>
+                </ownedRule>
                 <effect xmi:type="uml:OpaqueBehavior" xmi:id="_ayaFEBaGEe-UWoUXAn4FCQ">
                   <language>bean</language>
                   <body>createNextPriceVariable</body>
                 </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_W033UMNqEe6X9syf-CmCRw" event="_K9PWwLXcEe6PAs2TUsdVsw"/>
               </transition>
-              <transition xmi:type="uml:Transition" xmi:id="_z2DukMNqEe6X9syf-CmCRw" guard="_PCsFsMNwEe6X9syf-CmCRw" source="_QYmEgMN3Ee6X9syf-CmCRw" target="_tDW6cMNkEe6X9syf-CmCRw">
+              <transition xmi:type="uml:Transition" xmi:id="_z2DukMNqEe6X9syf-CmCRw" guard="_PCsFsMNwEe6X9syf-CmCRw" source="_YsCfJr9KEe65db1_bM-TwQ" target="_tDW6cMNkEe6X9syf-CmCRw">
                 <ownedRule xmi:type="uml:Constraint" xmi:id="_PCsFsMNwEe6X9syf-CmCRw">
                   <specification xmi:type="uml:OpaqueExpression" xmi:id="_PCsFscNwEe6X9syf-CmCRw">
                     <language>bean</language>
                     <body>notFullPrice</body>
                   </specification>
                 </ownedRule>
+                <trigger xmi:type="uml:Trigger" xmi:id="_11HSQBbaEe-h0e9geuINvw" event="_K9PWwLXcEe6PAs2TUsdVsw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_6L0WwMNqEe6X9syf-CmCRw" guard="_ch75EMNwEe6X9syf-CmCRw" source="_QYmEgMN3Ee6X9syf-CmCRw" target="_aiBJUL9KEe65db1_bM-TwQ">
                 <ownedRule xmi:type="uml:Constraint" xmi:id="_ch75EMNwEe6X9syf-CmCRw">
