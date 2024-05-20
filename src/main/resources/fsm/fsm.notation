@@ -590,6 +590,10 @@
                               <element xmi:type="uml:OpaqueBehavior" href="fsm.uml#_WBmLoMM7Ee6X9syf-CmCRw"/>
                               <layoutConstraint xmi:type="notation:Location" xmi:id="_WCVygcM7Ee6X9syf-CmCRw" x="-10" y="-10"/>
                             </children>
+                            <children xmi:type="notation:Shape" xmi:id="_040N0Bb1Ee-h0e9geuINvw" type="Behavior_ExitBehaviorLabel">
+                              <element xmi:type="uml:OpaqueBehavior" href="fsm.uml#_04dBcBb1Ee-h0e9geuINvw"/>
+                              <layoutConstraint xmi:type="notation:Location" xmi:id="_040N0Rb1Ee-h0e9geuINvw" x="-10" y="-10"/>
+                            </children>
                             <element xmi:type="uml:State" href="fsm.uml#_aiBJUL9KEe65db1_bM-TwQ"/>
                             <layoutConstraint xmi:type="notation:Bounds" xmi:id="_aiki8b9KEe65db1_bM-TwQ" x="186" y="190" width="133"/>
                           </children>

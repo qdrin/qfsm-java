@@ -160,16 +160,11 @@ public class ChangePriceTest extends SpringStarter {
     assertEquals(componentOfferIds.size(), bundle.components().size());
     ProductPrice nextPrice = Helper.testOffers.getOffers().get(offerId).getPrice(nextPriceId);
     nextPrice.setNextPayDate(t1);
-    ProductPrice expectedNextPrice = Helper.testOffers.getOffers().get(offerId).getPrice(nextPriceId);
-    expectedNextPrice.setPeriod(0);
-    expectedNextPrice.setNextPayDate(t1);
     String productId = bundle.drive.getProductId();
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .status(status)
       .machineState(buildMachineState(expectedStates))
       .build();
-
-    expectedBundle.drive.setProductPrice(Arrays.asList(expectedNextPrice));
 
     Characteristic nextPriceChar = Characteristic.builder()
       .name("nextPrice")
@@ -260,8 +255,6 @@ public class ChangePriceTest extends SpringStarter {
       .machineState(buildMachineState(expectedStates))
       .build();
 
-    // TODO: Уточнить, какой прайс должен быть в PriceWaiting - старый или промежуточный
-    // expectedBundle.drive.setProductPrice(Arrays.asList(expectedNextPrice));
     Message<String> message;
     if(nextPrice != null) {
       Characteristic nextPriceChar = Characteristic.builder()

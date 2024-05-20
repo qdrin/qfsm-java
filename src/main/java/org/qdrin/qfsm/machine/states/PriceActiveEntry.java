@@ -36,6 +36,7 @@ public class PriceActiveEntry implements Action<String, String> {
     new SignalAction("prolong").execute(context);
     ExtendedState extendedState = context.getStateMachine().getExtendedState();
     Product product = extendedState.get("product", Product.class);
+    log.debug("prices: {}", product.getProductPrice());
     ProductPrice price = product.getProductPrice(PriceType.RecurringCharge).get();
     if(! context.getEvent().equals("complete_price")) {
       OffsetDateTime activeEndDate = price.getNextPayDate();

@@ -57,12 +57,16 @@ public class Event {
   }
 
   public Message<String> toMessage() {
+    return toMessage(null);
+  }
+  public Message<String> toMessage(List<ProductPrice> userPrice) {
       Message<String> message = MessageBuilder
         .withPayload(eventType)
         .setHeader("clientInfo", clientInfo)
         .setHeader("eventDate", eventDate)
         .setHeader("characteristics", characteristics)
         .setHeader("eventProperties", eventProperties)
+        .setHeader("userPrice", userPrice)
 			  .build();
       return message;
   }

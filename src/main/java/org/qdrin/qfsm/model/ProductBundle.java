@@ -2,8 +2,6 @@ package org.qdrin.qfsm.model;
 
 import java.util.List;
 
-import org.springframework.statemachine.StateMachine;
-
 import java.util.ArrayList;
 
 import lombok.AccessLevel;
@@ -26,6 +24,7 @@ public class ProductBundle {
   Product bundle;             // Bundle head
   @Default
   List<Product> components = new ArrayList<>();   // drive legs if it's bundle
+  List<ProductPrice> userPrice;  // User-provided price(s). Need to process them before updating product
   String errorCode;
   String errorMessage;
 }

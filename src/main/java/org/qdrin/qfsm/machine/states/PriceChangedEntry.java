@@ -24,15 +24,9 @@ public class PriceChangedEntry implements Action<String, String> {
 
   @Override
   public void execute(StateContext<String, String> context) {
-    log.debug("event: {}, message: {}", context.getEvent());
     ExtendedState extendedState = context.getStateMachine().getExtendedState();
     Product product = extendedState.get("product", Product.class);
-    ProductPrice nextPrice = extendedState.get("nextPrice", ProductPrice.class);
-    nextPrice.setPeriod(0);
-    List<ProductPrice> currentPrices = product.getProductPrice();
-    currentPrices.removeIf(p -> p.getPriceType().equals(PriceType.RecurringCharge.name()));
-    currentPrices.add(nextPrice);
-    log.debug("productPrice: {}", product.getProductPrice());
+    ProductPrice nextPrice = extendedState.get("nextPrice", ProductPrice.class);  // TODO: insert nextPrice into task properties
     TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
     tasks.addToCreatePlan(TaskDef.builder().type(TaskType.CHANGE_PRICE_EXTERNAL).build());
   }

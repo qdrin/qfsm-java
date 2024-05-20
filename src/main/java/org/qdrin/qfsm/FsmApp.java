@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import org.qdrin.qfsm.exception.*;
 import org.qdrin.qfsm.model.*;
+import org.qdrin.qfsm.model.ProductBundle.ProductBundleBuilder;
 import org.qdrin.qfsm.model.dto.ProductActivateRequestDto;
 import org.qdrin.qfsm.model.dto.ProductOrderItemRelationshipDto;
 import org.qdrin.qfsm.model.dto.ProductRequestDto;
@@ -178,11 +179,8 @@ public class FsmApp {
 				.filter(p -> ProductClass.getBundles().contains(p.getProductClass()))
 				.collect(Collectors.toList());
 		for(Product head: heads) {
-			ProductBundle bundle = new ProductBundle();
-			bundle.setDrive(head);
-			bundle.setBundle(head);
-
-			List<Product> components = bundle.getComponents();
+			ProductRequestDto item = eventOrderItems.stream().filter(o -> o.getProductId().equals(head.getProductId())).findFirst().get();
+			List<Product> components = new ArrayList<>();
 			for(ProductRelationship relationship: head.getProductRelationship()) {
 				Optional<Product> component = products.stream()  // Ищем по продуктам, заявленным в ордере
 					.filter(p->p.getProductId().equals(relationship.getProductId()))
@@ -197,6 +195,12 @@ public class FsmApp {
 				processedProducts.add(component.get());
 				components.add(component.get());
 			}
+			ProductBundle bundle = ProductBundle.builder()
+				.drive(head)
+				.bundle(head)
+				.userPrice(item.getProductPrice())
+				.components(components)
+				.build();
 			bundles.add(bundle);
 			processedProducts.add(head);
 		}
@@ -204,18 +208,18 @@ public class FsmApp {
 			if(processedProducts.contains(product)) {
 				continue;
 			}
+			ProductRequestDto item = eventOrderItems.stream().filter(o -> o.getProductId().equals(product.getProductId())).findFirst().get();
 			int index = product.getProductClass();
 			ProductClass productClass = ProductClass.values()[index];
-			ProductBundle bundle = new ProductBundle();
+			ProductBundleBuilder bundleBuilder = ProductBundle.builder().drive(product);
+			// ProductBundle bundle = new ProductBundle();
 			switch(productClass) {
 				case BUNDLE_COMPONENT:
 					String errString = String.format("Hard bundle component without bundle: %s", product.getProductId());
 					log.error(errString);
 					throw new BadUserDataException(errString);
 				case SIMPLE:
-					bundle.setBundle(product);
-					bundle.setDrive(product);
-					bundles.add(bundle);
+					bundleBuilder.bundle(product).userPrice(item.getProductPrice());
 					break;
 				case CUSTOM_BUNDLE_COMPONENT:
 					Optional<Product> ohead = getCustomBundle(product);
@@ -224,15 +228,14 @@ public class FsmApp {
 							String.format("Custom bundle component %s has no head",
 								product.getProductId()));
 					}
-					bundle.setDrive(product);
-					bundle.setBundle(ohead.get());
-					bundles.add(bundle);
+					bundleBuilder.bundle(ohead.get());
 					break;
 				default:
 					errString = String.format("Unexpected bundle or custom bundle remains after their processing: %s", product.getProductId());
 					log.error(errString);
 					throw new BadUserDataException(errString);
 			}
+			bundles.add(bundleBuilder.build());
 		}
 		FsmResult result = new FsmResult();
 		result.setBundles(bundles);
@@ -272,7 +275,7 @@ public class FsmApp {
 			}
 			StateMachineEventResult<String, String> res;
 			try {
-				res = machine.sendEvent(Mono.just(event.toMessage())).blockLast();
+				res = machine.sendEvent(Mono.just(event.toMessage(bundle.getUserPrice()))).blockLast();
 			} catch(IllegalArgumentException e) {  // TODO: Change exception to denyReason variable
 				String emsg = String.format("[%s] Event %s not accepted in current state: %s",
 					machine.getId(), eventType, e.getLocalizedMessage());

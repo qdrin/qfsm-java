@@ -123,6 +123,11 @@ public class StateMachineConfig {
     }
 
     @Bean
+    PriceChangedExit priceChangedExit() {
+      return new PriceChangedExit();
+    }
+
+    @Bean
     PriceNotChangedEntry priceNotChangedEntry() {
       return new PriceNotChangedEntry();
     }

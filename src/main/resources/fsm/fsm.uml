@@ -386,6 +386,10 @@
                   <language>bean</language>
                   <body>priceChangedEntry</body>
                 </entry>
+                <exit xmi:type="uml:OpaqueBehavior" xmi:id="_04dBcBb1Ee-h0e9geuINvw">
+                  <language>bean</language>
+                  <body>priceChangedExit</body>
+                </exit>
               </subvertex>
               <subvertex xmi:type="uml:State" xmi:id="_cxyzkL9KEe65db1_bM-TwQ" name="PriceNotChanged">
                 <entry xmi:type="uml:OpaqueBehavior" xmi:id="_ZGWWEMM7Ee6X9syf-CmCRw">
