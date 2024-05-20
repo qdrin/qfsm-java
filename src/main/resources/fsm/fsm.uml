@@ -314,6 +314,10 @@
                 <trigger xmi:type="uml:Trigger" xmi:id="_VOxMQMNWEe6X9syf-CmCRw" event="_a_mX4MNVEe6X9syf-CmCRw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_R4k8cMNqEe6X9syf-CmCRw" source="_YsCfJr9KEe65db1_bM-TwQ" target="_QYmEgMN3Ee6X9syf-CmCRw">
+                <effect xmi:type="uml:OpaqueBehavior" xmi:id="_ayaFEBaGEe-UWoUXAn4FCQ">
+                  <language>bean</language>
+                  <body>createNextPriceVariable</body>
+                </effect>
                 <trigger xmi:type="uml:Trigger" xmi:id="_W033UMNqEe6X9syf-CmCRw" event="_K9PWwLXcEe6PAs2TUsdVsw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_z2DukMNqEe6X9syf-CmCRw" guard="_PCsFsMNwEe6X9syf-CmCRw" source="_QYmEgMN3Ee6X9syf-CmCRw" target="_tDW6cMNkEe6X9syf-CmCRw">

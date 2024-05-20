@@ -17,11 +17,8 @@ public class PriceNotChangedEntry implements Action<String, String> {
     Product product = context.getStateMachine().getExtendedState().get("product", Product.class);
     ProductPrice price = product.getProductPrice(PriceType.RecurringCharge).get();
     int pPeriod = (int) price.getPeriod();
-    int dur = (int) price.getDuration();
-    pPeriod = dur == 0 || pPeriod < dur ? pPeriod + 1 : 1;
+    pPeriod++;
     price.setPeriod(pPeriod);
-    // product.getProductPrice().removeIf(p -> p.getPriceType().equals(PriceType.RecurringCharge.name()));
-    // product.getProductPrice().add(price);
     log.debug("productPrice: {}", price);
   }
 }

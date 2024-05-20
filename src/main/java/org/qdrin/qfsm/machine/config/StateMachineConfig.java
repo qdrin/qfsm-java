@@ -2,6 +2,7 @@ package org.qdrin.qfsm.machine.config;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.qdrin.qfsm.PriceType;
@@ -10,11 +11,13 @@ import org.qdrin.qfsm.machine.actions.MergeComponent;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.machine.guards.*;
 import org.qdrin.qfsm.machine.states.*;
+import org.qdrin.qfsm.model.Characteristic;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.service.QStateMachineContextConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
@@ -196,7 +199,7 @@ public class StateMachineConfig {
 
     @Bean
     SignalAction sendPaymentOffAndPriceOff() {
-      return new SignalAction(Arrays.asList("payment_off", "price_off"));
+      return new SignalAction("payment_off", "price_off");
     }
 
     @Bean
@@ -210,17 +213,22 @@ public class StateMachineConfig {
       };
     }
 
-    // TODO: Remove
-    // @Bean
-    // Action<String, String> recalcMachineState() {
-    //   return new Action<String, String>() {
-    //     public void execute(StateContext<String, String> context) {
-    //       State<String, String> state = context.getTarget();
-    //       log.debug("recalcMachineState. state: {}", state.getId());
-    //       QStateMachineContextConverter.recalcMachineStates(context);
-    //     }
-    //   };
-    // }
+    @Bean
+    Action<String, String> createNextPriceVariable() {
+      return new Action<String, String>() {
+        public void execute(StateContext<String, String> context) {
+          ExtendedState extendedState = context.getExtendedState();
+          List<Characteristic> eventChars = (List<Characteristic>) context.getMessageHeader("characteristics");
+          Optional<Characteristic> nextPriceChar = eventChars.stream().filter(c -> c.getName().equals("nextPrice")).findFirst();
+          ProductPrice nextPrice = null;
+          if(nextPriceChar.isPresent()) {
+            nextPrice = (ProductPrice) nextPriceChar.get().getValue();
+          }
+          log.info("[{}] setting nextPrice: {}", extendedState.get("product", Product.class).getProductId(), nextPrice);
+          extendedState.getVariables().put("nextPrice", nextPrice);
+        }
+      };
+    }
 
     @Bean
     MergeComponent mergeComponent() {

@@ -4,11 +4,15 @@ import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.guard.Guard;
 
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 import java.util.Optional;
 
 import org.qdrin.qfsm.PriceType;
 import org.qdrin.qfsm.model.*;
 
+@Slf4j
 public class PriceGuard implements Guard<String, String> {
   private boolean equalDir;
   private boolean fullDir;
@@ -34,7 +38,15 @@ public class PriceGuard implements Guard<String, String> {
     ExtendedState extendedState = context.getStateMachine().getExtendedState();
     ProductPrice price =  extendedState.get("product", Product.class).getProductPrice(PriceType.RecurringCharge).get();
     String priceId = price == null ? "" : price.getId();
-    ProductPrice nextPrice = extendedState.get("nextPrice", ProductPrice.class);
+    
+    List<Characteristic> eventChars = (List<Characteristic>) context.getMessageHeader("characteristics");
+    List<Characteristic> nextPrices = eventChars.stream().filter(c -> c.getName().equals("nextPrice")).toList();
+    if(nextPrices.isEmpty()) {
+      log.error("No nextPrice characteristic found");
+      return false;
+    }
+    ProductPrice nextPrice = (ProductPrice) nextPrices.get(0).getValue();
+
     boolean res = true;
     if(fullCompare) {
       boolean isFull = nextPrice.getNextPayDate() != null;

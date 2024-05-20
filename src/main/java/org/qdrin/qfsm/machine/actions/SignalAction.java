@@ -15,31 +15,27 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class SignalAction implements Action<String, String> {
   
-  private List<String> signals;
+  private List<Message<String>> messages = new ArrayList<>();
 
-  public SignalAction(List<String> signals) {
-    this.signals = signals;
+  public SignalAction(List<Message<String>> messages) {
+    this.messages = messages;
+  }
+
+  public SignalAction(String... signals) {
+    for(String signal: signals) {
+      Message<String> msg = MessageBuilder.withPayload(signal).build();
+      messages.add(msg);
+    }
   }
 
   public SignalAction(String signal) {
-    this.signals = new ArrayList<>();
-    signals.add(signal);
+    messages.add(MessageBuilder.withPayload(signal).build());
   }
 
   @Override
   public void execute(StateContext<String, String> context) {
-    // Flux<Message<String>> messages = Flux.empty();
-    List<Message<String>> messageList = new ArrayList<>();
-
-    for(String signal: signals) {
-      log.debug("sending signal: {}", signal);
-      Message<String> msg = MessageBuilder.withPayload(signal).build();
-      messageList.add(msg);
-      // var res = context.getStateMachine().sendEvent(msg).collectList();
-      // res.block();
-    }
-    Flux<Message<String>> messages = Flux.fromIterable(messageList);
-    var res = context.getStateMachine().sendEvents(messages);
+    Flux<Message<String>> fluxMessages = Flux.fromIterable(messages);
+    var res = context.getStateMachine().sendEvents(fluxMessages);
     res.blockLast();
   }
 }

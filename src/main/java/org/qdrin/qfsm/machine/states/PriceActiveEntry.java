@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.qdrin.qfsm.PriceType;
 import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.model.*;
 
@@ -35,14 +36,14 @@ public class PriceActiveEntry implements Action<String, String> {
     new SignalAction("prolong").execute(context);
     ExtendedState extendedState = context.getStateMachine().getExtendedState();
     Product product = extendedState.get("product", Product.class);
-    ProductPrice nextPrice = extendedState.get("nextPrice", ProductPrice.class);
+    ProductPrice price = product.getProductPrice(PriceType.RecurringCharge).get();
     if(! context.getEvent().equals("complete_price")) {
-      OffsetDateTime activeEndDate = nextPrice.getNextPayDate();
+      OffsetDateTime activeEndDate = price.getNextPayDate();
       product.setActiveEndDate(activeEndDate);
       List<Product> components = (List<Product>) extendedState.getVariables().get("components");
       components.stream().filter(c -> ! c.getMachineContext().getIsIndependent()).forEach((c) -> {c.setActiveEndDate(activeEndDate);});
 
-      if(nextPrice.getProductStatus().equals("ACTIVE_TRIAL")) {
+      if(price.getProductStatus().equals("ACTIVE_TRIAL")) {
         product.setTrialEndDate(activeEndDate);
         components.stream().filter(c -> ! c.getMachineContext().getIsIndependent()).forEach((c) -> {c.setTrialEndDate(activeEndDate);});
       }

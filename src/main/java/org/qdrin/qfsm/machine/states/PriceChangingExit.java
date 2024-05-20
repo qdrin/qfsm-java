@@ -1,8 +1,6 @@
 package org.qdrin.qfsm.machine.states;
 import java.util.Arrays;
-
-import org.qdrin.qfsm.model.Product;
-import org.qdrin.qfsm.model.ProductPrice;
+import org.qdrin.qfsm.model.*;
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;

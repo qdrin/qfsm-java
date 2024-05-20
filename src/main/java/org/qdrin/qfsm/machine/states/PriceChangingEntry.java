@@ -1,9 +1,15 @@
 package org.qdrin.qfsm.machine.states;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import org.qdrin.qfsm.model.Characteristic;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.tasks.*;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
@@ -26,24 +32,24 @@ public class PriceChangingEntry implements Action<String, String> {
     log.debug("tarificationPeriod: {}", tPeriod);
     ProductPrice nextPrice;
     ProductPrice currentPrice = product.getProductPrice(PriceType.RecurringCharge).get();
-    SignalAction paymentProcessed = null;
+    List<Message<String>> messages = new ArrayList<>();
     if(tPeriod != 0) {
       TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
       tasks.addToCreatePlan(TaskDef.builder().type(TaskType.CHANGE_PRICE).build());
       return;
     } else {
       nextPrice = currentPrice;
+      messages.add(MessageBuilder.withPayload("change_price")
+        .setHeader("characteristics", Arrays.asList(
+        Characteristic.builder().valueType(nextPrice.getClass().getSimpleName()).value(nextPrice).name("nextPrice").build()
+      ))
+      .build());
       if(nextPrice.getProductStatus().equals("ACTIVE_TRIAL") && nextPrice.getNextPayDate() != null) {
-        log.debug("First trial period. Sending auto 'payment_processed'");
-        paymentProcessed = new SignalAction("payment_processed");        
+        messages.add(MessageBuilder.withPayload("payment_processed").build());
       }
+      log.debug("sending inner signals: {}", messages);
+      new SignalAction(messages).execute(context);
     }
-    variables.put("nextPrice", nextPrice);
     log.debug("price: {}, nextPrice: {}", currentPrice, nextPrice);
-    SignalAction changePrice = new SignalAction("change_price");
-    changePrice.execute(context);
-    if(paymentProcessed != null) {
-      paymentProcessed.execute(context);
-    }
   }
 }
