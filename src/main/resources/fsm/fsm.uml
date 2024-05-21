@@ -350,9 +350,6 @@
               <transition xmi:type="uml:Transition" xmi:id="_HSY4gMN4Ee6X9syf-CmCRw" source="_tDW6cMNkEe6X9syf-CmCRw" target="_YsCfJr9KEe65db1_bM-TwQ">
                 <trigger xmi:type="uml:Trigger" xmi:id="_HSllcMN7Ee6X9syf-CmCRw" event="_2k0noMN6Ee6X9syf-CmCRw"/>
               </transition>
-              <transition xmi:type="uml:Transition" xmi:id="_VUhZsMN8Ee6X9syf-CmCRw" source="_eYu8ML9KEe65db1_bM-TwQ" target="_eYu8ML9KEe65db1_bM-TwQ">
-                <trigger xmi:type="uml:Trigger" xmi:id="_hM4u0MN8Ee6X9syf-CmCRw" event="_2k0noMN6Ee6X9syf-CmCRw"/>
-              </transition>
               <transition xmi:type="uml:Transition" xmi:id="_YdnSMMWYEe63LKnRBmMiFw" source="_aiBJUL9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ">
                 <trigger xmi:type="uml:Trigger" xmi:id="_caSjIMWYEe63LKnRBmMiFw" event="_a_mX4MNVEe6X9syf-CmCRw"/>
               </transition>

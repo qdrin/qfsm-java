@@ -38,37 +38,36 @@ public class PriceActiveEntry implements Action<String, String> {
     Product product = extendedState.get("product", Product.class);
     log.debug("prices: {}", product.getProductPrice());
     ProductPrice price = product.getProductPrice(PriceType.RecurringCharge).get();
-    if(! context.getEvent().equals("complete_price")) {
-      OffsetDateTime activeEndDate = price.getNextPayDate();
-      product.setActiveEndDate(activeEndDate);
-      List<Product> components = (List<Product>) extendedState.getVariables().get("components");
-      components.stream().filter(c -> ! c.getMachineContext().getIsIndependent()).forEach((c) -> {c.setActiveEndDate(activeEndDate);});
+    OffsetDateTime activeEndDate = price.getNextPayDate();
+    product.setActiveEndDate(activeEndDate);
+    List<Product> components = (List<Product>) extendedState.getVariables().get("components");
+    components.stream().filter(c -> ! c.getMachineContext().getIsIndependent()).forEach((c) -> {c.setActiveEndDate(activeEndDate);});
 
-      if(price.getProductStatus().equals("ACTIVE_TRIAL")) {
-        product.setTrialEndDate(activeEndDate);
-        components.stream().filter(c -> ! c.getMachineContext().getIsIndependent()).forEach((c) -> {c.setTrialEndDate(activeEndDate);});
-      }
-      log.debug("activeEndDate: {}, trialEndDate: {}, priceEndedBefore: {}",
-          product.getActiveEndDate(), product.getTrialEndDate(), priceEndedBefore);
-      TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
-      tasks.addToCreatePlan(TaskDef.builder()
-        .type(TaskType.PRICE_ENDED)
-        .wakeAt(activeEndDate.minus(priceEndedBefore))
-        .build()  
-      );
-      // TODO: Change direct task creation to post action variable here and everywhere
-      // var postActions = context.getStateMachine().getExtendedState().get("postActions", PostActions);
-      // postActions.addNewTask("startPriceEndedTask", product.getProductId(), activeEndDate);
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // final SchedulerClient schedulerClient =
-      //   SchedulerClient.Builder.create(dataSource)
-      //       .serializer(new JacksonSerializer())
-      //       .build();
-      // Consumer<TaskContext> priceEndedFunc = ScheduledTasks::startPriceEndedTask;
-      // TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), activeEndDate.toInstant());
-      // priceEndedFunc.accept(ctx);
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-      extendedState.getVariables().remove("nextPrice");
+    if(price.getProductStatus().equals("ACTIVE_TRIAL")) {
+      product.setTrialEndDate(activeEndDate);
+      components.stream().filter(c -> ! c.getMachineContext().getIsIndependent()).forEach((c) -> {c.setTrialEndDate(activeEndDate);});
     }
+    log.debug("activeEndDate: {}, trialEndDate: {}, priceEndedBefore: {}",
+        product.getActiveEndDate(), product.getTrialEndDate(), priceEndedBefore);
+    TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
+    tasks.addToCreatePlan(TaskDef.builder()
+      .type(TaskType.PRICE_ENDED)
+      .wakeAt(activeEndDate.minus(priceEndedBefore))
+      .build()  
+    );
+    extendedState.getVariables().remove("nextPrice");
   }
 }
+
+    // TODO: Change direct task creation to post action variable here and everywhere
+    // var postActions = context.getStateMachine().getExtendedState().get("postActions", PostActions);
+    // postActions.addNewTask("startPriceEndedTask", product.getProductId(), activeEndDate);
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // final SchedulerClient schedulerClient =
+    //   SchedulerClient.Builder.create(dataSource)
+    //       .serializer(new JacksonSerializer())
+    //       .build();
+    // Consumer<TaskContext> priceEndedFunc = ScheduledTasks::startPriceEndedTask;
+    // TaskContext ctx = new TaskContext(schedulerClient, product.getProductId(), activeEndDate.toInstant());
+    // priceEndedFunc.accept(ctx);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
