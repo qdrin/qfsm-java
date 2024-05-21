@@ -1604,8 +1604,8 @@
     <styles xmi:type="notation:FontStyle" xmi:id="_I42_gcNWEe6X9syf-CmCRw"/>
     <element xmi:type="uml:Transition" href="fsm.uml#_I39AkMNWEe6X9syf-CmCRw"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_I42_gsNWEe6X9syf-CmCRw" points="[1529, 560, -643984, -643984]$[1529, 395, -643984, -643984]"/>
-    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_I6CEMMNWEe6X9syf-CmCRw" id="(0.49673202614379086,0.0)"/>
-    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_I6CEMcNWEe6X9syf-CmCRw" id="(0.41911764705882354,0.9861111111111112)"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_I6CEMMNWEe6X9syf-CmCRw" id="(0.6405228758169934,0.0)"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_I6CEMcNWEe6X9syf-CmCRw" id="(0.5808823529411765,1.0)"/>
   </edges>
   <edges xmi:type="notation:Connector" xmi:id="_R5FSwMNqEe6X9syf-CmCRw" type="Transition_Edge" source="_YsDGML9KEe65db1_bM-TwQ" target="_QZCwcMN3Ee6X9syf-CmCRw">
     <children xmi:type="notation:DecorationNode" xmi:id="_R5FSw8NqEe6X9syf-CmCRw" type="Transition_NameLabel">

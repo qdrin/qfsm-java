@@ -208,17 +208,6 @@ public class StateMachineConfig {
     }
 
     @Bean
-    Action<String, String> clearProductPrice() {
-      return new Action<String, String>() {
-        public void execute(StateContext<String, String> context) {
-          Product product = context.getStateMachine().getExtendedState().get("product", Product.class);
-          log.info("Clear product price. productId: {}", product.getProductId());
-          product.setProductPrice(null);
-        }
-      };
-    }
-
-    @Bean
     Action<String, String> createNextPriceVariable() {
       return new Action<String, String>() {
         public void execute(StateContext<String, String> context) {
