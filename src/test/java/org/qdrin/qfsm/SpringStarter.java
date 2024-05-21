@@ -42,6 +42,11 @@ public class SpringStarter {
   @Value("${application.fsm.time.waitingPayInterval}")
   Duration waitingPayInterval;
   public Duration getWaitingPayInterval() { return waitingPayInterval; }
+  
+
+  @Value("${application.fsm.time.suspendInterval}")
+  Duration suspendInterval;
+  public Duration getSuspendInterval() { return suspendInterval; }
 
   @Autowired
   private QStateMachineService service;

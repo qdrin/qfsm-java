@@ -27,10 +27,7 @@ public class SuspendingEntry implements Action<String, String> {
     log.debug("event: {}, message: {}", context.getEvent());
     ExtendedState extendedState = context.getStateMachine().getExtendedState();
     Product product = extendedState.get("product", Product.class);
-    ProductPrice price = product.getProductPrice(PriceType.RecurringCharge).get();
-    product.setActiveEndDate(OffsetDateTime.now());
-    price.setPeriod(0);
-    log.debug("productPrice: {}", price);
+    product.setActiveEndDate(OffsetDateTime.now());  // TODO: Оставить прежнюю?
     TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
     tasks.addToCreatePlan(TaskDef.builder().type(TaskType.SUSPEND_EXTERNAL).build());
   }

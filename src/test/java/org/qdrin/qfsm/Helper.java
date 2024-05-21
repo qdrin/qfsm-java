@@ -422,7 +422,7 @@ public class Helper {
         List<TaskDef> tasks = actListCreate.stream()
           .filter(a -> a.equals(exp))
           .toList();
-        assertEquals(1, tasks.size(), String.format("removePlan expected: %s, found: %d", exp.getType(), tasks.size()));
+        assertEquals(1, tasks.size(), String.format("createPlan expected: %s, found: %d", exp.getType(), tasks.size()));
         assertDates(exp.getWakeAt(), tasks.get(0).getWakeAt(), exp.getType().name());
       }
     }
