@@ -190,7 +190,7 @@ public class PaymentFailedTest extends SpringStarter {
     assertEquals(componentOfferIds.size(), bundle.components().size());
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .tarificationPeriod(0)
-      .pricePeriod(0)
+      .pricePeriod(pricePeriod)
       .machineState(buildMachineState(expectedStates))
       .build();
     machine = createMachine(bundle);
