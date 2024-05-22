@@ -2,8 +2,11 @@ package org.qdrin.qfsm.machine.actions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
@@ -15,25 +18,28 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class SignalAction implements Action<String, String> {
   
-  private List<Message<String>> messages = new ArrayList<>();
+  private List<MessageBuilder<String>> builders = new ArrayList<>();
 
-  public SignalAction(List<Message<String>> messages) {
-    this.messages = messages;
+  public SignalAction(List<MessageBuilder<String>> builders) {
+    this.builders = builders;
   }
 
   public SignalAction(String... signals) {
     for(String signal: signals) {
-      Message<String> msg = MessageBuilder.withPayload(signal).build();
-      messages.add(msg);
+      MessageBuilder<String> builder = MessageBuilder.withPayload(signal);
+      builders.add(builder);
     }
   }
 
   public SignalAction(String signal) {
-    messages.add(MessageBuilder.withPayload(signal).build());
+    builders.add(MessageBuilder.withPayload(signal));
   }
 
   @Override
   public void execute(StateContext<String, String> context) {
+    List<Message<String>> messages = new ArrayList();
+    builders.stream().forEach(b -> b.copyHeadersIfAbsent(context.getMessageHeaders()));
+    builders.forEach(b -> messages.add(b.build()));
     Flux<Message<String>> fluxMessages = Flux.fromIterable(messages);
     var res = context.getStateMachine().sendEvents(fluxMessages);
     res.blockLast();

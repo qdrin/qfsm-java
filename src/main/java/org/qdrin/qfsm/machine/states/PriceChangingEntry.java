@@ -32,23 +32,23 @@ public class PriceChangingEntry implements Action<String, String> {
     log.debug("tarificationPeriod: {}", tPeriod);
     ProductPrice nextPrice;
     ProductPrice currentPrice = product.getProductPrice(PriceType.RecurringCharge).get();
-    List<Message<String>> messages = new ArrayList<>();
+    List<MessageBuilder<String>> messageBuilders = new ArrayList<>();
     if(tPeriod != 0) {
       TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
-      tasks.addToCreatePlan(TaskDef.builder().type(TaskType.CHANGE_PRICE).build());
+      TaskDef task = TaskDef.builder().type(TaskType.CHANGE_PRICE).build();
+      task.getVariables().put("eventProperties", context.getMessageHeader("eventProperties"));
+      tasks.addToCreatePlan(task);
+      log.debug("task created: {}, messageHeaders: {}", task, context.getMessageHeaders());
       return;
     } else {
       nextPrice = currentPrice;
-      messages.add(MessageBuilder.withPayload("change_price")
+      messageBuilders.add(MessageBuilder.withPayload("change_price")
         .setHeader("characteristics", Arrays.asList(
-        Characteristic.builder().valueType(nextPrice.getClass().getSimpleName()).value(nextPrice).name("nextPrice").build()
-      ))
-      .build());
+        Characteristic.builder().valueType(nextPrice.getClass().getSimpleName()).value(nextPrice).name("nextPrice").build())));
       if(nextPrice.getProductStatus().equals("ACTIVE_TRIAL") && nextPrice.getNextPayDate() != null) {
-        messages.add(MessageBuilder.withPayload("payment_processed").build());
+        messageBuilders.add(MessageBuilder.withPayload("payment_processed"));
       }
-      log.debug("sending inner signals: {}", messages);
-      new SignalAction(messages).execute(context);
+      new SignalAction(messageBuilders).execute(context);
     }
     log.debug("price: {}, nextPrice: {}", currentPrice, nextPrice);
   }

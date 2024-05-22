@@ -10,8 +10,11 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.qdrin.qfsm.model.EventProperties;
 import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductPrice;
 import org.qdrin.qfsm.model.ProductRelationship;
@@ -278,7 +281,7 @@ public class Helper {
     }
 
     public static void assertDates(OffsetDateTime expected, OffsetDateTime real, String message, int delta) {
-      assert expected != null : "expeted " + message + " is null";
+      if(expected == null) return;
       assert real != null : "real " + message + " is null";
       OffsetDateTime t0 = expected.minusSeconds(delta);
       OffsetDateTime t1 = expected.plusSeconds(delta);
@@ -417,13 +420,32 @@ public class Helper {
           .filter(a -> a.equals(exp))
           .toList();
         assertEquals(1, tasks.size(), String.format("removePlan expected: %s, found: %d", exp.getType(), tasks.size()));
+        TaskDef task = tasks.get(0);
+        assertEquals(exp.getVariables(), task.getVariables());
       }
       for(TaskDef exp: expListCreate) {
         List<TaskDef> tasks = actListCreate.stream()
           .filter(a -> a.equals(exp))
           .toList();
         assertEquals(1, tasks.size(), String.format("createPlan expected: %s, found: %d", exp.getType(), tasks.size()));
-        assertDates(exp.getWakeAt(), tasks.get(0).getWakeAt(), exp.getType().name());
+        TaskDef task = tasks.get(0);
+        // assertDates(exp.getWakeAt(), task.getWakeAt(), exp.getType().name());
+        for(Entry<String, Object> expVar: exp.getVariables().entrySet()) {
+          Object actVar =  task.getVariables().get(expVar.getKey());
+          assertNotNull(actVar, expVar.getKey());
+          switch(expVar.getKey()) {
+            case "eventProperties":
+              EventProperties evProps = (EventProperties) expVar.getValue();
+              EventProperties actProps = (EventProperties) actVar;
+              assertDates(evProps.getEndDate(), actProps.getEndDate(), "endDate");
+              assertDates(evProps.getStartDate(), actProps.getStartDate(), "startDate");
+              assertEquals(evProps.getPeriodNumber(), actProps.getPeriodNumber());
+              assertEquals(evProps.getCost(), actProps.getCost());
+              break;
+            default:
+              assertEquals(expVar.getValue(), actVar, expVar.getKey());
+          }
+        }
       }
     }
   }

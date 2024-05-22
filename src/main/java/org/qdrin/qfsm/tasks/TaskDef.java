@@ -1,6 +1,8 @@
 package org.qdrin.qfsm.tasks;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import lombok.*;
 import lombok.Builder.Default;
@@ -14,6 +16,8 @@ public class TaskDef {
     String productId;
     @Default
     OffsetDateTime wakeAt = OffsetDateTime.now();
+    @Default
+    Map<String, Object> variables = new HashMap<>();
 
     @Override
     public boolean equals(Object obj) {

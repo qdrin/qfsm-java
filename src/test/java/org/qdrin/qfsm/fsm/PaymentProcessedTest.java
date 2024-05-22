@@ -8,7 +8,6 @@ import org.springframework.statemachine.StateMachineEventResult;
 import static org.junit.Assert.assertEquals;
 import static org.qdrin.qfsm.Helper.Assertions.*;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
-import static org.qdrin.qfsm.TestBundleEquals.testBundleEqualTo;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -20,6 +19,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.qdrin.qfsm.BundleBuilder;
 import org.qdrin.qfsm.BundleBuilder.TestBundle;
+import org.qdrin.qfsm.model.EventProperties;
 import org.qdrin.qfsm.Helper;
 import static org.qdrin.qfsm.Helper.buildMachineState;
 import org.qdrin.qfsm.SpringStarter;
@@ -211,6 +211,153 @@ public class PaymentProcessedTest extends SpringStarter {
               .and()
           .step()
               .sendEvent("payment_processed")
+              .expectStates(Helper.stateSuite(expectedStates))
+              .expectVariableWith(taskPlanEqualTo(expectedTasks))
+              .and()
+          .build();
+    plan.test();
+    releaseMachine(machine.getId());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
+  }
+
+  private static Stream<Arguments> testCommon() {
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-active",
+        Arrays.asList("Active", "WaitingPayment", "PriceChanging"), Arrays.asList()),
+      Arguments.of("simpleOffer1", "simple1-price-active",
+        Arrays.asList("Active", "WaitingPayment", "PriceChanged"), Arrays.asList()),
+      Arguments.of("simpleOffer1", "simple1-price-active",
+        Arrays.asList("Active", "WaitingPayment", "PriceActive"), Arrays.asList()),
+      Arguments.of("bundleOffer1", "bundle1-price-active", 
+        Arrays.asList("Active", "WaitingPayment", "PriceChanging"), Arrays.asList("component1", "component2")),
+      Arguments.of("bundleOffer1", "bundle1-price-active", 
+        Arrays.asList("Active", "WaitingPayment", "PriceChanged"), Arrays.asList("component1", "component2")),
+      Arguments.of("bundleOffer1", "bundle1-price-active", 
+        Arrays.asList("Active", "WaitingPayment", "PriceActive"), Arrays.asList("component1", "component2")),
+      Arguments.of("customBundleOffer1", "custom1-price-active",
+        Arrays.asList("Active", "WaitingPayment", "PriceChanging"), Arrays.asList("component1", "component2")),
+      Arguments.of("customBundleOffer1", "custom1-price-active",
+        Arrays.asList("Active", "WaitingPayment", "PriceChanged"), Arrays.asList("component1", "component2")),
+      Arguments.of("customBundleOffer1", "custom1-price-active",
+        Arrays.asList("Active", "WaitingPayment", "PriceActive"), Arrays.asList("component1", "component2"))
+    );  
+  }
+  @ParameterizedTest
+  @MethodSource
+  public void testCommon(String offerId, String priceId, List<String> states, List<String> componentOfferIds) throws Exception {
+    OffsetDateTime t0 = OffsetDateTime.now();
+    JsonNode machineState = buildMachineState(states);
+    List<String> expectedStates = new ArrayList<>(states);
+    expectedStates.set(1, "Paid");
+    int pricePeriod = 1;
+
+    log.debug("expectedStates: {}", expectedStates);
+    JsonNode expectedMachineState = buildMachineState(expectedStates);
+    TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
+      .status("ACTIVE")
+      .productStartDate(t0)
+      .tarificationPeriod(1)
+      .priceNextPayDate(nextPayDate)
+      .pricePeriod(pricePeriod)
+      .machineState(machineState)
+      .build();
+    assertEquals(componentOfferIds.size(), bundle.components().size());
+    TestBundle expectedBundle = new BundleBuilder(bundle)
+      .tarificationPeriod(2)
+      .pricePeriod(pricePeriod)
+      .machineState(expectedMachineState)
+      .build();
+    machine = createMachine(bundle);
+    
+    TaskPlan expectedTasks = new TaskPlan(machine.getId());
+    expectedTasks.addToRemovePlan(TaskDef.builder().type(TaskType.WAITING_PAY_ENDED).build());
+
+    StateMachineTestPlan<String, String> plan =
+        StateMachineTestPlanBuilder.<String, String>builder()
+          .defaultAwaitTime(2)
+          .stateMachine(machine)
+          .step()
+              .expectStates(Helper.stateSuite(states))
+              .and()
+          .step()
+              .sendEvent("payment_processed")
+              .expectStates(Helper.stateSuite(expectedStates))
+              .expectVariableWith(taskPlanEqualTo(expectedTasks))
+              .and()
+          .build();
+    plan.test();
+    releaseMachine(machine.getId());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
+  }
+
+  private static Stream<Arguments> testPriceWaitingSuccess() {
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-trial",
+        Arrays.asList("ActiveTrial", "WaitingPayment", "PriceWaiting"), Arrays.asList()),
+      Arguments.of("simpleOffer1", "simple1-price-active",
+        Arrays.asList("Active", "WaitingPayment", "PriceWaiting"), Arrays.asList()),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", 
+        Arrays.asList("ActiveTrial", "WaitingPayment", "PriceWaiting"), Arrays.asList("component1", "component2")),
+      Arguments.of("bundleOffer1", "bundle1-price-active", 
+        Arrays.asList("Active", "WaitingPayment", "PriceWaiting"), Arrays.asList("component1", "component2")),
+      Arguments.of("customBundleOffer1", "custom1-price-trial",
+        Arrays.asList("ActiveTrial", "WaitingPayment", "PriceWaiting"), Arrays.asList("component1", "component2")),
+      Arguments.of("customBundleOffer1", "custom1-price-active",
+        Arrays.asList("Active", "WaitingPayment", "PriceWaiting"), Arrays.asList("component1", "component2"))
+    );  
+  }
+  @ParameterizedTest
+  @MethodSource
+  public void testPriceWaitingSuccess(String offerId, String priceId, List<String> states, List<String> componentOfferIds) throws Exception {
+    OffsetDateTime t0 = OffsetDateTime.now();
+    OffsetDateTime t1 = t0.plusDays(30);
+    JsonNode machineState = buildMachineState(states);
+    List<String> expectedStates = Arrays.asList(states.get(0), "Paid", "PriceChanging");
+    expectedStates.set(1, "Paid");
+    int pricePeriod = 1;
+    String status = priceId.contains("trial") ? "ACTIVE_TRIAL" : "ACTIVE";
+
+
+    log.debug("expectedStates: {}", expectedStates);
+    JsonNode expectedMachineState = buildMachineState(expectedStates);
+    TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
+      .status(status)
+      .productStartDate(t0)
+      .tarificationPeriod(1)
+      .activeEndDate(t0.plus(getPriceEndedBefore()))
+      .priceNextPayDate(t0.plus(getPriceEndedBefore()))
+      .pricePeriod(pricePeriod)
+      .machineState(machineState)
+      .build();
+    assertEquals(componentOfferIds.size(), bundle.components().size());
+    TestBundle expectedBundle = new BundleBuilder(bundle)
+      .tarificationPeriod(2)
+      .pricePeriod(pricePeriod)
+      .machineState(expectedMachineState)
+      .build();
+    machine = createMachine(bundle);
+    
+    TaskPlan expectedTasks = new TaskPlan(machine.getId());
+    expectedTasks.addToRemovePlan(TaskDef.builder().type(TaskType.WAITING_PAY_ENDED).build());
+    expectedTasks.addToCreatePlan(TaskDef.builder().type(TaskType.CHANGE_PRICE).build());
+    EventProperties eventProperties = EventProperties.builder().endDate(t1).build();
+    expectedTasks.getCreatePlan().get(0).getVariables().put("eventProperties", eventProperties);
+    Message<String> msg = MessageBuilder
+        .withPayload("payment_processed")
+        .setHeader("eventProperties", eventProperties)
+        .build();
+    log.debug("sending message: {}", msg);
+    StateMachineTestPlan<String, String> plan =
+        StateMachineTestPlanBuilder.<String, String>builder()
+          .defaultAwaitTime(2)
+          .stateMachine(machine)
+          .step()
+              .expectStates(Helper.stateSuite(states))
+              .and()
+          .step()
+              .sendEvent(msg)
               .expectStates(Helper.stateSuite(expectedStates))
               .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
