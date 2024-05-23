@@ -144,7 +144,12 @@
                   <body>resumingEntry</body>
                 </entry>
               </subvertex>
-              <subvertex xmi:type="uml:State" xmi:id="_9e_dAL9fEe65db1_bM-TwQ" name="Prolongation"/>
+              <subvertex xmi:type="uml:State" xmi:id="_9e_dAL9fEe65db1_bM-TwQ" name="Prolongation">
+                <entry xmi:type="uml:OpaqueBehavior" xmi:id="_NHK2kBkXEe-KMucVkt9qsA">
+                  <language>bean</language>
+                  <body>prolongationEntry</body>
+                </entry>
+              </subvertex>
             </region>
           </subvertex>
           <subvertex xmi:type="uml:FinalState" xmi:id="_pUzTQLz8Ee6WIIctFrkbQg" name="UsageFinal"/>
@@ -349,6 +354,7 @@
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_HSY4gMN4Ee6X9syf-CmCRw" source="_tDW6cMNkEe6X9syf-CmCRw" target="_YsCfJr9KEe65db1_bM-TwQ">
                 <trigger xmi:type="uml:Trigger" xmi:id="_HSllcMN7Ee6X9syf-CmCRw" event="_2k0noMN6Ee6X9syf-CmCRw"/>
+                <trigger xmi:type="uml:Trigger" xmi:id="_H_fH4BkTEe-KMucVkt9qsA" event="_a_mX4MNVEe6X9syf-CmCRw"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_YdnSMMWYEe63LKnRBmMiFw" source="_aiBJUL9KEe65db1_bM-TwQ" target="_YsCfJr9KEe65db1_bM-TwQ">
                 <trigger xmi:type="uml:Trigger" xmi:id="_caSjIMWYEe63LKnRBmMiFw" event="_a_mX4MNVEe6X9syf-CmCRw"/>

@@ -133,6 +133,11 @@ public class StateMachineConfig {
     }
 
     @Bean
+    ProlongationEntry prolongationEntry() {
+      return new ProlongationEntry();
+    }
+
+    @Bean
     SuspendingEntry suspendingEntry() {
       return new SuspendingEntry();
     }

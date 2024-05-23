@@ -5,6 +5,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
+import org.qdrin.qfsm.machine.actions.SignalAction;
 import org.qdrin.qfsm.model.Product;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,5 +22,6 @@ public class PaidEntry implements Action<String, String> {
     int tPeriod = product.getTarificationPeriod() + 1;
     product.setTarificationPeriod(tPeriod);
     log.info("[{}] tarificationPeriod={}", product.getProductId(), tPeriod);
+    new SignalAction("prolong").execute(context);
   }
 }

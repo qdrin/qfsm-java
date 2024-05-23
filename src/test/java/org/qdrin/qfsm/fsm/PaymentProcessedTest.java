@@ -222,7 +222,7 @@ public class PaymentProcessedTest extends SpringStarter {
     assertProductEquals(expectedBundle.components(), bundle.components());
   }
 
-  private static Stream<Arguments> testCommon() {
+  private static Stream<Arguments> testWithNoActivePrice() {
     return Stream.of(
       Arguments.of("simpleOffer1", "simple1-price-active",
         Arrays.asList("Active", "WaitingPayment", "PriceChanging"), Arrays.asList()),
@@ -246,7 +246,7 @@ public class PaymentProcessedTest extends SpringStarter {
   }
   @ParameterizedTest
   @MethodSource
-  public void testCommon(String offerId, String priceId, List<String> states, List<String> componentOfferIds) throws Exception {
+  public void testWithNoActivePrice(String offerId, String priceId, List<String> states, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
     JsonNode machineState = buildMachineState(states);
     List<String> expectedStates = new ArrayList<>(states);
@@ -293,6 +293,71 @@ public class PaymentProcessedTest extends SpringStarter {
     assertProductEquals(expectedBundle.components(), bundle.components());
   }
 
+  private static Stream<Arguments> testWithActivePrice() {
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-trial",
+        Arrays.asList("ActiveTrial", "WaitingPayment", "PriceActive"), Arrays.asList()),
+      Arguments.of("simpleOffer1", "simple1-price-active",
+        Arrays.asList("Active", "WaitingPayment", "PriceActive"), Arrays.asList()),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", 
+        Arrays.asList("ActiveTrial", "WaitingPayment", "PriceActive"), Arrays.asList("component1", "component2")),
+      Arguments.of("bundleOffer1", "bundle1-price-active", 
+        Arrays.asList("Active", "WaitingPayment", "PriceActive"), Arrays.asList("component1", "component2")),
+      Arguments.of("customBundleOffer1", "custom1-price-trial",
+        Arrays.asList("ActiveTrial", "WaitingPayment", "PriceActive"), Arrays.asList("component1", "component2")),
+      Arguments.of("customBundleOffer1", "custom1-price-active",
+        Arrays.asList("Active", "WaitingPayment", "PriceActive"), Arrays.asList("component1", "component2"))
+    );  
+  }
+  @ParameterizedTest
+  @MethodSource
+  public void testWithActivePrice(String offerId, String priceId, List<String> states, List<String> componentOfferIds) throws Exception {
+    OffsetDateTime t0 = OffsetDateTime.now();
+    OffsetDateTime t1 = t0.plusDays(30);
+    JsonNode machineState = buildMachineState(states);
+    List<String> expectedStates = Arrays.asList("Prolongation", "Paid", "PriceActive");
+    int pricePeriod = 2;
+    String status = priceId.contains("trial") ? "ACTIVE_TRIAL" : "ACTIVE";
+
+    log.debug("expectedStates: {}", expectedStates);
+    JsonNode expectedMachineState = buildMachineState(expectedStates);
+    TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
+      .status(status)
+      .productStartDate(t0.minusDays(30))
+      .tarificationPeriod(1)
+      .priceNextPayDate(t1)
+      .pricePeriod(2)
+      .machineState(machineState)
+      .build();
+    assertEquals(componentOfferIds.size(), bundle.components().size());
+    TestBundle expectedBundle = new BundleBuilder(bundle)
+      .tarificationPeriod(2)
+      .machineState(expectedMachineState)
+      .build();
+    machine = createMachine(bundle);
+    
+    TaskPlan expectedTasks = new TaskPlan(machine.getId());
+    expectedTasks.addToCreatePlan(TaskDef.builder().type(TaskType.PROLONG_EXTERNAL).build());
+
+    StateMachineTestPlan<String, String> plan =
+        StateMachineTestPlanBuilder.<String, String>builder()
+          .defaultAwaitTime(2)
+          .stateMachine(machine)
+          .step()
+              .expectStates(Helper.stateSuite(states))
+              .and()
+          .step()
+              .sendEvent("payment_processed")
+              .expectStates(Helper.stateSuite(expectedStates))
+              .expectVariableWith(taskPlanEqualTo(expectedTasks))
+              .and()
+          .build();
+    plan.test();
+    releaseMachine(machine.getId());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
+  }
+
   private static Stream<Arguments> testFromSuspended() {
     return Stream.of(
       Arguments.of("simpleOffer1", "simple1-price-active",
@@ -301,18 +366,24 @@ public class PaymentProcessedTest extends SpringStarter {
         Arrays.asList("Suspended", "NotPaid", "PriceChanged"), Arrays.asList()),
       Arguments.of("simpleOffer1", "simple1-price-active",
         Arrays.asList("Suspended", "NotPaid", "PriceActive"), Arrays.asList()),
+      Arguments.of("simpleOffer1", "simple1-price-active",
+        Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), Arrays.asList()),
       Arguments.of("bundleOffer1", "bundle1-price-active", 
         Arrays.asList("Suspended", "NotPaid", "PriceChanging"), Arrays.asList("component1", "component2")),
       Arguments.of("bundleOffer1", "bundle1-price-active", 
         Arrays.asList("Suspended", "NotPaid", "PriceChanged"), Arrays.asList("component1", "component2")),
       Arguments.of("bundleOffer1", "bundle1-price-active", 
         Arrays.asList("Suspended", "NotPaid", "PriceActive"), Arrays.asList("component1", "component2")),
+      Arguments.of("bundleOffer1", "bundle1-price-active", 
+        Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), Arrays.asList("component1", "component2")),
       Arguments.of("customBundleOffer1", "custom1-price-active",
         Arrays.asList("Suspended", "NotPaid", "PriceChanging"), Arrays.asList("component1", "component2")),
       Arguments.of("customBundleOffer1", "custom1-price-active",
         Arrays.asList("Suspended", "NotPaid", "PriceChanged"), Arrays.asList("component1", "component2")),
       Arguments.of("customBundleOffer1", "custom1-price-active",
-        Arrays.asList("Suspended", "NotPaid", "PriceActive"), Arrays.asList("component1", "component2"))
+        Arrays.asList("Suspended", "NotPaid", "PriceActive"), Arrays.asList("component1", "component2")),
+      Arguments.of("customBundleOffer1", "custom1-price-active",
+        Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), Arrays.asList("component1", "component2"))
     );  
   }
   @ParameterizedTest
@@ -321,7 +392,6 @@ public class PaymentProcessedTest extends SpringStarter {
     OffsetDateTime t0 = OffsetDateTime.now();
     JsonNode machineState = buildMachineState(states);
     List<String> expectedStates = Arrays.asList("Suspended", "Paid", "PriceChanging");
-    int pricePeriod = 1;
 
     log.debug("expectedStates: {}", expectedStates);
     JsonNode expectedMachineState = buildMachineState(expectedStates);
@@ -330,13 +400,14 @@ public class PaymentProcessedTest extends SpringStarter {
       .productStartDate(t0)
       .tarificationPeriod(1)
       .priceNextPayDate(t0.minusDays(20))
-      .pricePeriod(pricePeriod)
+      .pricePeriod(1)
       .machineState(machineState)
       .build();
     assertEquals(componentOfferIds.size(), bundle.components().size());
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .tarificationPeriod(2)
       .machineState(expectedMachineState)
+      .pricePeriod(0)  // Resetting pricePeriod when resume
       .build();
     machine = createMachine(bundle);
     
@@ -371,18 +442,24 @@ public class PaymentProcessedTest extends SpringStarter {
         Arrays.asList("Suspended", "NotPaid", "PriceChanged"), Arrays.asList()),
       Arguments.of("simpleOffer1", "simple1-price-active",
         Arrays.asList("Suspended", "NotPaid", "PriceActive"), Arrays.asList()),
+      Arguments.of("simpleOffer1", "simple1-price-active",
+        Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), Arrays.asList()),
       Arguments.of("bundleOffer1", "bundle1-price-active", 
         Arrays.asList("Suspended", "NotPaid", "PriceChanging"), Arrays.asList("component1", "component2")),
       Arguments.of("bundleOffer1", "bundle1-price-active", 
         Arrays.asList("Suspended", "NotPaid", "PriceChanged"), Arrays.asList("component1", "component2")),
       Arguments.of("bundleOffer1", "bundle1-price-active", 
         Arrays.asList("Suspended", "NotPaid", "PriceActive"), Arrays.asList("component1", "component2")),
+      Arguments.of("bundleOffer1", "bundle1-price-active", 
+        Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), Arrays.asList("component1", "component2")),
       Arguments.of("customBundleOffer1", "custom1-price-active",
         Arrays.asList("Suspended", "NotPaid", "PriceChanging"), Arrays.asList("component1", "component2")),
       Arguments.of("customBundleOffer1", "custom1-price-active",
         Arrays.asList("Suspended", "NotPaid", "PriceChanged"), Arrays.asList("component1", "component2")),
       Arguments.of("customBundleOffer1", "custom1-price-active",
-        Arrays.asList("Suspended", "NotPaid", "PriceActive"), Arrays.asList("component1", "component2"))
+        Arrays.asList("Suspended", "NotPaid", "PriceActive"), Arrays.asList("component1", "component2")),
+      Arguments.of("customBundleOffer1", "custom1-price-active",
+        Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), Arrays.asList("component1", "component2"))
     );  
   }
   @ParameterizedTest
@@ -392,7 +469,6 @@ public class PaymentProcessedTest extends SpringStarter {
     OffsetDateTime t1 = t0.plusDays(30);
     JsonNode machineState = buildMachineState(states);
     List<String> expectedStates = Arrays.asList("Suspended", "Paid", "PriceChanging");
-    int pricePeriod = 1;
 
     log.debug("expectedStates: {}", expectedStates);
     JsonNode expectedMachineState = buildMachineState(expectedStates);
@@ -401,13 +477,14 @@ public class PaymentProcessedTest extends SpringStarter {
       .productStartDate(t0)
       .tarificationPeriod(1)
       .priceNextPayDate(t0.minusDays(20))
-      .pricePeriod(pricePeriod)
+      .pricePeriod(1)
       .machineState(machineState)
       .build();
     assertEquals(componentOfferIds.size(), bundle.components().size());
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .tarificationPeriod(2)
       .machineState(expectedMachineState)
+      .pricePeriod(0)
       .build();
     machine = createMachine(bundle);
     
@@ -460,7 +537,6 @@ public class PaymentProcessedTest extends SpringStarter {
     JsonNode machineState = buildMachineState(states);
     List<String> expectedStates = Arrays.asList(states.get(0), "Paid", "PriceChanging");
     expectedStates.set(1, "Paid");
-    int pricePeriod = 1;
     String status = priceId.contains("trial") ? "ACTIVE_TRIAL" : "ACTIVE";
 
 
@@ -472,13 +548,12 @@ public class PaymentProcessedTest extends SpringStarter {
       .tarificationPeriod(1)
       .activeEndDate(t0.plus(getPriceEndedBefore()))
       .priceNextPayDate(t0.plus(getPriceEndedBefore()))
-      .pricePeriod(pricePeriod)
+      .pricePeriod(1)
       .machineState(machineState)
       .build();
     assertEquals(componentOfferIds.size(), bundle.components().size());
     TestBundle expectedBundle = new BundleBuilder(bundle)
       .tarificationPeriod(2)
-      .pricePeriod(pricePeriod)
       .machineState(expectedMachineState)
       .build();
     machine = createMachine(bundle);
@@ -603,7 +678,6 @@ public class PaymentProcessedTest extends SpringStarter {
       JsonNode machineState = buildMachineState(states);
       List<String> expectedStates = Arrays.asList(states.get(0), "Paid", "PriceChanging");
       expectedStates.set(1, "Paid");
-      int pricePeriod = 1;
       String status = priceId.contains("trial") ? "ACTIVE_TRIAL" : "ACTIVE";
   
   
@@ -615,14 +689,13 @@ public class PaymentProcessedTest extends SpringStarter {
         .tarificationPeriod(1)
         .activeEndDate(t0.plus(getPriceEndedBefore()))
         .priceNextPayDate(t0.plus(getPriceEndedBefore()))
-        .pricePeriod(pricePeriod)
+        .pricePeriod(1)
         .machineState(machineState)
         .unmergeComponent("component3", "PENDING_ACTIVATE", Arrays.asList("PendingActivate"))
         .build();
       assertEquals(componentOfferIds.size(), bundle.components().size());
       TestBundle expectedBundle = new BundleBuilder(bundle)
         .tarificationPeriod(2)
-        .pricePeriod(pricePeriod)
         .machineState(expectedMachineState)
         .build();
       machine = createMachine(bundle);

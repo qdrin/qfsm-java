@@ -45,7 +45,7 @@ public class ChangePriceCompletedTest extends SpringStarter {
     clearDb();
   }
 
-  public static Stream<Arguments> testSuccess() {
+  public static Stream<Arguments> testData() {
     return Stream.of(
       Arguments.of("simpleOffer1", "simple1-price-trial", "simple1-price-active", new ArrayList<>()),
       Arguments.of("bundleOffer1", "bundle1-price-trial", "bundle1-price-active", Arrays.asList("component1", "component2", "component3")),
@@ -55,10 +55,11 @@ public class ChangePriceCompletedTest extends SpringStarter {
       Arguments.of("customBundleOffer1", "custom1-price-active", "custom1-price-trial", Arrays.asList("component1", "component2", "component3"))
     );
   }
+
   @ParameterizedTest
-  @MethodSource
+  @MethodSource("testData")
   // Prolong
-  public void testSuccess(String offerId, String priceId, String userPriceId, List<String> componentOfferIds) throws Exception {
+  public void testWithNoPayment(String offerId, String priceId, String userPriceId, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
     OffsetDateTime t1 = t0.plusDays(30);
     OffsetDateTime trialEndDate = priceId.contains("trial") ? t0 : null;
@@ -98,6 +99,75 @@ public class ChangePriceCompletedTest extends SpringStarter {
     expectedTasks.addToCreatePlan(TaskDef.builder()
       .type(TaskType.PRICE_ENDED)
       .wakeAt(t1.minus(getPriceEndedBefore()))
+      .build()
+    );
+
+    StateMachineTestPlan<String, String> plan =
+        StateMachineTestPlanBuilder.<String, String>builder()
+          .defaultAwaitTime(2)
+          .stateMachine(machine)
+          .step()
+              .expectStates(Helper.stateSuite(states))
+              .and()
+          .step()
+              .sendEvent(message)
+              .expectStates(Helper.stateSuite(expectedStates))
+              .expectVariableWith(taskPlanEqualTo(expectedTasks))
+              .and()
+          .build();
+    plan.test();
+    releaseMachine(machine.getId());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
+  }
+
+  @ParameterizedTest
+  @MethodSource("testData")
+  // Prolong
+  public void testWithPayment(String offerId, String priceId, String userPriceId, List<String> componentOfferIds) throws Exception {
+    OffsetDateTime t0 = OffsetDateTime.now();
+    OffsetDateTime t1 = t0.plusDays(30);
+    OffsetDateTime trialEndDate = priceId.contains("trial") ? t0 : null;
+    String usage = priceId.contains("trial") ? "ActiveTrial" : "Active";
+    String status = priceId.contains("trial") ? "ACTIVE_TRIAL" : "ACTIVE";
+    List<String> states = Arrays.asList(usage, "Paid", "PriceChanged");
+    List<String> expectedStates = Arrays.asList("Prolongation", "Paid", "PriceActive");
+    
+    TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
+      .status(status)
+      .machineState(buildMachineState(states))
+      .productStartDate(t0)
+      .priceNextPayDate(t0)
+      .activeEndDate(t0)
+      .trialEndDate(trialEndDate)
+      .pricePeriod(2)
+      .tarificationPeriod(2)
+      .build();
+    assertEquals(componentOfferIds.size(), bundle.components().size());
+    ProductPrice userPrice = Helper.testOffers.getOffers().get(offerId).getPrice(userPriceId);
+    userPrice.setNextPayDate(t1);  // TODO: we cannot trust foreign dates
+    String productId = bundle.drive.getProductId();
+    TestBundle expectedBundle = new BundleBuilder(bundle)
+      .status(status)
+      .machineState(buildMachineState(expectedStates))
+      .pricePeriod(0)
+      .activeEndDate(t1)
+      .build();
+    expectedBundle.drive.setProductPrice(Arrays.asList(userPrice));
+
+    Message<String> message = MessageBuilder.withPayload("change_price_completed")
+      .setHeader("userPrice", Arrays.asList(userPrice))
+      .build();
+    machine = createMachine(bundle);
+    
+    TaskPlan expectedTasks = new TaskPlan(productId);
+    expectedTasks.addToCreatePlan(TaskDef.builder()
+      .type(TaskType.PRICE_ENDED)
+      .wakeAt(t1.minus(getPriceEndedBefore()))
+      .build()
+    );
+    expectedTasks.addToCreatePlan(TaskDef.builder()
+      .type(TaskType.PROLONG_EXTERNAL)
       .build()
     );
 

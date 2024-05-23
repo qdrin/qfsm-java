@@ -34,7 +34,9 @@ public class PriceChangingEntry implements Action<String, String> {
     ProductPrice currentPrice = product.getProductPrice(PriceType.RecurringCharge).get();
     List<MessageBuilder<String>> messageBuilders = new ArrayList<>();
     if(tPeriod != 0) {
-      currentPrice.setPeriod(0);
+      if(context.getEvent().equals("resume_price")) {
+        currentPrice.setPeriod(0);
+      }
       TaskPlan tasks = extendedState.get("tasks", TaskPlan.class);
       TaskDef task = TaskDef.builder().type(TaskType.CHANGE_PRICE).build();
       task.getVariables().put("eventProperties", context.getMessageHeader("eventProperties"));
