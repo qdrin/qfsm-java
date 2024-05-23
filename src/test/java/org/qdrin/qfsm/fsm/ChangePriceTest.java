@@ -45,7 +45,7 @@ public class ChangePriceTest extends SpringStarter {
     clearDb();
   }
 
-  public static Stream<Arguments> testSamePrice() {
+  public static Stream<Arguments> testSamePriceFromWaitingPayment() {
     return Stream.of(
       Arguments.of("simpleOffer1", "simple1-price-trial", new ArrayList<>()),
       Arguments.of("bundleOffer1", "bundle1-price-trial", Arrays.asList("component1", "component2", "component3")),
@@ -58,7 +58,7 @@ public class ChangePriceTest extends SpringStarter {
   @ParameterizedTest
   @MethodSource
   // Prolong
-  public void testSamePrice(String offerId, String priceId, List<String> componentOfferIds) throws Exception {
+  public void testSamePriceFromWaitingPayment(String offerId, String priceId, List<String> componentOfferIds) throws Exception {
     OffsetDateTime t0 = OffsetDateTime.now();
     OffsetDateTime t1 = t0.plusDays(30);
     OffsetDateTime trialEndDate = priceId.contains("trial") ? t1 : null;
@@ -124,6 +124,91 @@ public class ChangePriceTest extends SpringStarter {
     assertProductEquals(expectedBundle.drive, bundle.drive);
     assertProductEquals(expectedBundle.components(), bundle.components());
   }
+
+  public static Stream<Arguments> testSamePriceFromPaid() {
+    return Stream.of(
+      Arguments.of("simpleOffer1", "simple1-price-trial", new ArrayList<>()),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", Arrays.asList("component1", "component2", "component3")),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", Arrays.asList("component1", "component2", "component3")),
+      Arguments.of("simpleOffer1", "simple1-price-active", new ArrayList<>()),
+      Arguments.of("bundleOffer1", "bundle1-price-active", Arrays.asList("component1", "component2", "component3")),
+      Arguments.of("customBundleOffer1", "custom1-price-active", Arrays.asList("component1", "component2", "component3"))
+    );
+  }
+  @ParameterizedTest
+  @MethodSource
+  // Prolong
+  public void testSamePriceFromPaid(String offerId, String priceId, List<String> componentOfferIds) throws Exception {
+    OffsetDateTime t0 = OffsetDateTime.now();
+    OffsetDateTime t1 = t0.plusDays(30);
+    OffsetDateTime trialEndDate = priceId.contains("trial") ? t1 : null;
+    String usage = priceId.contains("trial") ? "ActiveTrial" : "Active";
+    String status = priceId.contains("trial") ? "ACTIVE_TRIAL" : "ACTIVE";
+    List<String> states = Arrays.asList(usage, "Paid", "PriceChanging");
+    List<String> expectedStates = Arrays.asList("Prolongation", "Paid", "PriceActive");
+    
+    TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
+      .status(status)
+      .machineState(buildMachineState(states))
+      .productStartDate(t0)
+      .priceNextPayDate(t1)
+      .pricePeriod(1)
+      .tarificationPeriod(2)
+      .build();
+    assertEquals(componentOfferIds.size(), bundle.components().size());
+    String productId = bundle.drive.getProductId();
+    TestBundle expectedBundle = new BundleBuilder(bundle)
+      .machineState(buildMachineState(expectedStates))
+      .pricePeriod(2)
+      .trialEndDate(trialEndDate)
+      .activeEndDate(t1)
+      .build();
+
+    ProductPrice nextPrice = bundle.drive.getProductPrice(PriceType.RecurringCharge).get();
+    nextPrice.setNextPayDate(t1);
+    Characteristic nextPriceChar = Characteristic.builder()
+      .name("nextPrice")
+      .valueType(nextPrice.getClass().getSimpleName())
+      .value(nextPrice)
+      .build();
+    List<Characteristic> eventChars = Arrays.asList(nextPriceChar);
+
+    Message<String> message = MessageBuilder.withPayload("change_price")
+      .setHeader("characteristics", eventChars)
+      .build();
+    machine = createMachine(bundle);
+    
+    TaskPlan expectedTasks = new TaskPlan(productId);
+    expectedTasks.addToCreatePlan(TaskDef.builder()
+      .type(TaskType.PRICE_ENDED)
+      .wakeAt(t1.minus(getPriceEndedBefore()))
+      .build()
+    );
+
+    expectedTasks.addToCreatePlan(TaskDef.builder()
+      .type(TaskType.PROLONG_EXTERNAL)
+      .build()
+    );
+
+    StateMachineTestPlan<String, String> plan =
+        StateMachineTestPlanBuilder.<String, String>builder()
+          .defaultAwaitTime(2)
+          .stateMachine(machine)
+          .step()
+              .expectStates(Helper.stateSuite(states))
+              .and()
+          .step()
+              .sendEvent(message)
+              .expectStates(Helper.stateSuite(expectedStates))
+              .expectVariableWith(taskPlanEqualTo(expectedTasks))
+              .and()
+          .build();
+    plan.test();
+    releaseMachine(machine.getId());
+    assertProductEquals(expectedBundle.drive, bundle.drive);
+    assertProductEquals(expectedBundle.components(), bundle.components());
+  }
+
 
   public static Stream<Arguments> testFromSuspended() {
     return Stream.of(
