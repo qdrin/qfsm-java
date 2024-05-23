@@ -131,10 +131,6 @@
                   <language>bean</language>
                   <body>suspendedEntry</body>
                 </entry>
-                <exit xmi:type="uml:OpaqueBehavior" xmi:id="_YqQHQORpEe67v-ZZRTSIIQ">
-                  <language>bean</language>
-                  <body>suspendedExit</body>
-                </exit>
               </subvertex>
               <subvertex xmi:type="uml:State" xmi:id="_UnhUQL9fEe65db1_bM-TwQ" name="Suspending">
                 <entry xmi:type="uml:OpaqueBehavior" xmi:id="_gDlN8MM7Ee6X9syf-CmCRw">
@@ -251,6 +247,10 @@
                   <language>bean</language>
                   <body>notPaidEntry</body>
                 </entry>
+                <exit xmi:type="uml:OpaqueBehavior" xmi:id="_TPlWYBkDEe-KMucVkt9qsA">
+                  <language>bean</language>
+                  <body>notPaidExit</body>
+                </exit>
               </subvertex>
               <subvertex xmi:type="uml:Pseudostate" xmi:id="_jJ1NUL9CEe65db1_bM-TwQ"/>
             </region>

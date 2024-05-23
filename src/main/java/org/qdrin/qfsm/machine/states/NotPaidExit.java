@@ -12,13 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class SuspendedExit implements Action<String, String> {
+public class NotPaidExit implements Action<String, String> {
   @Autowired
   DataSource dataSource;
   
   public void execute(StateContext<String, String> context) {
-    log.debug("event: {}", context.getEvent());
     TaskPlan tasks = context.getStateMachine().getExtendedState().get("tasks", TaskPlan.class);
     tasks.addToRemovePlan(TaskDef.builder().type(TaskType.SUSPEND_ENDED).build());
+    log.debug("addToRemovePlan: SUSPEND_ENDED");
   }
 }

@@ -1,5 +1,7 @@
 package org.qdrin.qfsm;
 
+import static org.qdrin.qfsm.Helper.buildMachineState;
+
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -210,6 +212,15 @@ public class BundleBuilder {
             .productClass(componentClass)
             .build();
         addComponent(product);
+        return this;
+    }
+
+    public BundleBuilder unmergeComponent(String offerId, String status, List<String> states) {
+        Product product = products.stream().filter(p -> p.getProductOfferingId().equals(offerId)).findFirst().get();
+        product.setStatus(status);
+        MachineContext mcont = product.getMachineContext();
+        mcont.setIsIndependent(true);
+        mcont.setMachineState(buildMachineState(states));
         return this;
     }
 

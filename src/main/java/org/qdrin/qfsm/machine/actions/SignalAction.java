@@ -37,7 +37,7 @@ public class SignalAction implements Action<String, String> {
 
   @Override
   public void execute(StateContext<String, String> context) {
-    List<Message<String>> messages = new ArrayList();
+    List<Message<String>> messages = new ArrayList<>();
     builders.stream().forEach(b -> b.copyHeadersIfAbsent(context.getMessageHeaders()));
     builders.forEach(b -> messages.add(b.build()));
     Flux<Message<String>> fluxMessages = Flux.fromIterable(messages);

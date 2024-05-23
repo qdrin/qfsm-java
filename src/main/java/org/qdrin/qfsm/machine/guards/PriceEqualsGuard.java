@@ -25,11 +25,13 @@ public class PriceEqualsGuard implements Guard<String, String> {
   @Override
   public boolean evaluate(StateContext<String, String> context) {
     ExtendedState extendedState = context.getStateMachine().getExtendedState();
-    ProductPrice price =  extendedState.get("product", Product.class).getProductPrice(PriceType.RecurringCharge).get();
+    Product product = extendedState.get("product", Product.class);
+    ProductPrice price =  product.getProductPrice(PriceType.RecurringCharge).get();
     String priceId = price == null ? "" : price.getId();
     
     ProductPrice nextPrice = extendedState.get("nextPrice", ProductPrice.class);
-    boolean eq = priceId.equals(nextPrice.getId());
+    boolean isResume = product.getTarificationPeriod() > 0 && price.getPeriod() == 0;
+    boolean eq = isResume ? false : priceId.equals(nextPrice.getId());
     return notEqual ? ! eq : eq;
   }
   

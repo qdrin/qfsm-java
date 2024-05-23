@@ -143,8 +143,8 @@ public class StateMachineConfig {
     }
 
     @Bean
-    SuspendedExit suspendedExit() {
-      return new SuspendedExit();
+    NotPaidExit notPaidExit() {
+      return new NotPaidExit();
     }
 
     @Bean
