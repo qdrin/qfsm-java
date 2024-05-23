@@ -73,7 +73,13 @@
               <transition xmi:type="uml:Transition" xmi:id="_RmhtoL9NEe65db1_bM-TwQ" source="_s3PiQr9MEe65db1_bM-TwQ" target="_UnhUQL9fEe65db1_bM-TwQ">
                 <trigger xmi:type="uml:Trigger" xmi:id="_UDeRML9NEe65db1_bM-TwQ" event="_1PsuoKAWEe6Sh616vaZpZA"/>
               </transition>
-              <transition xmi:type="uml:Transition" xmi:id="_XAkUcL9NEe65db1_bM-TwQ" source="_KhfkoL9NEe65db1_bM-TwQ" target="_1sOrUL9fEe65db1_bM-TwQ">
+              <transition xmi:type="uml:Transition" xmi:id="_XAkUcL9NEe65db1_bM-TwQ" guard="_R3yAsBkpEe-Zbea7O_1pYw" source="_KhfkoL9NEe65db1_bM-TwQ" target="_1sOrUL9fEe65db1_bM-TwQ">
+                <ownedRule xmi:type="uml:Constraint" xmi:id="_R3yAsBkpEe-Zbea7O_1pYw">
+                  <specification xmi:type="uml:OpaqueExpression" xmi:id="_R3yAsRkpEe-Zbea7O_1pYw">
+                    <language>bean</language>
+                    <body>prolongGuard</body>
+                  </specification>
+                </ownedRule>
                 <trigger xmi:type="uml:Trigger" xmi:id="_YeRBgL9NEe65db1_bM-TwQ" event="_J5ICcL9gEe65db1_bM-TwQ"/>
               </transition>
               <transition xmi:type="uml:Transition" xmi:id="_rFiZcL9fEe65db1_bM-TwQ" source="_UnhUQL9fEe65db1_bM-TwQ" target="_KhfkoL9NEe65db1_bM-TwQ">
@@ -236,6 +242,10 @@
                   <language>bean</language>
                   <body>paidEntry</body>
                 </doActivity>
+                <entry xmi:type="uml:OpaqueBehavior" xmi:id="_Z_KM8BkoEe-Zbea7O_1pYw">
+                  <language>bean</language>
+                  <body>paidEntry</body>
+                </entry>
               </subvertex>
               <subvertex xmi:type="uml:State" xmi:id="_cx3bIL9BEe65db1_bM-TwQ" name="WaitingPayment">
                 <entry xmi:type="uml:OpaqueBehavior" xmi:id="_Vp1vUONuEe697snvjqqg5w">
