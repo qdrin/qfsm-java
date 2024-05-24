@@ -87,6 +87,8 @@ public class DeactivationStartedTest extends SpringStarter {
     List<String> active = Arrays.asList("Active", "Paid", "PriceActive");
     List<String> prolongation = Arrays.asList("Prolongation", "Paid", "PriceActive");
     List<String> resuming = Arrays.asList("Resuming", "Paid", "PriceActive");
+    List<String> externalTrial = Arrays.asList("ActiveTrial", "PaymentStopping", "PriceActive");
+    List<String> externalActive = Arrays.asList("Active", "PaymentStopping", "PriceActive");
 
     return Stream.of(
       Arguments.of("simpleOffer1", "simple1-price-trial", trial, empty, DisconnectMode.POSTPONED, null, null),
@@ -109,6 +111,13 @@ public class DeactivationStartedTest extends SpringStarter {
       Arguments.of("bundleOffer1", "bundle1-price-active", resuming, components, DisconnectMode.POSTPONED, null, null),
       Arguments.of("customBundleOffer1", "custom1-price-trial", resuming, components, DisconnectMode.POSTPONED, null, null),
       Arguments.of("customBundleOffer1", "custom1-price-active", resuming, components, DisconnectMode.POSTPONED, null, null),
+
+      Arguments.of("simpleOffer1", "simple1-price-trial", externalTrial, empty, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("simpleOffer1", "simple1-price-active", externalActive, empty, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", externalTrial, components, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("bundleOffer1", "bundle1-price-active", externalActive, components, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", externalTrial, components, DisconnectMode.POSTPONED, null, null),
+      Arguments.of("customBundleOffer1", "custom1-price-active", externalActive, components, DisconnectMode.POSTPONED, null, null),
       
       // productCharacteristic = "Immediate"
       Arguments.of("simpleOffer1", "simple1-price-trial", trial, empty, DisconnectMode.IMMEDIATE, "Immediate", null),
@@ -132,6 +141,13 @@ public class DeactivationStartedTest extends SpringStarter {
       Arguments.of("customBundleOffer1", "custom1-price-trial", resuming, components, DisconnectMode.IMMEDIATE, "Immediate", null),
       Arguments.of("customBundleOffer1", "custom1-price-active", resuming, components, DisconnectMode.IMMEDIATE, "Immediate", null),
 
+      Arguments.of("simpleOffer1", "simple1-price-trial", externalTrial, empty, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("simpleOffer1", "simple1-price-active", externalActive, empty, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", externalTrial, components, DisconnectMode.IMMEDIATE,"Immediate", null),
+      Arguments.of("bundleOffer1", "bundle1-price-active", externalActive, components, DisconnectMode.IMMEDIATE,"Immediate", null),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", externalTrial, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+      Arguments.of("customBundleOffer1", "custom1-price-active", externalActive, components, DisconnectMode.IMMEDIATE, "Immediate", null),
+
       // productCharacteristic = "Immediate" and eventCharacteristic = "Postponed"
       Arguments.of("simpleOffer1", "simple1-price-trial", trial, empty, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
       Arguments.of("simpleOffer1", "simple1-price-active", active, empty, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
@@ -154,6 +170,13 @@ public class DeactivationStartedTest extends SpringStarter {
       Arguments.of("customBundleOffer1", "custom1-price-trial", resuming, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
       Arguments.of("customBundleOffer1", "custom1-price-active", resuming, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
 
+      Arguments.of("simpleOffer1", "simple1-price-trial", externalTrial, empty, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("simpleOffer1", "simple1-price-active", externalActive, empty, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", externalTrial, components, DisconnectMode.POSTPONED,"Immediate", "Postponed"),
+      Arguments.of("bundleOffer1", "bundle1-price-active", externalActive, components, DisconnectMode.POSTPONED,"Immediate", "Postponed"),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", externalTrial, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+      Arguments.of("customBundleOffer1", "custom1-price-active", externalActive, components, DisconnectMode.POSTPONED, "Immediate", "Postponed"),
+
       // productCharacteristic = "Postponed" and eventCharacteristic = "Immediate"
       Arguments.of("simpleOffer1", "simple1-price-trial", trial, empty, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
       Arguments.of("simpleOffer1", "simple1-price-active", active, empty, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
@@ -174,7 +197,14 @@ public class DeactivationStartedTest extends SpringStarter {
       Arguments.of("bundleOffer1", "bundle1-price-trial", resuming, components, DisconnectMode.IMMEDIATE,"Postponed", "Immediate"),
       Arguments.of("bundleOffer1", "bundle1-price-active", resuming, components, DisconnectMode.IMMEDIATE,"Postponed", "Immediate"),
       Arguments.of("customBundleOffer1", "custom1-price-trial", resuming, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
-      Arguments.of("customBundleOffer1", "custom1-price-active", resuming, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate")
+      Arguments.of("customBundleOffer1", "custom1-price-active", resuming, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+
+      Arguments.of("simpleOffer1", "simple1-price-trial", externalTrial, empty, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("simpleOffer1", "simple1-price-active", externalActive, empty, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", externalTrial, components, DisconnectMode.IMMEDIATE,"Postponed", "Immediate"),
+      Arguments.of("bundleOffer1", "bundle1-price-active", externalActive, components, DisconnectMode.IMMEDIATE,"Postponed", "Immediate"),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", externalTrial, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate"),
+      Arguments.of("customBundleOffer1", "custom1-price-active", externalActive, components, DisconnectMode.IMMEDIATE, "Postponed", "Immediate")
       );
   }
 
