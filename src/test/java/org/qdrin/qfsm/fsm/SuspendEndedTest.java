@@ -20,20 +20,16 @@ import org.qdrin.qfsm.Helper;
 import static org.qdrin.qfsm.Helper.Assertions.*;
 import static org.qdrin.qfsm.Helper.buildMachineState;
 import static org.qdrin.qfsm.TaskPlanEquals.taskPlanEqualTo;
-import org.qdrin.qfsm.ProductClass;
 import org.qdrin.qfsm.SpringStarter;
-import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.tasks.*;
 import org.springframework.statemachine.test.StateMachineTestPlan;
 import org.springframework.statemachine.test.StateMachineTestPlanBuilder;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class DeactivationExternalTest extends SpringStarter {
+public class SuspendEndedTest extends SpringStarter {
 
   StateMachine<String, String> machine = null;
   
@@ -43,29 +39,43 @@ public class DeactivationExternalTest extends SpringStarter {
     clearDb();
   }
 
-  public static Stream<Arguments> testCommon() {
+  public static Stream<Arguments> testSuccess() {
     List<String> empty = new ArrayList<>();
     List<String> components = Arrays.asList("component1", "component2", "component3");
     return Stream.of(  // TODO: expand list of cases
-      Arguments.of("simpleOffer1", "simple1-price-trial", Arrays.asList("ActiveTrial", "Paid", "PriceActive"), empty),
-      Arguments.of("simpleOffer1", "simple1-price-active", Arrays.asList("Active", "Paid", "PriceActive"), empty),
-      Arguments.of("bundleOffer1", "bundle1-price-trial", Arrays.asList("ActiveTrial", "Paid", "PriceActive"), components),
-      Arguments.of("bundleOffer1", "bundle1-price-active", Arrays.asList("Active", "Paid", "PriceActive"), components),
-      Arguments.of("customBundleOffer1", "custom1-price-trial", Arrays.asList("ActiveTrial", "Paid", "PriceActive"), components),
-      Arguments.of("customBundleOffer1", "custom1-price-active", Arrays.asList("Active", "Paid", "PriceActive"), components),
+      Arguments.of("simpleOffer1", "simple1-price-trial", Arrays.asList("Suspended", "NotPaid", "PriceActive"), empty),
+      Arguments.of("simpleOffer1", "simple1-price-active", Arrays.asList("Suspended", "NotPaid", "PriceActive"), empty),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", Arrays.asList("Suspended", "NotPaid", "PriceActive"), components),
+      Arguments.of("bundleOffer1", "bundle1-price-active", Arrays.asList("Suspended", "NotPaid", "PriceActive"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", Arrays.asList("Suspended", "NotPaid", "PriceActive"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-active", Arrays.asList("Suspended", "NotPaid", "PriceActive"), components),
 
-      Arguments.of("simpleOffer1", "simple1-price-trial", Arrays.asList("Prolongation", "Paid", "PriceActive"), empty),
-      Arguments.of("simpleOffer1", "simple1-price-active", Arrays.asList("Suspending", "NotPaid", "PriceActive"), empty),
+      Arguments.of("simpleOffer1", "simple1-price-trial", Arrays.asList("Suspended", "NotPaid", "PriceChanging"), empty),
+      Arguments.of("simpleOffer1", "simple1-price-active", Arrays.asList("Suspended", "NotPaid", "PriceChanging"), empty),
       Arguments.of("bundleOffer1", "bundle1-price-trial", Arrays.asList("Suspended", "NotPaid", "PriceChanging"), components),
-      Arguments.of("bundleOffer1", "bundle1-price-active", Arrays.asList("Active", "WaitingPayment", "PriceWaiting"), components),
-      Arguments.of("customBundleOffer1", "custom1-price-trial", Arrays.asList("ActiveTrial", "WaitingPayment", "PriceChanged"), components),
-      Arguments.of("customBundleOffer1", "custom1-price-active", Arrays.asList("Resuming", "Paid", "PriceActive"), components)
+      Arguments.of("bundleOffer1", "bundle1-price-active", Arrays.asList("Suspended", "NotPaid", "PriceChanging"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", Arrays.asList("Suspended", "NotPaid", "PriceChanging"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-active", Arrays.asList("Suspended", "NotPaid", "PriceChanging"), components),
+
+      Arguments.of("simpleOffer1", "simple1-price-trial", Arrays.asList("Suspended", "NotPaid", "PriceChanged"), empty),
+      Arguments.of("simpleOffer1", "simple1-price-active", Arrays.asList("Suspended", "NotPaid", "PriceChanged"), empty),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", Arrays.asList("Suspended", "NotPaid", "PriceChanged"), components),
+      Arguments.of("bundleOffer1", "bundle1-price-active", Arrays.asList("Suspended", "NotPaid", "PriceChanged"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", Arrays.asList("Suspended", "NotPaid", "PriceChanged"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-active", Arrays.asList("Suspended", "NotPaid", "PriceChanged"), components),
+
+      Arguments.of("simpleOffer1", "simple1-price-trial", Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), empty),
+      Arguments.of("simpleOffer1", "simple1-price-active", Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), empty),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), components),
+      Arguments.of("bundleOffer1", "bundle1-price-active", Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-active", Arrays.asList("Suspended", "NotPaid", "PriceWaiting"), components)
     );
   }
 
   @ParameterizedTest
   @MethodSource
-  public void testCommon(String offerId, String priceId, List<String> states, List<String> componentOfferIds) throws Exception {
+  public void testSuccess(String offerId, String priceId, List<String> states, List<String> componentOfferIds) throws Exception {
 
     OffsetDateTime t0 = OffsetDateTime.now();
     String usageState = states.get(0);
@@ -95,13 +105,14 @@ public class DeactivationExternalTest extends SpringStarter {
     OffsetDateTime taskDate = t0.plus(getWaitingPayInterval());
     TaskPlan expectedTasks = new TaskPlan(productId);
     expectedTasks.addToCreatePlan(TaskDef.builder().type(TaskType.DISCONNECT_EXTERNAL_EXTERNAL).build());
+    expectedTasks.addToRemovePlan(TaskDef.builder().type(TaskType.SUSPEND_ENDED).build());
 
     StateMachineTestPlan<String, String> plan =
         StateMachineTestPlanBuilder.<String, String>builder()
           .defaultAwaitTime(2)
           .stateMachine(machine)
           .step()
-              .sendEvent("deactivation_external")
+              .sendEvent("suspend_ended")
               .expectStates(Helper.stateSuite(expectedStates))
               .expectVariableWith(taskPlanEqualTo(expectedTasks))
               .and()
