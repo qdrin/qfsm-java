@@ -160,6 +160,7 @@
           </subvertex>
           <subvertex xmi:type="uml:FinalState" xmi:id="_pUzTQLz8Ee6WIIctFrkbQg" name="UsageFinal"/>
           <subvertex xmi:type="uml:State" xmi:id="_dafD4L9NEe65db1_bM-TwQ" name="PendingDisconnect">
+            <deferrableTrigger xmi:type="uml:Trigger" xmi:id="_wfuigBm6Ee-SXL4dRkftUg" event="_ZOkncLCDEe6zeo6uvgVLWA"/>
             <entry xmi:type="uml:OpaqueBehavior" xmi:id="_tqX5QL9VEe65db1_bM-TwQ" name="pendingDisconnectEntry" visibility="protected">
               <language>bean</language>
               <body>pendingDisconnectEntry</body>
@@ -418,7 +419,9 @@
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_ZdmsILn-Ee6yNs2FzguhlQ" name=""/>
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_bp6j8LoEEe6yNs2FzguhlQ" name="ProvisionFork" kind="fork"/>
       <subvertex xmi:type="uml:Pseudostate" xmi:id="_lUS-kLoEEe6yNs2FzguhlQ" name="ProvisionJoin" kind="join"/>
-      <subvertex xmi:type="uml:State" xmi:id="__Z-08LzsEe6WIIctFrkbQg" name="Disconnect"/>
+      <subvertex xmi:type="uml:State" xmi:id="__Z-08LzsEe6WIIctFrkbQg" name="Disconnect">
+        <deferrableTrigger xmi:type="uml:Trigger" xmi:id="_FEcR0Bm9Ee-SXL4dRkftUg" event="_ZOkncLCDEe6zeo6uvgVLWA"/>
+      </subvertex>
       <subvertex xmi:type="uml:State" xmi:id="_mBTgYMlsEe6D_qDhyLHyWw" name="Entry"/>
     </region>
   </packagedElement>

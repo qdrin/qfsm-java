@@ -122,4 +122,59 @@ public class SuspendEndedTest extends SpringStarter {
     assertProductEquals(expectedBundle.drive, bundle.drive);
     assertProductEquals(expectedBundle.components(), bundle.components());
   }
+
+  public static Stream<Arguments> testRejected() {
+    List<String> empty = new ArrayList<>();
+    List<String> components = Arrays.asList("component1", "component2", "component3");
+    return Stream.of(  // TODO: expand list of cases
+      Arguments.of("simpleOffer1", "simple1-price-trial", Arrays.asList("ActiveTrial", "WaitingPayment", "PriceActive"), empty),
+      Arguments.of("simpleOffer1", "simple1-price-active", Arrays.asList("Active", "WaitingPayment", "PriceChanging"), empty),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", Arrays.asList("ActiveTrial", "WaitingPayment", "PriceChanged"), components),
+      Arguments.of("bundleOffer1", "bundle1-price-active", Arrays.asList("Active", "WaitingPayment", "PriceWaiting"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", Arrays.asList("ActiveTrial", "WaitingPayment", "PriceActive"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-active", Arrays.asList("Active", "WaitingPayment", "PriceWaiting"), components),
+      Arguments.of("simpleOffer1", "simple1-price-trial", Arrays.asList("Prolongation", "Paid", "PriceActive"), empty),
+      Arguments.of("simpleOffer1", "simple1-price-active", Arrays.asList("Active", "Paid", "PriceActive"), empty),
+      Arguments.of("bundleOffer1", "bundle1-price-trial", Arrays.asList("ActiveTrial", "Paid", "PriceChanging"), components),
+      Arguments.of("bundleOffer1", "bundle1-price-active", Arrays.asList("Active", "Paid", "PriceChanged"), components),
+      Arguments.of("customBundleOffer1", "custom1-price-trial", Arrays.asList("ActiveTrial", "Paid", "PriceWaiting"), components)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  public void testRejected(String offerId, String priceId, List<String> states, List<String> componentOfferIds) throws Exception {
+
+    OffsetDateTime t0 = OffsetDateTime.now();
+    String usageState = states.get(0);
+    if(usageState.contains("Active")) {
+      usageState = priceId.contains("trial") ? "ActiveTrial" : "Active";
+    }
+    String status = priceId.contains("trial") ? "ACTIVE_TRIAL" : "ACTIVE";
+    status = Arrays.asList("Suspended", "Resuming").contains(usageState) ? "SUSPEND" : status;
+
+    String priceState = states.get(2);
+    TestBundle bundle = new BundleBuilder(offerId, priceId, componentOfferIds)
+      .tarificationPeriod(2)
+      .activeEndDate(t0.plusDays(15))
+      .pricePeriod(2)
+      .status(status)
+      .machineState(buildMachineState(states))
+      .build();
+    assertEquals(componentOfferIds.size(), bundle.components().size());
+
+    machine = createMachine(bundle);
+
+    StateMachineTestPlan<String, String> plan =
+        StateMachineTestPlanBuilder.<String, String>builder()
+          .defaultAwaitTime(2)
+          .stateMachine(machine)
+          .step()
+              .sendEvent("suspend_ended")
+              .expectStateChanged(0)
+              .and()
+          .build();
+    plan.test();
+    releaseMachine(machine.getId());
+  }
 }

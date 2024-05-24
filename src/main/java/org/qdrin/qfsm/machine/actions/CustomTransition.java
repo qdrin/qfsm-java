@@ -1,12 +1,15 @@
 package org.qdrin.qfsm.machine.actions;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.annotation.*;
+import org.springframework.statemachine.region.Region;
 import org.springframework.statemachine.state.AbstractState;
+import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
 
 import lombok.extern.slf4j.Slf4j;
