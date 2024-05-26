@@ -1,31 +1,28 @@
 package org.qdrin.qfsm.tasks;
-// Действия, которыми может управлять StateMachine
 
-import java.time.OffsetDateTime;
+import java.util.function.Consumer;
+
+import org.qdrin.qfsm.tasks.ScheduledTasks.TaskContext;
 
 public enum TaskType {
-  // tasks
-  ABORT,
-  PRICE_ENDED,
-  CHANGE_PRICE,
-  DISCONNECT,
-  WAITING_PAY_ENDED,
-  SUSPEND_ENDED,
-  PROLONG_EXTERNAL,
-  SUSPEND_EXTERNAL,
-  RESUME_EXTERNAL,
-  CHANGE_PRICE_EXTERNAL,
-  DISCONNECT_EXTERNAL,
-  DISCONNECT_EXTERNAL_EXTERNAL;
+  ABORT(ScheduledTasks::startAbortTask),
+  PRICE_ENDED(ScheduledTasks::startPriceEndedTask),
+  CHANGE_PRICE(ScheduledTasks::startChangePriceTask),
+  DISCONNECT(ScheduledTasks::startDisconnectTask),
+  WAITING_PAY_ENDED(ScheduledTasks::startWaitingPayEndedTask),
+  SUSPEND_ENDED(ScheduledTasks::startSuspendEndedTask),
+  PROLONG_EXTERNAL(ScheduledTasks::startProlongExternalTask),
+  SUSPEND_EXTERNAL(ScheduledTasks::startSuspendExternalTask),
+  RESUME_EXTERNAL(ScheduledTasks::startResumeExternalTask),
+  CHANGE_PRICE_EXTERNAL(ScheduledTasks::startChangePriceExternalTask),
+  DISCONNECT_EXTERNAL(ScheduledTasks::startDisconnectExternalTask),
+  DISCONNECT_EXTERNAL_EXTERNAL(ScheduledTasks::startDisconnectExternalExternalTask);
 
-  private OffsetDateTime wakeAt = OffsetDateTime.now();
+  private Consumer<TaskContext> taskFunc;
 
-  public TaskType withWakeAt(OffsetDateTime wakeAt) {
-    this.wakeAt = wakeAt;
-    return this;
+  TaskType(Consumer<TaskContext> func) {
+    this.taskFunc = func;
   }
 
-  public OffsetDateTime getWakeAt() {
-    return wakeAt;
-  }
+  Consumer<TaskContext> getTaskFunc() { return taskFunc; }
 }

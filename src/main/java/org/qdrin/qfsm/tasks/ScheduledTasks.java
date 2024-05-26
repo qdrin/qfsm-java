@@ -1,10 +1,12 @@
 package org.qdrin.qfsm.tasks;
 
 import java.time.Instant;
-
+import java.util.Arrays;
+import java.util.UUID;
 
 import org.qdrin.qfsm.FsmApp;
 import org.qdrin.qfsm.model.*;
+import org.qdrin.qfsm.model.dto.ProductRequestDto;
 import org.qdrin.qfsm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -35,18 +37,39 @@ public class ScheduledTasks {
   @Autowired
   FsmApp fsmApp;
 
+  Event.EventBuilder internalEventBuilder(TaskInstance<Void> instance, ExecutionContext ctx) {
+    String productId = instance.getId();
+    String eventType = instance.getTaskName();
+
+    Product product = productRepository.findById(productId).get();
+    ProductRequestDto productRequest = ProductRequestDto.builder()
+      .productId(productId)
+      .build();
+    Event.EventBuilder builder = Event.builder()
+      .refId(instance.getTaskAndInstance())
+      .refIdType("taskEvent")
+      .sourceCode("PSI")
+      .eventType(eventType)
+      .products(Arrays.asList(productRequest));
+    return builder;
+  }
+
+  public static final TaskWithoutDataDescriptor abort_TASK = new TaskWithoutDataDescriptor("abort");
   public static final TaskWithoutDataDescriptor price_ended_TASK = new TaskWithoutDataDescriptor("price_ended");
   public static final TaskWithoutDataDescriptor change_price_TASK = new TaskWithoutDataDescriptor("change_price");
   public static final TaskWithoutDataDescriptor disconnect_TASK = new TaskWithoutDataDescriptor("disconnect");
   public static final TaskWithoutDataDescriptor waiting_pay_ended_TASK = new TaskWithoutDataDescriptor("waiting_pay_ended");
   public static final TaskWithoutDataDescriptor suspend_ended_TASK = new TaskWithoutDataDescriptor("suspend_ended");
+  public static final TaskWithoutDataDescriptor prolong_external_TASK = new TaskWithoutDataDescriptor("PROLONG");
   public static final TaskWithoutDataDescriptor suspend_external_TASK = new TaskWithoutDataDescriptor("SUSPEND");
   public static final TaskWithoutDataDescriptor resume_external_TASK = new TaskWithoutDataDescriptor("RESUME");
   public static final TaskWithoutDataDescriptor disconnect_external_TASK = new TaskWithoutDataDescriptor("DISCONNECT");
   public static final TaskWithoutDataDescriptor change_price_external_TASK = new TaskWithoutDataDescriptor("CHANGE_PRICE");
   public static final TaskWithoutDataDescriptor disconnect_external_external_TASK = new TaskWithoutDataDescriptor("DISCONNECT_EXTERNAL");
 
-  
+  public static void startAbortTask(TaskContext taskContext) {
+    taskContext.schedulerClient.schedule(abort_TASK.instance(taskContext.id), taskContext.wakeAt);
+  }
 
   public static void startPriceEndedTask(TaskContext taskContext) {
     taskContext.schedulerClient.schedule(price_ended_TASK.instance(taskContext.id), taskContext.wakeAt);
@@ -68,6 +91,10 @@ public class ScheduledTasks {
     taskContext.schedulerClient.schedule(suspend_ended_TASK.instance(taskContext.id), taskContext.wakeAt);
   }
 
+  public static void startProlongExternalTask(TaskContext taskContext) {
+    taskContext.schedulerClient.schedule(prolong_external_TASK.instance(taskContext.id), taskContext.wakeAt);
+  }
+
   public static void startSuspendExternalTask(TaskContext taskContext) {
     taskContext.schedulerClient.schedule(suspend_external_TASK.instance(taskContext.id), taskContext.wakeAt);
   }
@@ -86,6 +113,13 @@ public class ScheduledTasks {
 
   public static void startDisconnectExternalExternalTask(TaskContext taskContext) {
     taskContext.schedulerClient.schedule(disconnect_external_external_TASK.instance(taskContext.id), taskContext.wakeAt);
+  }
+
+  @Bean
+  Task<Void> abortTask() {
+    return Tasks
+        .oneTime(abort_TASK)
+        .execute(getTaskInstance(abort_TASK));
   }
 
   @Bean
@@ -115,7 +149,15 @@ public class ScheduledTasks {
             return;
           }
           // TODO: Change plannedPrice to price-calc request
-          ProductPrice nextPrice = new ProductPrice();
+          ProductPrice nextPrice = ExternalData.requestNextPrice(product);
+          Characteristic nextPriceChar = Characteristic.builder()
+            .valueType(ProductPrice.class.getSimpleName())
+            .value(nextPrice)
+            .name("nextPrice")
+            .build();
+          Event event = internalEventBuilder(instance, ctx)
+            .characteristics(Arrays.asList(nextPriceChar))
+            .build();
           /////////////////////////////////////////////////////
           
           //  fsmApp.setVariable(productId, "nextPrice", nextPrice);
@@ -135,6 +177,13 @@ public class ScheduledTasks {
     return Tasks
         .oneTime(suspend_ended_TASK)
         .execute(getTaskInstance(suspend_ended_TASK));
+  }
+
+  @Bean
+  Task<Void> prolongExternalTask() {
+    return Tasks
+        .oneTime(prolong_external_TASK)
+        .execute(getExternalTaskInstance(prolong_external_TASK));
   }
 
   @Bean
@@ -174,8 +223,8 @@ public class ScheduledTasks {
 
   private VoidExecutionHandler<Void> getTaskInstance(TaskWithoutDataDescriptor descriptor) {
     return (instance, ctx) -> {
-      log.info("task instance run. productId: {}, taskName: {}", instance.getId(), instance.getTaskName());
-      // fsmApp.sendEvent(instance.getId(), instance.getTaskName());
+      Event event = internalEventBuilder(instance, ctx).build();
+      fsmApp.sendEvent(event);
     };
   }
 

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -14,7 +16,6 @@ import org.springframework.statemachine.StateMachineEventResult;
 import org.springframework.statemachine.state.State;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -37,6 +38,9 @@ public class FsmApp {
 
 	@Autowired
 	QStateMachineService service;
+
+	@Autowired
+	DataSource dataSource;
 
 	@Autowired
 	EventRepository eventRepository;
@@ -302,12 +306,12 @@ public class FsmApp {
 				case ACCEPTED:
 			}
 
-			FsmActions fsmActions = new FsmActions();
+			FsmTasks fsmTasks = new FsmTasks(dataSource);
 			for(TaskDef task: tasks.getRemovePlan()) {
-				fsmActions.deleteTask(task);
+				fsmTasks.deleteTask(task);
 			}
 			for(TaskDef task: tasks.getCreatePlan()) {
-				fsmActions.createTask(task);
+				fsmTasks.createTask(task);
 			}
 			if(productBundle != null && ! productBundle.getProductId().equals(product.getProductId())) {
 				productRepository.save(productBundle);

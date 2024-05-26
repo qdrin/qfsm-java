@@ -2,21 +2,31 @@ package org.qdrin.qfsm.tasks;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.qdrin.qfsm.PriceType;
+import org.qdrin.qfsm.model.Product;
 import org.qdrin.qfsm.model.ProductCharacteristic;
 import org.qdrin.qfsm.model.ProductPrice;
 
-import java.time.OffsetDateTime;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ExternalData {
-  public static ProductPrice requestProductPrice() {
+  public static ProductPrice requestNextPrice(Product product) {
+    ObjectMapper mapper = new ObjectMapper();
     // Application.scanner.reset();
-		ProductPrice price = new ProductPrice();
-		price.setId("1");
-		price.setProductStatus("ACTIVE");
-		price.setDuration(0);
-    System.out.print("nextPayDate('YYYY-MM-DDTHH:mm:SS'/null):");
-    price.setNextPayDate(OffsetDateTime.now().plusDays(30));
-		return price;
+		ProductPrice price = product.getProductPrice(PriceType.RecurringCharge).get();
+    try {
+      ProductPrice nextPrice = mapper.readValue(mapper.writeValueAsString(price), ProductPrice.class);
+      return nextPrice;
+    } catch (JsonMappingException e) {
+      e.printStackTrace();
+    } catch (JsonProcessingException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+		return null;
   }
 
   public static List<ProductCharacteristic> requestProductCharacteristics() {
