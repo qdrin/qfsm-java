@@ -1,15 +1,12 @@
-package org.qdrin.qfsm.machine.actions;
+package org.qdrin.qfsm.machine.listeners;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
 
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.annotation.*;
-import org.springframework.statemachine.region.Region;
 import org.springframework.statemachine.state.AbstractState;
-import org.springframework.statemachine.state.RegionState;
 import org.springframework.statemachine.state.State;
 
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +22,6 @@ public class CustomTransition {
         StateContext<String, String> context
         ) {
     State<String, String> source = context.getSource();
-    State<String, String> target = context.getTarget();
     StateMachine<String, String> machine = context.getStateMachine();
     AbstractState<String, String> mstate = (AbstractState<String, String>) machine.getState();
     

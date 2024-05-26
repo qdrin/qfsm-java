@@ -271,9 +271,7 @@
               <subvertex xmi:type="uml:Pseudostate" xmi:id="_jJ1NUL9CEe65db1_bM-TwQ"/>
             </region>
           </subvertex>
-          <subvertex xmi:type="uml:FinalState" xmi:id="_XTQZYLz8Ee6WIIctFrkbQg" name="PaymentFinal">
-            <deferrableTrigger xmi:type="uml:Trigger" xmi:id="_tzdAMBuAEe-mcOKVCRlHfg" event="_ZOkncLCDEe6zeo6uvgVLWA"/>
-          </subvertex>
+          <subvertex xmi:type="uml:FinalState" xmi:id="_XTQZYLz8Ee6WIIctFrkbQg" name="PaymentFinal"/>
           <subvertex xmi:type="uml:State" xmi:id="_TFrpsL9BEe65db1_bM-TwQ" name="PaymentStopping">
             <entry xmi:type="uml:OpaqueBehavior" xmi:id="_-BxJIOdPEe6ty6sBqXkWnw">
               <language>bean</language>
@@ -413,9 +411,7 @@
             </region>
           </subvertex>
           <subvertex xmi:type="uml:State" xmi:id="_aVZ0ML9LEe65db1_bM-TwQ" name="PriceOff"/>
-          <subvertex xmi:type="uml:FinalState" xmi:id="_c28j4L9LEe65db1_bM-TwQ" name="PriceFinal" visibility="public">
-            <deferrableTrigger xmi:type="uml:Trigger" xmi:id="_woYl8BuAEe-mcOKVCRlHfg" event="_ZOkncLCDEe6zeo6uvgVLWA"/>
-          </subvertex>
+          <subvertex xmi:type="uml:FinalState" xmi:id="_c28j4L9LEe65db1_bM-TwQ" name="PriceFinal" visibility="public"/>
           <subvertex xmi:type="uml:State" xmi:id="__C9pcArHEe-F_I8jzb-Dqg" name="PriceEntry"/>
           <subvertex xmi:type="uml:Pseudostate" xmi:id="_pzb7MArIEe-F_I8jzb-Dqg" name=""/>
         </region>

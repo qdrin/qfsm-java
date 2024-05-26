@@ -89,11 +89,11 @@ public class DeactivationCompletedTest extends SpringStarter {
           .and()
       .step()
           .sendEvent("disconnect")
-          .expectStates(Helper.stateSuite(states))
+          .expectStates(Helper.stateSuite(expectedStates))
           .and()
       .step()
           .sendEvent(deferred)
-          .expectStates(Helper.stateSuite(expectedStates))
+          .expectState("Disconnect")
           .and()
       .build();
     plan.test();

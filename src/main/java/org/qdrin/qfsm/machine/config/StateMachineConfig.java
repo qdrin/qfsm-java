@@ -25,7 +25,6 @@ import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineModelConfigurer;
 import org.springframework.statemachine.config.model.StateMachineModelFactory;
 import org.springframework.statemachine.guard.Guard;
-import org.springframework.statemachine.state.State;
 import org.springframework.statemachine.uml.UmlStateMachineModelFactory;
 
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +45,7 @@ public class StateMachineConfig {
 
     @Bean
     public StateMachineModelFactory<String, String> modelFactory() {
+      // TODO: Remove deferred event "deactivation_started" from PaymentFinal and PriceFinal when RegionState shouldDefer start to work properly
       UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm/fsm.uml");
       // UmlStateMachineModelFactory factory = new UmlStateMachineModelFactory("classpath:fsm.simple/fsm.uml");
       return factory;
